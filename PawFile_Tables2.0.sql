@@ -7,32 +7,32 @@ CREATE TABLE Supervisor (
 
 -- Sponsor Table
 CREATE TABLE Sponsor (
-	Sponsor_ID VARCHAR(5) PRIMARY KEY,
-	Sponsor_LN VARCHAR(30) NOT NULL,
+    Sponsor_ID VARCHAR(5) PRIMARY KEY,
+    Sponsor_LN VARCHAR(30) NOT NULL,
     Sponsor_FN VARCHAR(30) NOT NULL,
     Sponsor_MI VARCHAR(5),
     Spouse_Name VARCHAR(50),
     Sponsor_Status VARCHAR(20) NOT NULL CHECK(Sponsor_Status IN ('Active Duty', 'Civilian', 'Retired')),
     Grade VARCHAR(10) CHECK(Grade IN('E-1', 'E-2', 'E-3', 'E-4', 'E-5', 'E-6', 'E-7', 'E-8', 'E-9', 
-									 'W-1', 'W-2', 'W-3', 'W-4', 'W-5', 
+				     'W-1', 'W-2', 'W-3', 'W-4', 'W-5', 
                                      'O-1', 'O-2', 'O-3', 'O-4', 'O-5', 'O-6', 'O-7', 'O-8', 'O-9', 'O-10', 
                                      'N/A')),
-	is_Dual_Military VARCHAR(3) CHECK(is_Dual_Military IN ('Yes', 'No', 'N/A')),
-	Branch VARCHAR(30),
+    is_Dual_Military VARCHAR(3) CHECK(is_Dual_Military IN ('Yes', 'No', 'N/A')),
+    Branch VARCHAR(30),
     Unit VARCHAR(50),
     Personal_Email VARCHAR(50) NOT NULL,
-	Mail_Box INT,
+    Mail_Box INT,
     Sponsor_Phone_No VARCHAR(15) NOT NULL,
     Work_Phone VARCHAR(15),
     Spouse_Alt_No VARCHAR(15),
     Preferred_Contact VARCHAR(10) NOT NULL CHECK(Preferred_Contact IN ('Sponsor', 'Spouse', 'Work', 'Personal')),
-	Supervisor_ID VARCHAR(20) NULL,
+    Supervisor_ID VARCHAR(20) NULL,
     FOREIGN KEY (Supervisor_ID) REFERENCES Supervisor(Supervisor_ID)
 );
 
 -- Pet Table
 CREATE TABLE Pets (
-	Microchip_No BIGINT PRIMARY KEY,
+    Microchip_No BIGINT PRIMARY KEY,
     Pet_Name VARCHAR(20) NOT NULL,
     Sponsor_ID VARCHAR(5) NOT NULL,
     Species VARCHAR(15) NOT NULL,
@@ -40,12 +40,12 @@ CREATE TABLE Pets (
     Age INT NOT NULL,
     Breed VARCHAR(50) NOT NULL,
     Color VARCHAR(15) NOT NULL CHECK (Color IN ('Solid', 'Bi-color', 'Multi-color')),
-	Has_Passport VARCHAR(5) NOT NULL CHECK (Has_Passport IN ('Yes', 'No')),
+    Has_Passport VARCHAR(5) NOT NULL CHECK (Has_Passport IN ('Yes', 'No')),
     Sex VARCHAR(10) NOT NULL CHECK (Sex IN ('Male', 'Female')),
     Is_Spayed_Neutered VARCHAR(5) NOT NULL CHECK (Is_Spayed_Neutered IN ('Yes', 'No')),
     Has_Recent_Clinic_History VARCHAR(5) NOT NULL CHECK (Has_Recent_Clinic_History IN ('Yes', 'No')),
     Clinic_Name VARCHAR(50),
-	FOREIGN KEY (Sponsor_ID) REFERENCES Sponsor(Sponsor_ID)
+    FOREIGN KEY (Sponsor_ID) REFERENCES Sponsor(Sponsor_ID)
 );
 
 -- Vaccine Table
@@ -71,27 +71,28 @@ CREATE TABLE Vaccine_Reaction (
     FOREIGN KEY (Vaccine_Lot) REFERENCES Vaccine(Vaccine_Lot)
 );
 
--- Insert data into Supervisor Table (kept 'N/A' as it's a special record)
+-- Insert data into Supervisor Table 
 INSERT INTO Supervisor VALUES
 ('CPT-2034', 'William M. Castillo', 'castillo.william@gmail.com'),
 ('N/A', 'N/A', 'N/A');
 
--- Insert data into Sponsor Table (changed 'N/A' to NULL for non-applicable fields)
+-- Insert data into Sponsor Table 
 INSERT INTO Sponsor VALUES
 ('A7B9K', 'Diokno', 'Enrico', 'C.', 'Wilma M. Diokno', 'Active Duty', 'E-5', 'No', 'Philippine Army', '1st Infantry Division', 'william.diokno@gmail.com', 1430, '0932 543 7611', '0917 245 6382', '0946 535 4015', 'Spouse', 'CPT-2034'),
 ('X3D7P', 'Mendoza', 'Josephine', 'R.', 'Miguel T. Mendoza', 'Civilian', NULL, NULL, NULL, NULL, 'mendoza.js@gmail.com', 2355, '9956971340', '0917 245 6382', '0967 234 5561', 'Sponsor', NULL),
 ('M9Z4Q', 'Brown', 'Michael', 'T.', 'Lisa Brown', 'Retired', 'O-6', 'Yes', 'Philippine Navy', 'Offshore Combat Force', 'mbrown@gmail.com', 4023, '9171234567', '0917 892 4615', '0915 738 2641', 'Spouse', NULL);
 
--- Insert data into Pet Table (changed 'N/A' to NULL for clinic names)
+-- Insert data into Pet Table 
 INSERT INTO Pets VALUES
-(900085000123456, 'Tiger Commando', 'Dog', '2021-03-25', 3, 'German Shepherd', 'Bi-color', 'No', 'Male', 'Yes', 'No', NULL),
-(987654321234567, 'Hachiko',  'Dog', '2020-07-15', 4, 'Akita', 'Solid', 'Yes', 'Female', 'No', 'Yes', 'Vetopia Animal Clinic'),
-(981020000876543, 'Mingming', 'Cat', '2019-08-03', 5, 'Persian', 'Multi-color', 'Yes', 'Female', 'No', 'No', NULL),
-(956000010234852, 'Bantay',  'Dog', '2020-05-12', 4, 'Golden Retriever', 'Solid', 'Yes', 'Female', 'Yes', 'Yes', 'Shepherd Animal Clinic'),
-(991001900123478, 'Garfield',  'Cat', '2021-10-05', 3, 'Sphynx', 'Solid', 'Yes', 'Male', 'Yes', 'No', NULL),
-(985141002374652, 'Tiger Commando',  'Dog', '2020-08-05', 4, 'German Shepherd', 'Bi-color', 'No', 'Male', 'Yes', 'Yes', 'Serbisyo Beterinaryo');
+(900085000123456, 'Tiger Commando', 'A7B9K', 'Dog', '2021-03-25', 3, 'German Shepherd', 'Bi-colored', 'No', 'Male', 'Yes', 'No', NULL),
+(987654321234567, 'Hachiko', 'A7B9K', 'Dog', '2020-07-15', 4, 'Akita', 'Solid', 'Yes', 'Female', 'No', 'Yes', 'Vetopia Animal Clinic'),
+(981020000876543, 'Mingming', 'X3D7P', 'Cat', '2019-08-03', 5, 'Persian', 'Multi-colored', 'Yes', 'Female', 'No', 'No', NULL),
+(956000010234852, 'Bantay', 'X3D7P', 'Dog', '2020-05-12', 4, 'Golden Retriever', 'Solid', 'Yes', 'Female', 'Yes', 'Yes', 'Shepherd Animal Clinic'),
+(991001900123478, 'Garfield', 'X3D7P', 'Cat', '2021-10-05', 3, 'Sphynx', 'Solid', 'Yes', 'Male', 'Yes', 'No', NULL),
+(985141002374652, 'Tiger Commando', 'M9Z4Q', 'Dog', '2020-08-05', 4, 'German Shepherd', 'Bi-colored', 'No', 'Male', 'Yes', 'Yes', 'Serbisyo Beterinaryo');
 
--- Vaccine Table data remains the same as all values are valid
+
+-- Insert data into vaccine table
 INSERT INTO Vaccine VALUES
 ('RV01', 'Rabvac', 'Core', 3),
 ('VP01', 'Vanguard Plus 5', 'Core', 1),
@@ -111,7 +112,7 @@ INSERT INTO Vaccine VALUES
 ('NL03', 'Nobivac Lyme', 'Non-Core', 2),
 ('RV04', 'Rabvac', 'Core', 3);
 
--- Insert data into Vaccine Reaction Table (changed 'N/A' to NULL for symptoms)
+-- Insert data into Vaccine Reaction Table
 INSERT INTO Vaccine_Reaction VALUES
 ('A7B9K', 900085000123456, 'RV01', '2021-03-15', '2024-03-15', 'Yes', 'Swelling'),
 ('A7B9K', 900085000123456, 'VP01', '2024-03-18', '2025-03-18', 'Yes', 'Fever'),
