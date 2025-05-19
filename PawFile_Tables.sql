@@ -7,32 +7,32 @@ CREATE TABLE Supervisor (
 
 -- Sponsor Table
 CREATE TABLE Sponsor (
-	Sponsor_ID VARCHAR(5) PRIMARY KEY,
-	Sponsor_LN VARCHAR(30) NOT NULL,
+    Sponsor_ID VARCHAR(5) PRIMARY KEY,
+    Sponsor_LN VARCHAR(30) NOT NULL,
     Sponsor_FN VARCHAR(30) NOT NULL,
     Sponsor_MI VARCHAR(5),
     Spouse_Name VARCHAR(50),
     Sponsor_Status VARCHAR(20) NOT NULL CHECK(Sponsor_Status IN ('Active Duty', 'Civilian', 'Retired')),
     Grade VARCHAR(10) CHECK(Grade IN('E-1', 'E-2', 'E-3', 'E-4', 'E-5', 'E-6', 'E-7', 'E-8', 'E-9', 
-									 'W-1', 'W-2', 'W-3', 'W-4', 'W-5', 
+				     'W-1', 'W-2', 'W-3', 'W-4', 'W-5', 
                                      'O-1', 'O-2', 'O-3', 'O-4', 'O-5', 'O-6', 'O-7', 'O-8', 'O-9', 'O-10', 
                                      'N/A')),
-	is_Dual_Military VARCHAR(3) CHECK(is_Dual_Military IN ('Yes', 'No', 'N/A')),
-	Branch VARCHAR(30),
+    is_Dual_Military VARCHAR(3) CHECK(is_Dual_Military IN ('Yes', 'No', 'N/A')),
+    Branch VARCHAR(30),
     Unit VARCHAR(50),
     Personal_Email VARCHAR(50) NOT NULL,
-	Mail_Box INT,
+    Mail_Box INT,
     Sponsor_Phone_No VARCHAR(15) NOT NULL,
     Work_Phone VARCHAR(15),
     Spouse_Alt_No VARCHAR(15),
     Preferred_Contact VARCHAR(10) NOT NULL CHECK(Preferred_Contact IN ('Sponsor', 'Spouse', 'Work', 'Personal')),
-	Supervisor_ID VARCHAR(20) NULL,
+    Supervisor_ID VARCHAR(20) NULL,
     FOREIGN KEY (Supervisor_ID) REFERENCES Supervisor(Supervisor_ID)
 );
 
 -- Pet Table
 CREATE TABLE Pets (
-	Microchip_No BIGINT PRIMARY KEY,
+    Microchip_No BIGINT PRIMARY KEY,
     Pet_Name VARCHAR(20) NOT NULL,
     Sponsor_ID VARCHAR(10) NOT NULL,
     Species VARCHAR(15) NOT NULL,
@@ -40,7 +40,7 @@ CREATE TABLE Pets (
     Age INT NOT NULL,
     Breed VARCHAR(50) NOT NULL,
     Color VARCHAR(15) NOT NULL CHECK (Color IN ('Solid', 'Bi-color', 'Multi-color')),
-	Has_Passport VARCHAR(5) NOT NULL CHECK (Has_Passport IN ('Yes', 'No')),
+    Has_Passport VARCHAR(5) NOT NULL CHECK (Has_Passport IN ('Yes', 'No')),
     Sex VARCHAR(10) NOT NULL CHECK (Sex IN ('Male', 'Female')),
     Is_Spayed_Neutered VARCHAR(5) NOT NULL CHECK (Is_Spayed_Neutered IN ('Yes', 'No')),
     Has_Recent_Clinic_History VARCHAR(5) NOT NULL CHECK (Has_Recent_Clinic_History IN ('Yes', 'No')),
