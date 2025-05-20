@@ -34,7 +34,6 @@ CREATE TABLE Sponsor (
 CREATE TABLE Pets (
     Microchip_No BIGINT PRIMARY KEY,
     Pet_Name VARCHAR(20) NOT NULL,
-    Sponsor_ID VARCHAR(10) NOT NULL,
     Species VARCHAR(15) NOT NULL,
     DOB DATE NOT NULL,
     Age INT NOT NULL,
@@ -45,7 +44,6 @@ CREATE TABLE Pets (
     Is_Spayed_Neutered VARCHAR(5) NOT NULL CHECK (Is_Spayed_Neutered IN ('Yes', 'No')),
     Has_Recent_Clinic_History VARCHAR(5) NOT NULL CHECK (Has_Recent_Clinic_History IN ('Yes', 'No')),
     Clinic_Name VARCHAR(50),
-    FOREIGN KEY (Sponsor_ID) REFERENCES Sponsor(Sponsor_ID)
 );
 
 -- Vaccine Table
