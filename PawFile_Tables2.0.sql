@@ -84,12 +84,12 @@ INSERT INTO Sponsor VALUES
 
 -- Insert data into Pet Table 
 INSERT INTO Pets VALUES
-(900085000123456, 'Tiger Commando', 'A7B9K', 'Dog', '2021-03-25', 3, 'German Shepherd', 'Bi-colored', 'No', 'Male', 'Yes', 'No', NULL),
+(900085000123456, 'Tiger Commando', 'A7B9K', 'Dog', '2021-03-25', 3, 'German Shepherd', 'Bi-color', 'No', 'Male', 'Yes', 'No', NULL),
 (987654321234567, 'Hachiko', 'A7B9K', 'Dog', '2020-07-15', 4, 'Akita', 'Solid', 'Yes', 'Female', 'No', 'Yes', 'Vetopia Animal Clinic'),
-(981020000876543, 'Mingming', 'X3D7P', 'Cat', '2019-08-03', 5, 'Persian', 'Multi-colored', 'Yes', 'Female', 'No', 'No', NULL),
+(981020000876543, 'Mingming', 'X3D7P', 'Cat', '2019-08-03', 5, 'Persian', 'Multi-color', 'Yes', 'Female', 'No', 'No', NULL),
 (956000010234852, 'Bantay', 'X3D7P', 'Dog', '2020-05-12', 4, 'Golden Retriever', 'Solid', 'Yes', 'Female', 'Yes', 'Yes', 'Shepherd Animal Clinic'),
 (991001900123478, 'Garfield', 'X3D7P', 'Cat', '2021-10-05', 3, 'Sphynx', 'Solid', 'Yes', 'Male', 'Yes', 'No', NULL),
-(985141002374652, 'Tiger Commando', 'M9Z4Q', 'Dog', '2020-08-05', 4, 'German Shepherd', 'Bi-colored', 'No', 'Male', 'Yes', 'Yes', 'Serbisyo Beterinaryo');
+(985141002374652, 'Tiger Commando', 'M9Z4Q', 'Dog', '2020-08-05', 4, 'German Shepherd', 'Bi-color', 'No', 'Male', 'Yes', 'Yes', 'Serbisyo Beterinaryo');
 
 
 -- Insert data into vaccine table
