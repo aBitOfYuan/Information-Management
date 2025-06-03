@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>PawFile - Login Interface</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+    <div class="container">
+        <div class="left-panel">
+            <div class="left-content">
+                <div class="logo">
+                    P<span class="paw-icon">🐾</span>wFile
+                </div>
+                <p class="tagline">
+                    The digital treat your pet never knew they <span class="highlight">needed</span>
+                </p> 
+            </div>
+            <div class="pet-illustration">
+                <img src="dog-pic.png" alt="Dog Image">
+            </div>
+        </div>
+        
+        <div class="right-panel">
+            <h1 class="login-title">Login</h1>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label" for="userRole">User Role</label>
+                    <select class="form-select" id="userRole" name="userRole">
+                        <option value="client" selected>Client</option>
+                        <option value="admin">Admin</option>
+                        <option value="veterinarian">Veterinarian</option>
+                        <option value="staff">Staff</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <input 
+                        type="text" 
+                        class="form-input" 
+                        id="sponsorId" 
+                        name="sponsorId" 
+                        placeholder="Sponsor ID"
+                        required
+                    />
+                </div>
+                
+                <div class="form-group">
+                    <input 
+                        type="password" 
+                        class="form-input" 
+                        id="password" 
+                        name="password" 
+                        placeholder="Password"
+                        required
+                    />
+                </div>
+                
+                <button type="submit" class="login-btn">Login</button>
+            </form>
+            
+            <div class="signup-link">
+                Don't have an account? <a href="#signup">Sign Up</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
