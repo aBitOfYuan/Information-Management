@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="pet-information-style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+      integrity="sha512-..."
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <script src="pet-information.js"></script>
+    <style>
+        input:-webkit-autofill {
+            transition: background-color 9999s ease-in-out 0s;
+        }
+    </style>
+    <title>Pet Registration</title>
+</head>
+<body>
+    <div class="header">
+        <div class="tagline">
+            <h1>Unleash the <span class="highlight-blue">P<i class="fa-solid fa-paw" aria-hidden="true"></i>wsibilities!</span></h1>
+            <p>Register your pet</p>
+        </div>
+
+        <div class="pet-banner">
+            <img src="image 1.png" alt="A happy pet with its owner" class="header-img" />
+        </div>
+    </div>
+
+    <h2 class="form-title">Pet Registration Form</h2>
+
+    <div id="pet-form-container">
+        <form class="registration-form">
+            <h3 class="form-name">Pet Information 1</h3>
+
+            <div class="form-row">
+                <input type="text" name="pet-name" placeholder="Pet Name" required />
+                <input type="text" name="species" placeholder="Species" required />
+                <div class="form-field">
+                    <input type="date" name="dob" id="dob" class="dob-input" required>
+                    <span class="dob-placeholder">Date of Birth</span>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <input type="text" name="age" placeholder="Age" required />
+                <input type="text" name="breed" placeholder="Breed" required />
+                <select name="color-pattern" required>
+                    <option value="" disabled selected>Select Color Pattern</option>
+                    <option value="solid">SOLID-COLOR</option>
+                    <option value="bi-color">BI-COLOR</option>
+                    <option value="multi-color">MULTI-COLOR</option>
+                </select>
+            </div>
+
+            <div class="form-row">
+                <div class="field-container">
+                    <label class="field-label">Spayed/Neutered</label>
+                    <div class="radio-options">
+                        <label class="radio-wrapper">
+                            <input type="radio" name="spayed-1" value="yes" /> <span class="custom-radio"></span> YES
+                        </label>
+                        <label class="radio-wrapper">
+                            <input type="radio" name="spayed-1" value="no" /> <span class="custom-radio"></span> NO
+                        </label>
+                    </div>
+                </div>
+
+                <div class="field-container">
+                    <label class="field-label">Has Passport</label>
+                    <div class="radio-options">
+                        <label class="radio-wrapper">
+                            <input type="radio" name="passport-1" value="yes" /> <span class="custom-radio"></span> YES
+                        </label>
+                        <label class="radio-wrapper">
+                            <input type="radio" name="passport-1" value="no" /> <span class="custom-radio"></span> NO
+                        </label>
+                    </div>
+                </div>
+
+                <div class="field-container">
+                    <label class="field-label">Has Clinic History</label>
+                    <div class="radio-options">
+                        <label class="radio-wrapper">
+                            <input type="radio" name="clinic-history-1" value="yes" id="clinic-yes"/> <span class="custom-radio"></span> YES
+                        </label>
+                        <label class="radio-wrapper">
+                            <input type="radio" name="clinic-history-1" value="no" id="clinic-no"/> <span class="custom-radio"></span> NO
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <input type="text" name="clinic-name" id="clinic-name" placeholder="Clinic Name" required />
+                <div class="field-container">
+                    <label class="field-label">Sex</label>
+                    <div class="radio-options">
+                        <label class="radio-wrapper">
+                            <input type="radio" name="sex-1" value="male" /> <span class="custom-radio"></span> Male
+                        </label>
+                        <label class="radio-wrapper">
+                            <input type="radio" name="sex-1" value="female" /> <span class="custom-radio"></span> Female
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <h3>Vaccine History</h3>
+            <div id="vaccine-section">
+                <div class="vaccine-section">
+                    <p>Vaccine #1</p>
+                    <div class="form-row">
+                        <input type="text" name="vaccine-lot" placeholder="Vaccine Lot" required />
+                        <input type="text" name="vaccine-name" placeholder="Vaccine Name" required />
+                        <select name="vaccine-type" required>
+                            <option value="" disabled selected>Vaccine Type</option>
+                            <option value="Core">Core</option>
+                            <option value="Non-core">Non-core</option>
+                        </select>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-field">
+                            <input type="date" name="vaccine_duration" id="vaccine_duration" class="dob-input" required>
+                            <span class="dob-placeholder">Vaccine Duration</span>
+                        </div>
+                        <div class="form-field">
+                            <input type="date" name="vaccination_date" id="vaccination_date" class="dob-input" required>
+                            <span class="dob-placeholder">Date of Vaccination</span>
+                        </div>
+                        <div class="form-field">
+                            <input type="date" name="vaccination_end_date" id="vaccination_end_date" class="dob-input" required>
+                            <span class="dob-placeholder">End Date of Vaccination</span>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="field-container">
+                            <label class="field-label">Sex</label>
+                            <div class="radio-options">
+                                <label class="radio-wrapper">
+                                    <input type="radio" name="vaccine-sex" value="male" /> <span class="custom-radio"></span> Male
+                                </label>
+                                <label class="radio-wrapper">
+                                    <input type="radio" name="vaccine-sex" value="female" /> <span class="custom-radio"></span> Female
+                                </label>
+                            </div>
+                        </div>
+                        <input type="text" name="vaccine-clinic-name" placeholder="Clinic Name" required />
+                    </div>
+                </div>
+            </div>
+
+                <div class="form-actions">
+                    <div class="right-buttons">
+                        <button class="add-vaccine" type="button">Add Vaccine</button>
+                        <button class="delete-vaccine" type="button">Delete Vaccine</button>                            
+                    </div>
+                </div>
+
+        </form>
+    </div>
+    <div class="form-actions">
+        <div class="right-buttons">
+            <button class="add-pet" type="button">Add Pet</button>
+            <button class="delete-pet" type="button">Delete Pet</button>
+        </div>
+        <div class="left-buttons">
+            <button id="back-button" type="button" onclick="window.location.href='sponsor.html'">Back</button>
+            <button id="save-information" type="submit">Save</button>
+        </div>
+    </div>   
+</body>
+</html>
