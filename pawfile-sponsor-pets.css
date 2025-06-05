@@ -148,7 +148,7 @@ body {
 }
 
 .pet-card .fa-arrow-up-right-from-square:hover {
-  color: #4caf50; /* or any accent color you prefer */
+  color: #4caf50;
   transform: scale(1.2) rotate(-10deg);
 }
 
