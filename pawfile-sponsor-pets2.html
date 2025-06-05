@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PawFile - Pet Detail</title>
+  <link rel="stylesheet" href="pawfile-sponsor-pets2.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="logo">Paw<i class="fa-solid fa-paw"></i>File</div>
+      <nav>
+        <ul>
+          <li><a href="#" class="nav-link"><i class="fa-solid fa-user"></i> Profile</a></li>
+          <li><a href="#" class="nav-link active"><i class="fa-solid fa-paw"></i> Pets</a></li>
+        </ul>
+      </nav>
+      <button class="sign-out">Sign Out</button>
+    </aside>
+
+    <main class="main-content">
+      <h1>My P<i class="fa-solid fa-paw"></i>wmily!</h1>
+      <div class="pet-id">PET ID: <span id="petId">A7B9K</span></div>
+
+      <section class="info-section">
+        <div class="section-header">
+          <h2>Pet Information</h2>
+          <button class="edit-btn"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
+        </div>
+        <div class="info-grid">
+          <input placeholder="Pet Name" disabled />
+          <input placeholder="Species" disabled />
+          <input placeholder="Date of Birth" disabled />
+          <input placeholder="Age" disabled />
+          <input placeholder="Breed" disabled />
+          <select disabled><option>Solid Color</option></select>
+
+          <div class="checkbox-group">
+            <div class="checkbox-container">
+              <label class="checkbox-label">Spayed/Neutered</label>
+              <div class="checkbox-yesno-container">
+                <label><input type="checkbox" disabled /> YES</label>
+                <label><input type="checkbox" disabled /> NO</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="checkbox-group">
+            <div class="checkbox-container">
+              <label class="checkbox-label">Has Passport</label>
+              <div class="checkbox-yesno-container">
+                <label><input type="checkbox" disabled /> YES</label>
+                <label><input type="checkbox" disabled /> NO</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="checkbox-group">
+            <div class="checkbox-container">
+              <label class="checkbox-label">Has Recent Clinic History</label>
+              <div class="checkbox-yesno-container">
+                <label><input type="checkbox" disabled /> YES</label>
+                <label><input type="checkbox" disabled /> NO</label>
+              </div>
+            </div>
+          </div>
+
+          <input placeholder="Clinic Name" disabled />
+
+          <div class="checkbox-group">
+            <div class="checkbox-container">
+              <label class="checkbox-label">Sex</label>
+              <div class="checkbox-yesno-container">
+                <label><input type="checkbox" disabled /> MALE</label>
+                <label><input type="checkbox" disabled /> FEMALE</label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="info-section">
+        <div class="section-header">
+          <h2>Vaccine History</h2>
+          <button class="edit-btn"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
+        </div>
+
+        <div class="vaccine-record">
+          <h3>Vaccine #1</h3>
+          <div class="info-grid">
+            <input placeholder="Vaccine LOT" disabled />
+            <input placeholder="Vaccine Name" disabled />
+            <select disabled><option>CORE</option></select>
+            <input placeholder="Vaccine Duration" disabled />
+            <input placeholder="Date of Vaccination" disabled />
+            <input placeholder="End Date of Vaccination Effectiveness" disabled />
+
+            <div class="checkbox-group">
+              <div class="checkbox-container">
+                <label class="checkbox-label">Had Vaccine Reaction</label>
+                <div class="checkbox-yesno-container">
+                  <label><input type="checkbox" disabled /> YES</label>
+                  <label><input type="checkbox" disabled /> NO</label>
+                </div>
+              </div>
+            </div>
+
+            <input placeholder="Vaccine Symptom" disabled />
+          </div>
+        </div>
+
+        <div class="vaccine-record">
+          <h3>Vaccine #2</h3>
+          <div class="info-grid">
+            <input placeholder="Vaccine LOT" disabled />
+            <input placeholder="Vaccine Name" disabled />
+            <select disabled><option>CORE</option></select>
+            <input placeholder="Vaccine Duration" disabled />
+            <input placeholder="Date of Vaccination" disabled />
+            <input placeholder="End Date of Vaccination Effectiveness" disabled />
+
+            <div class="checkbox-group">
+              <div class="checkbox-container">
+                <label class="checkbox-label">Had Vaccine Reaction</label>
+                <div class="checkbox-yesno-container">
+                  <label><input type="checkbox" disabled /> YES</label>
+                  <label><input type="checkbox" disabled /> NO</label>
+                </div>
+              </div>
+            </div>
+
+            <input placeholder="Vaccine Symptom" disabled />
+          </div>
+        </div>
+      </section>
+
+      <a href="pawfile-pets.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Back</a>
+    </main>
+  </div>
+
+  <script src="pawfile-sponsor-pets2.js"></script>
+</body>
+</html>
