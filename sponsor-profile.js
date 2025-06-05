@@ -53,3 +53,29 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+    const sponsorID = "X3D7P"; // You can also fetch this dynamically from session or URL
+
+    fetch(`http://localhost:3000/api/sponsor/${sponsorID}`)
+        .then(res => res.json())    
+        .then(data => {
+            document.getElementById("firstName").value = data.Sponsor_FN;
+            document.getElementById("lastName").value = data.Sponsor_LN;
+            document.getElementById("middleInitial").value = data.Sponsor_MI;
+            document.getElementById("spouseName").value = data.Spouse_Name;
+            document.getElementById("status").value = data.Sponsor_Status;
+            document.getElementById("militaryGrade").value = data.Grade;
+            document.getElementById("dualMilitary").value = data.is_Dual_Military;
+            document.getElementById("militaryBranch").value = data.Branch;
+            document.getElementById("militaryUnit").value = data.Unit;
+            document.getElementById("personalEmail").value = data.Personal_Email;
+            document.getElementById("mailBox").value = data.Mail_Box;
+            document.getElementById("personalContact").value = data.Sponsor_Phone_No;
+            document.getElementById("workContact").value = data.Work_Phone;
+            document.getElementById("spouseContact").value = data.Spouse_Alt_No;
+            document.getElementById("preferredContact").value = data.Preferred_Contact;
+            document.getElementById("supervisorId").value = data.Supervisor_ID;
+        })
+        .catch(err => console.error("Fetch error:", err));
+});
