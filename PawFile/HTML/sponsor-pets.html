@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>PawFile – My Pets</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-  <link rel="stylesheet" href="pawfile-sponsor-pets.css" />
+  <link rel="stylesheet" href="../CSS/sponsor-pets.css" />
 </head>
 <body>
   <div class="container">
@@ -16,7 +16,7 @@
       </div>
       <ul class="nav-menu">
         <li>
-          <a href="sponsor-profile.html">
+          <a href="../HTML/sponsor-profile.html">
             <i class="fa-solid fa-user"></i> Profile
           </a>
         </li>
@@ -59,12 +59,14 @@
           <span class="pet-name">${pet.name}</span>
           <div class="pet-id">PET ID: ${pet.id}</div>
         </div>
-        <a href="pawfile-sponsor-pets2.html?petId=${encodeURIComponent(pet.id)}" class="pet-detail-link" title="View Details">
+        <a href="../HTML/sponsor-pets-details.html?petId=${encodeURIComponent(pet.id)}" class="pet-detail-link" title="View Details">
           <i class="fa-solid fa-arrow-up-right-from-square"></i>
         </a>
       `;
       petList.appendChild(li);
     });
-  </script>
+  </script> 
+  <script src="../JS/sponsor-pets.js"></script>
+
 </body>
 </html>

@@ -3,7 +3,7 @@
 --------------------------------------------------------------------*/
 @font-face {
   font-family: 'Jellee';
-  src: url('Jellee-Roman.ttf') format('truetype');
+  src: url('../Fonts/Jellee-Roman.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
