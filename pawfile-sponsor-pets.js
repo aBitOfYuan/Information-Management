@@ -1,4 +1,4 @@
-// Only arrow icon click navigates to pawfile-sponsor-pets2.html
+// Arrow icon click => navigate to pet details page
 document.querySelectorAll('.pet-card .fa-arrow-up-right-from-square').forEach(icon => {
   icon.addEventListener('click', function (event) {
     event.stopPropagation(); // Prevent bubbling to card
