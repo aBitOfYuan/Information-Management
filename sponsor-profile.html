@@ -19,7 +19,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="pawfile-pets.html">
+                    <a href="pawfile-sponsor-pets.html">
                         <i class="fa-solid fa-paw"></i> Pets
                     </a>
                 </li>
@@ -41,37 +41,46 @@
                 </div>
                 <div class="form-grid">
                     <div class="form-group small">
-                        <input type="text" id="firstName" name="firstName" placeholder="First Name">
+                        <input type="text" id="firstName" name="firstName" placeholder="First Name" readonly>
                     </div>
                     <div class="form-group small">
-                        <input type="text" id="lastName" name="lastName" placeholder="Last Name">
+                        <input type="text" id="lastName" name="lastName" placeholder="Last Name" readonly>
                     </div>
                     <div class="form-group small">
-                        <input type="text" id="middleInitial" name="middleInitial" placeholder="Middle Initial">
+                        <input type="text" id="middleInitial" name="middleInitial" placeholder="Middle Initial" readonly>
                     </div>
                     <div class="form-group large">
-                        <input type="text" id="spouseName" name="spouseName" placeholder="Spouse's First and Last Name">
+                        <input type="text" id="spouseName" name="spouseName" placeholder="Spouse's First and Last Name" readonly>
                     </div>
                     <div class="form-group small">
-                        <input type="text" id="status" name="status" placeholder="Status" value="ACTIVE DUTY" readonly>
+                        <select id="status" name="status" class="dropdown-select" disabled>
+                            <option value="ACTIVE DUTY">Active Duty</option>
+                            <option value="CIVILIAN">Civilian</option>
+                            <option value="RETIRED">Retired</option>
+                        </select>
                     </div>
                     <div class="form-group medium">
-                        <input type="email" id="personalEmail" name="personalEmail" placeholder="Personal Email">
+                        <input type="email" id="personalEmail" name="personalEmail" placeholder="Personal Email" readonly>
                     </div>
                     <div class="form-group medium">
-                        <input type="tel" id="personalContact" name="personalContact" placeholder="Personal Contact No.">
+                        <input type="tel" id="personalContact" name="personalContact" placeholder="Personal Contact No." readonly>
                     </div>
                     <div class="form-group medium">
-                        <input type="tel" id="workContact" name="workContact" placeholder="Work Contact No.">
+                        <input type="tel" id="workContact" name="workContact" placeholder="Work Contact No." readonly>
                     </div>
                     <div class="form-group medium">
-                        <input type="tel" id="spouseContact" name="spouseContact" placeholder="Spouse / Alternative Contact No.">
+                        <input type="tel" id="spouseContact" name="spouseContact" placeholder="Spouse / Alternative Contact No." readonly>
                     </div>
                     <div class="form-group small">
-                        <input type="text" id="preferredContact" name="preferredContact" placeholder="Preferred Contact" value="PERSONAL" readonly>
+                        <select id="preferredContact" name="preferredContact" class="dropdown-select" disabled>
+                            <option value="SPONSOR">Sponsor</option>
+                            <option value="SPOUSE">Spouse</option>
+                            <option value="WORK">Work</option>
+                            <option value="PERSONAL">Personal</option>
+                        </select>
                     </div>
                     <div class="form-group medium">
-                        <input type="text" id="mailBox" name="mailBox" placeholder="Mail Box No.">
+                        <input type="text" id="mailBox" name="mailBox" placeholder="Mail Box No." readonly>
                     </div>
                 </div>
             </section>
@@ -83,19 +92,23 @@
                 </div>
                 <div class="form-grid">
                     <div class="form-group medium">
-                        <input type="text" id="militaryGrade" name="militaryGrade" placeholder="Military Grade">
+                        <input type="text" id="militaryGrade" name="militaryGrade" placeholder="Military Grade" readonly>
                     </div>
                     <div class="form-group medium">
-                        <input type="text" id="dualMilitary" name="dualMilitary" placeholder="Dual Military" value="YES" readonly>
+                        <select id="dualMilitary" name="dualMilitary" class="dropdown-select" disabled>
+                            <option value="YES">Yes</option>
+                            <option value="NO">No</option>
+                            <option value="N/A">N/A</option>
+                        </select>
                     </div>
                     <div class="form-group medium">
-                        <input type="text" id="militaryBranch" name="militaryBranch" placeholder="Military Branch">
+                        <input type="text" id="militaryBranch" name="militaryBranch" placeholder="Military Branch" readonly>
                     </div>
                     <div class="form-group medium">
-                        <input type="text" id="militaryUnit" name="militaryUnit" placeholder="Military Unit">
+                        <input type="text" id="militaryUnit" name="militaryUnit" placeholder="Military Unit" readonly>
                     </div>
                     <div class="form-group medium">
-                        <input type="text" id="supervisorId" name="supervisorId" placeholder="Supervisor ID">
+                        <input type="text" id="supervisorId" name="supervisorId" placeholder="Supervisor ID" readonly>
                     </div>
                 </div>
             </section>

@@ -1,7 +1,8 @@
 document.addEventListener('DOMContentLoaded', function() {
     const editBtn = document.querySelector('.edit-btn');
     const signOutBtn = document.querySelector('.sign-out-btn');
-    const inputs = document.querySelectorAll('input:not([readonly])');
+    const allInputs = document.querySelectorAll('input');
+    const dropdowns = document.querySelectorAll('.dropdown-select');
     
     // Edit button functionality
     editBtn.addEventListener('click', function() {
@@ -9,18 +10,35 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (isEditing) {
             this.innerHTML = '<i class="fa-solid fa-save"></i> Save';
-            inputs.forEach(input => {
+            // Enable all inputs
+            allInputs.forEach(input => {
                 input.removeAttribute('readonly');
                 input.style.backgroundColor = '#fff';
                 input.style.borderColor = '#0F5AA6';
             });
+            
+            // Enable dropdowns
+            dropdowns.forEach(dropdown => {
+                dropdown.disabled = false;
+                dropdown.style.backgroundColor = '#fff';
+                dropdown.style.borderColor = '#0F5AA6';
+            });
         } else {
             this.innerHTML = '<i class="fa-solid fa-edit"></i> Edit';
-            inputs.forEach(input => {
+            // Disable all inputs
+            allInputs.forEach(input => {
                 input.setAttribute('readonly', true);
-                input.style.backgroundColor = '#f8f9fa';
+                input.style.backgroundColor = '#e9ecef';
                 input.style.borderColor = '#e0e0e0';
             });
+            
+            // Disable dropdowns
+            dropdowns.forEach(dropdown => {
+                dropdown.disabled = true;
+                dropdown.style.backgroundColor = '#e9ecef';
+                dropdown.style.borderColor = '#e0e0e0';
+            });
+            
             alert('Changes saved successfully!');
         }
     });
@@ -31,8 +49,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Redirect to login page after 1 second (to show the alert)
             setTimeout(function() {
                 window.location.href = 'pawfile-login.html'; 
-            }, 1000);
-            alert('You have been signed out successfully. Redirecting to login page...');
+            }, 250);
         }
     });
 });
