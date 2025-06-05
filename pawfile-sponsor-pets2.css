@@ -327,11 +327,19 @@ body {
 /*--------------------------------------------------------------------
   BACK BUTTON & FORM ACTIONS
 --------------------------------------------------------------------*/
+/* Container for action buttons (Back, Save, etc.) */
 .form-actions {
   display: flex;
-  justify-content: flex-start;
-  max-width: 970px;
+  justify-content: flex-end;   /* push contents to the right */
+  align-items: center;
+  width: 100%;
   margin-top: 20px;
+}
+
+/* You can remove float here—flex will handle alignment */
+.right-buttons {
+  display: flex;
+  gap: 10px; /* space between any buttons you add later */
 }
 
 .back-btn {
