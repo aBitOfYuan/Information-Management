@@ -1,3 +1,11 @@
+@font-face {
+  font-family: 'Jellee';
+  src: url('Jellee-Roman.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* Reset and base styles */
 body {
   margin: 0;
   font-family: 'Jellee', sans-serif;
@@ -10,6 +18,7 @@ body {
   height: 100vh;
 }
 
+/* Sidebar styles - sticky and responsive */
 .sidebar {
   background: #F9C320;
   width: 240px;
@@ -17,6 +26,12 @@ body {
   flex-direction: column;
   align-items: center;
   padding: 40px 0;
+
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  z-index: 100;
 }
 
 .logo {
@@ -24,12 +39,19 @@ body {
   font-weight: bold;
   color: #0F5AA6;
   margin-bottom: 60px;
+  text-align: center;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
 
 .sidebar nav ul {
   list-style: none;
   padding: 0;
   width: 100%;
+  margin-bottom: auto; /* push sign-out button down */
 }
 
 .nav-link {
@@ -38,21 +60,24 @@ body {
   padding: 14px 28px;
   text-decoration: none;
   color: #222;
-  font-weight: bold;
+  font-weight: 600;
+  font-size: 1.1rem;
+  border-radius: 8px;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .nav-link.active,
 .nav-link:hover {
-  background: #1769aa;
+  background: #0F5AA6;
   color: #fff;
 }
 
 .sign-out {
   margin-top: auto;
-  background: #1769aa;
+  background: #0F5AA6;
   color: #fff;
   border: none;
-  border-radius: 20px;
+  border-radius: 25px;
   padding: 10px 28px;
   cursor: pointer;
   font-family: 'Jellee', cursive;
@@ -61,8 +86,14 @@ body {
   align-items: center;
   justify-content: center;
   gap: 8px;
+  transition: background-color 0.3s;
 }
 
+.sign-out:hover {
+  background: #0d4d8a;
+}
+
+/* Main content styles */
 .main-content {
   flex: 1;
   padding: 40px;
@@ -113,18 +144,32 @@ body {
   gap: 16px;
 }
 
-input,
-select {
-  padding: 10px;
-  border: none;
+/* Form field with label above input/select inside gray container */
+.form-field {
+  display: flex;
+  flex-direction: column;
   background: #eee;
   border-radius: 6px;
+  padding: 8px 12px;
   font-size: 1rem;
   color: #222;
 }
 
-input::placeholder {
-  color: #999;
+.form-field label {
+  font-size: 0.9rem;
+  font-weight: bold;
+  margin-bottom: 4px;
+  color: #555;
+}
+
+.form-field input,
+.form-field select {
+  border: none;
+  background: transparent;
+  font-size: 1rem;
+  color: #222;
+  font-family: inherit;
+  outline: none;
 }
 
 /* Checkbox groups */
@@ -194,7 +239,53 @@ input::placeholder {
 
   float: right;
 }
+
 .back-btn i {
   color: #F9C320;             /* yellow arrow */
   font-size: 1.4rem;
+}
+
+/* Responsive sidebar adjustments */
+@media (max-width: 900px) {
+  .sidebar {
+    position: relative;
+    width: 100%;
+    height: auto;
+    padding: 15px 20px;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .logo {
+    margin-bottom: 0;
+    font-size: 1.8rem;
+  }
+
+  .sidebar nav ul {
+    display: flex;
+    margin-bottom: 0;
+    gap: 8px;
+    width: auto;
+  }
+
+  .nav-link {
+    padding: 10px 16px;
+    font-size: 1rem;
+    border-radius: 6px;
+  }
+
+  .sign-out {
+    margin: 0;
+    font-size: 1rem;
+    padding: 6px 20px;
+  }
+
+  .layout {
+    flex-direction: column;
+  }
+
+  .main-content {
+    padding: 24px;
+  }
 }
