@@ -1,81 +1,83 @@
+@font-face {
+  font-family: 'Jellee';
+  src: url('Jellee-Roman.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* Reset and base styles */
 body {
   margin: 0;
-  padding: 0;
-}
-
-body {
   font-family: 'Jellee', sans-serif;
-  background-color: rgba(244, 244, 244, 0.68);
-  color: #0d2038;
-  line-height: 1.5;
+  background: #f5f5f5;
+  color: #222;
+}
+
+.layout {
+  display: flex;
   height: 100vh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
 }
 
-/*--------------------------------------------------------------------
-  LAYOUT CONTAINER
---------------------------------------------------------------------*/
-.container {
-  display: flex;
-  flex: 1;
-  height: 100%;
-}
-
+/* Sidebar styles - sticky and responsive */
 .sidebar {
-  background-color: #F9C320;
-  width: 220px;
-  padding: 25px 15px;
+  background: #F9C320;
+  width: 240px;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 40px 0;
+
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  z-index: 100;
 }
 
 .logo {
-  font-size: 2.2rem;
+  font-size: 2rem;
   font-weight: bold;
   color: #0F5AA6;
   margin-bottom: 60px;
+  text-align: center;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
 
-.logo i {
-  font-size: 1.8rem;
-  margin: 0 1px;
-}
-
-.nav-menu {
+.sidebar nav ul {
   list-style: none;
   padding: 0;
   width: 100%;
+  margin-bottom: auto; /* push sign-out button down */
 }
 
-.nav-menu a {
-  color: #333;
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 1.1rem;
+.nav-link {
   display: flex;
   align-items: center;
   padding: 14px 28px;
   text-decoration: none;
   color: #222;
-  font-weight: bold;
+  font-weight: 600;
+  font-size: 1.1rem;
+  border-radius: 8px;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .nav-link.active,
 .nav-link:hover {
-  background: #1769aa;
+  background: #0F5AA6;
   color: #fff;
 }
 
 .sign-out {
   margin-top: auto;
-  background: #1769aa;
+  background: #0F5AA6;
   color: #fff;
   border: none;
-  border-radius: 20px;
+  border-radius: 25px;
   padding: 10px 28px;
   cursor: pointer;
   font-family: 'Jellee', cursive;
@@ -84,51 +86,39 @@ body {
   align-items: center;
   justify-content: center;
   gap: 8px;
+  transition: background-color 0.3s;
 }
 
+.sign-out:hover {
+  background: #0d4d8a;
+}
+
+/* Main content styles */
 .main-content {
   flex: 1;
-  padding: 30px;
+  padding: 40px;
   overflow-y: auto;
-  background-color: rgba(244, 244, 244, 0.68);
+  position: relative;
 }
 
-.welcome-header {
+.main-content h1 {
   font-size: 2.2rem;
-  font-weight: bold;
-  margin-bottom: 32px;
-  color: #111;
-  letter-spacing: 1px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  /* Add vertical margin for better spacing */
-  margin-top: 0;
-  margin-bottom: 28px;
-}
-
-.welcome-header i.fa-paw {
-  margin: 0 4px;
-  font-size: 1.2em;
-  vertical-align: middle;
+  color: #0F5AA6;
 }
 
 .pet-id {
-  font-size: 1rem;
-  color: #0d2038;
-  margin-bottom: 25px;
-  font-weight: 600;
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: #1769aa;
+  margin: 10px 0 30px;
 }
 
-/*--------------------------------------------------------------------
-  SECTION: Pet Information & Vaccine History
---------------------------------------------------------------------*/
 .info-section {
   background: #fff;
-  padding: 25px 30px;
   border-radius: 10px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  padding: 30px;
   margin-bottom: 30px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .section-header {
@@ -136,132 +126,111 @@ body {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
-  padding-bottom: 10px;
-  border-bottom: 2px solid #e9ecef;
-}
-
-.section-header h2 {
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: #333;
 }
 
 .edit-btn {
-  background-color: #0F5AA6;
+  background: #0F5AA6;
   color: #fff;
   border: none;
-  padding: 7px 14px;
-  border-radius: 5px;
-  font-size: 0.9rem;
+  border-radius: 10px;
+  padding: 6px 16px;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition: background-color 0.3s;
-}
-
-.edit-btn:hover {
-  background-color: #0d4d8a;
+  font-weight: bold;
 }
 
 .info-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
 }
 
-input,
-select {
-  padding: 10px;
-  border: none;
+/* Form field with label above input/select inside gray container */
+.form-field {
+  display: flex;
+  flex-direction: column;
   background: #eee;
   border-radius: 6px;
+  padding: 8px 12px;
   font-size: 1rem;
   color: #222;
 }
 
-input::placeholder {
-  color: #999;
+.form-field label {
+  font-size: 0.9rem;
+  font-weight: bold;
+  margin-bottom: 4px;
+  color: #555;
 }
 
-/*--------------------------------------------------------------------
-  CHECKBOX / RADIO GROUPS
---------------------------------------------------------------------*/
+.form-field input,
+.form-field select {
+  border: none;
+  background: transparent;
+  font-size: 1rem;
+  color: #222;
+  font-family: inherit;
+  outline: none;
+}
+
+/* Checkbox groups */
 .checkbox-group {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  gap: 6px;
+  font-size: 0.9rem;
 }
 
 .checkbox-container {
-  background-color: #eeeeee;
-  border-radius: 8px;
-  padding: 12px 14px;
+  background: #eee;
+  border-radius: 6px;
+  padding: 10px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
+  font-size: 1rem;
+  color: #222;
+  font-weight: normal;
+  font-family: inherit;
 }
 
 .checkbox-label {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: #444;
+  margin-bottom: 4px;
+  user-select: none;
+  color: inherit;
+  font-weight: normal;
 }
 
 .checkbox-yesno-container {
   display: flex;
-  gap: 20px;
+  gap: 16px;
 }
 
 .checkbox-yesno-container label {
-  display: flex;
-  align-items: center;
-  font-size: 0.9rem;
+  font-weight: normal;
+  color: inherit;
   cursor: pointer;
   user-select: none;
-}
-
-.checkbox-yesno-container input[type="radio"] {
-  margin-right: 6px;
-  accent-color: #0F5AA6;
-}
-
-/*--------------------------------------------------------------------
-  VACCINE SECTION (wrapper inside info-section)
---------------------------------------------------------------------*/
-.vaccine-section {
-  border: 1px solid #ccc;
-  padding: 20px;
-  margin-bottom: 20px;
-  border-radius: 8px;
-  background-color: #f9f9f9;
-}
-
-.vaccine-section h3 {
-  margin-top: 0;
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: #0d2038;
-  margin-bottom: 15px;
-}
-
-/*--------------------------------------------------------------------
-  BACK BUTTON & FORM ACTIONS
---------------------------------------------------------------------*/
-.form-actions {
   display: flex;
-  justify-content: flex-start;
-  max-width: 970px;
-  margin-top: 20px;
+  align-items: center;
+  gap: 6px;
+  font-family: inherit;
+  font-size: 1rem;
 }
 
+.checkbox-yesno-container input[type="checkbox"] {
+  cursor: pointer;
+}
+
+/* Back button styled like sign out button */
 .back-btn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 10px 18px;
-  background-color: #ffc107;
-  color: #0d2038;
+  gap: 10px;
+  background-color: #1769aa;  /* blue container */
+  color: white;               /* white text */
+  padding: 10px 28px;
+  border-radius: 20px;
+  font-weight: bold;
   text-decoration: none;
   font-size: 1.1rem;
   margin-top: 40px;
@@ -270,6 +239,7 @@ input::placeholder {
 
   float: right;
 }
+
 .back-btn i {
   color: #F9C320;             /* yellow arrow */
   font-size: 1.4rem;

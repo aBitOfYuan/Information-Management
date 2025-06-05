@@ -3,61 +3,74 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>PawFile – Pet Detail</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <title>PawFile - Pet Detail</title>
   <link rel="stylesheet" href="pawfile-sponsor-pets2.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 </head>
 <body>
-  <div class="container">
-    <!-- Sticky Sidebar Panel -->
+  <div class="layout">
     <aside class="sidebar">
-      <div class="logo">P<i class="fa-solid fa-paw"></i>wFile</div>
-      <ul class="nav-menu">
-        <li>
-          <a href="sponsor-profile.html">
-            <i class="fa-solid fa-user"></i> Profile
-          </a>
-        </li>
-        <li>
-          <a href="pawfile-sponsor-pets.html" class="active">
-            <i class="fa-solid fa-paw"></i> Pets
-          </a>
-        </li>
-      </ul>
-      <button class="sign-out-btn">Sign Out</button>
+      <div class="logo">Paw<i class="fa-solid fa-paw"></i>File</div>
+      <nav>
+        <ul>
+          <li><a href="#" class="nav-link"><i class="fa-solid fa-user"></i> Profile</a></li>
+          <li><a href="#" class="nav-link active"><i class="fa-solid fa-paw"></i> Pets</a></li>
+        </ul>
+      </nav>
+      <button class="sign-out">Sign Out</button>
     </aside>
 
-    <!-- Main Content Area -->
     <main class="main-content">
-      <h1 class="welcome-header">
-        My P<i class="fa-solid fa-paw"></i>wmily!
-      </h1>
-      <div class="pet-id">
-        PET ID: <span id="petId">A7B9K</span>
-      </div>
+      <h1>My P<i class="fa-solid fa-paw"></i>wmily!</h1>
+      <div class="pet-id">PET ID: <span id="petId">A7B9K</span></div>
 
-      <!-- Pet Information Section -->
       <section class="info-section">
         <div class="section-header">
           <h2>Pet Information</h2>
-          <button class="edit-btn">
-            <i class="fa-solid fa-pen-to-square"></i> Edit
-          </button>
+          <button class="edit-btn"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
         </div>
         <div class="info-grid">
-          <input placeholder="Pet Name" />
-          <input placeholder="Species" />
-          <input placeholder="Date of Birth" />
-          <input placeholder="Age" />
-          <input placeholder="Breed" />
-          <select><option>Solid Color</option></select>
+
+          <div class="form-field">
+            <label>Pet Name</label>
+            <input type="text" />
+          </div>
+
+          <div class="form-field">
+            <label>Species</label>
+            <input type="text" />
+          </div>
+
+          <div class="form-field">
+            <label>Date of Birth</label>
+            <input type="date" />
+          </div>
+
+          <div class="form-field">
+            <label>Age</label>
+            <input type="number" />
+          </div>
+
+          <div class="form-field">
+            <label>Breed</label>
+            <input type="text" />
+          </div>
+
+          <div class="form-field">
+            <label>Color Pattern</label>
+            <select>
+              <option>Solid</option>
+              <option>Bi-color</option>
+              <option>Multi-color</option>
+            </select>
+          </div>
 
           <div class="checkbox-group">
             <div class="checkbox-container">
               <label class="checkbox-label">Spayed/Neutered</label>
               <div class="checkbox-yesno-container">
-                <label><input type="radio" name="spayNeuter" /> YES</label>
-                <label><input type="radio" name="spayNeuter" /> NO</label>
+                <label><input type="checkbox" /> YES</label>
+                <label><input type="checkbox" /> NO</label>
               </div>
             </div>
           </div>
@@ -66,8 +79,8 @@
             <div class="checkbox-container">
               <label class="checkbox-label">Has Passport</label>
               <div class="checkbox-yesno-container">
-                <label><input type="radio" name="hasPassport" /> YES</label>
-                <label><input type="radio" name="hasPassport" /> NO</label>
+                <label><input type="checkbox" /> YES</label>
+                <label><input type="checkbox" /> NO</label>
               </div>
             </div>
           </div>
@@ -76,20 +89,23 @@
             <div class="checkbox-container">
               <label class="checkbox-label">Has Recent Clinic History</label>
               <div class="checkbox-yesno-container">
-                <label><input type="radio" name="clinicHistory" /> YES</label>
-                <label><input type="radio" name="clinicHistory" /> NO</label>
+                <label><input type="checkbox" /> YES</label>
+                <label><input type="checkbox" /> NO</label>
               </div>
             </div>
           </div>
 
-          <input placeholder="Clinic Name" />
+          <div class="form-field">
+            <label>Clinic Name</label>
+            <input type="text" />
+          </div>
 
           <div class="checkbox-group">
             <div class="checkbox-container">
               <label class="checkbox-label">Sex</label>
               <div class="checkbox-yesno-container">
-                <label><input type="radio" name="sex" /> MALE</label>
-                <label><input type="radio" name="sex" /> FEMALE</label>
+                <label><input type="checkbox" /> MALE</label>
+                <label><input type="checkbox" /> FEMALE</label>
               </div>
             </div>
           </div>
@@ -97,82 +113,127 @@
         </div>
       </section>
 
-      <!-- Vaccine History Section -->
       <section class="info-section">
         <div class="section-header">
           <h2>Vaccine History</h2>
-          <button class="edit-btn">
-            <i class="fa-solid fa-pen-to-square"></i> Edit
-          </button>
+          <button class="edit-btn"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
         </div>
 
-        <div class="vaccine-section">
+        <div class="vaccine-record">
           <h3>Vaccine #1</h3>
           <div class="info-grid">
-            <input placeholder="Vaccine LOT" />
-            <input placeholder="Vaccine Name" />
-            <select><option>CORE</option></select>
-            <input placeholder="Vaccine Duration" />
-            <input placeholder="Date of Vaccination" />
-            <input placeholder="End Date of Vaccination Effectiveness" />
+
+            <div class="form-field">
+              <label>Vaccine LOT</label>
+              <input type="text" />
+            </div>
+
+            <div class="form-field">
+              <label>Vaccine Name</label>
+              <input type="text" />
+            </div>
+
+            <div class="form-field">
+              <label>Vaccine Type</label>
+              <select>
+                <option>CORE</option>
+              </select>
+            </div>
+
+            <div class="form-field">
+              <label>Vaccine Duration</label>
+              <input type="text" />
+            </div>
+
+            <div class="form-field">
+              <label>Date of Vaccination</label>
+              <input type="date" />
+            </div>
+
+            <div class="form-field">
+              <label>End Date of Vaccination Effectiveness</label>
+              <input type="date" />
+            </div>
 
             <div class="checkbox-group">
               <div class="checkbox-container">
                 <label class="checkbox-label">Had Vaccine Reaction</label>
                 <div class="checkbox-yesno-container">
-                  <label><input type="radio" name="reaction1" /> YES</label>
-                  <label><input type="radio" name="reaction1" /> NO</label>
+                  <label><input type="checkbox" /> YES</label>
+                  <label><input type="checkbox" /> NO</label>
                 </div>
               </div>
             </div>
 
-            <input placeholder="Vaccine Symptom" />
+            <div class="form-field">
+              <label>Vaccine Symptom</label>
+              <input type="text" />
+            </div>
+
           </div>
         </div>
 
-        <div class="vaccine-section">
+        <div class="vaccine-record">
           <h3>Vaccine #2</h3>
           <div class="info-grid">
-            <input placeholder="Vaccine LOT" />
-            <input placeholder="Vaccine Name" />
-            <select><option>CORE</option></select>
-            <input placeholder="Vaccine Duration" />
-            <input placeholder="Date of Vaccination" />
-            <input placeholder="End Date of Vaccination Effectiveness" />
+
+            <div class="form-field">
+              <label>Vaccine LOT</label>
+              <input type="text" />
+            </div>
+
+            <div class="form-field">
+              <label>Vaccine Name</label>
+              <input type="text" />
+            </div>
+
+            <div class="form-field">
+              <label>Vaccine Type</label>
+              <select>
+                <option>CORE</option>
+              </select>
+            </div>
+
+            <div class="form-field">
+              <label>Vaccine Duration</label>
+              <input type="text" />
+            </div>
+
+            <div class="form-field">
+              <label>Date of Vaccination</label>
+              <input type="date" />
+            </div>
+
+            <div class="form-field">
+              <label>End Date of Vaccination Effectiveness</label>
+              <input type="date" />
+            </div>
 
             <div class="checkbox-group">
               <div class="checkbox-container">
                 <label class="checkbox-label">Had Vaccine Reaction</label>
                 <div class="checkbox-yesno-container">
-                  <label><input type="radio" name="reaction2" /> YES</label>
-                  <label><input type="radio" name="reaction2" /> NO</label>
+                  <label><input type="checkbox" /> YES</label>
+                  <label><input type="checkbox" /> NO</label>
                 </div>
               </div>
             </div>
 
-            <input placeholder="Vaccine Symptom" />
+            <div class="form-field">
+              <label>Vaccine Symptom</label>
+              <input type="text" />
+            </div>
+
           </div>
         </div>
       </section>
 
-      <div class="form-actions">
-        <div class="left-buttons">
-          <a href="pawfile-sponsor-pets.html" class="back-btn">
-            <i class="fa-solid fa-arrow-left"></i> Back
-          </a>
-        </div>
-      </div>
+      <a href="pawfile-sponsor-pets.html" class="back-btn">
+        <i class="fa-solid fa-arrow-left"></i> Back
+      </a>
     </main>
   </div>
 
   <script src="pawfile-sponsor-pets2.js"></script>
-  <script>
-    // Set petId from URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const petId = urlParams.get('petId');
-    if (petId) {
-      document.getElementById('petId').textContent = petId;
-    }
-  </script>
 </body>
 </html>
