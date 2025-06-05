@@ -116,6 +116,7 @@ body {
   padding: 22px 32px;
   margin-bottom: 18px;
   transition: box-shadow 0.2s;
+  cursor: pointer;
 }
 
 .pet-card:hover {
@@ -140,20 +141,16 @@ body {
 .pet-card i.fa-arrow-up-right-from-square {
   font-size: 1.3rem;
   color: #111;
-}
-
-.pet-card .fa-arrow-up-right-from-square {
-  transition: color 0.2s, transform 0.2s;
   cursor: pointer;
+  transition: color 0.2s, transform 0.2s;
 }
 
-.pet-card .fa-arrow-up-right-from-square:hover {
+.pet-card i.fa-arrow-up-right-from-square:hover {
   color: #4caf50;
   transform: scale(1.2) rotate(-10deg);
 }
 
 .pet-card.highlight {
   background: #f0f8ff;
-  cursor: pointer;
   transition: background 0.2s;
 }
