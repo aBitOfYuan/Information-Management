@@ -1,15 +1,3 @@
-// Arrow icon click => navigate to pet details page
-document.querySelectorAll('.pet-card .fa-arrow-up-right-from-square').forEach(icon => {
-  icon.addEventListener('click', function (event) {
-    event.stopPropagation(); // Prevent bubbling to card
-    const petCard = this.closest('.pet-card');
-    const petId = petCard.getAttribute('data-pet-id');
-    if (petId) {
-      window.location.href = `pawfile-sponsor-pets2.html?petId=${encodeURIComponent(petId)}`;
-    }
-  });
-});
-
 // Highlight pet card on hover
 document.querySelectorAll('.pet-card').forEach(card => {
   card.addEventListener('mouseenter', function () {

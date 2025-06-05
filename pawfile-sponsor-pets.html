@@ -3,63 +3,68 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>PawFile - My Pets</title>
-  <link rel="stylesheet" href="pawfile-sponsor-pets.css" />
+  <title>PawFile – My Pets</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="pawfile-sponsor-pets.css" />
 </head>
 <body>
-  <div class="layout">
-    <!-- Sidebar Panel -->
+  <div class="container">
+    <!-- Sticky Sidebar Panel -->
     <aside class="sidebar">
       <div class="logo">
-        Paw<i class="fa-solid fa-paw"></i>File
+        P<i class="fa-solid fa-paw"></i>wFile
       </div>
-      <nav>
-        <ul>
-          <li>
-            <a href="#" class="nav-link">
-              <i class="fa-solid fa-user"></i> Profile
-            </a>
-          </li>
-          <li>
-            <a href="#" class="nav-link active">
-              <i class="fa-solid fa-paw"></i> Pets
-            </a>
-          </li>
-        </ul>
-      </nav>
-      <button class="sign-out">Sign Out</button>
+      <ul class="nav-menu">
+        <li>
+          <a href="sponsor-profile.html">
+            <i class="fa-solid fa-user"></i> Profile
+          </a>
+        </li>
+        <li>
+          <a href="#" class="active">
+            <i class="fa-solid fa-paw"></i> Pets
+          </a>
+        </li>
+      </ul>
+      <button class="sign-out-btn">Sign Out</button>
     </aside>
 
     <!-- Main Content Area -->
     <main class="main-content">
-      <h1 class="main-title">My P<i class="fa-solid fa-paw"></i>wmily!</h1>
-      <ul class="pet-list">
-        <li class="pet-card" data-pet-id="A7B9K">
-          <div>
-            <span class="pet-name">KingKong</span>
-            <div class="pet-id">PET ID: A7B9K</div>
-          </div>
-          <!-- Only arrow icon -->
-          <i class="fa-solid fa-arrow-up-right-from-square"></i>
-        </li>
-        <li class="pet-card" data-pet-id="C2B2K">
-          <div>
-            <span class="pet-name">Tiger</span>
-            <div class="pet-id">PET ID: C2B2K</div>
-          </div>
-          <i class="fa-solid fa-arrow-up-right-from-square"></i>
-        </li>
-        <li class="pet-card" data-pet-id="A2Z4D">
-          <div>
-            <span class="pet-name">Dora</span>
-            <div class="pet-id">PET ID: A2Z4D</div>
-          </div>
-          <i class="fa-solid fa-arrow-up-right-from-square"></i>
-        </li>
+      <h1 class="welcome-header">
+        My P<i class="fa-solid fa-paw"></i>wmily!
+      </h1>
+
+      <ul class="pet-list" id="petList">
+        <!-- Each pet‐card will be injected here by JavaScript -->
       </ul>
     </main>
   </div>
-  <script src="pawfile-sponsor-pets.js"></script>
+
+  <script>
+    // Sample data; you can replace this with a fetch() call if desired
+    const pets = [
+      { id: 'A7B9K', name: 'KingKong' },
+      { id: 'C2B2K', name: 'Tiger' },
+      { id: 'A2Z4D', name: 'Dora' }
+    ];
+
+    const petList = document.getElementById('petList');
+    pets.forEach(pet => {
+      const li = document.createElement('li');
+      li.className = 'pet-card';
+      li.setAttribute('data-pet-id', pet.id);
+      li.innerHTML = `
+        <div>
+          <span class="pet-name">${pet.name}</span>
+          <div class="pet-id">PET ID: ${pet.id}</div>
+        </div>
+        <a href="pawfile-sponsor-pets2.html?petId=${encodeURIComponent(pet.id)}" class="pet-detail-link" title="View Details">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i>
+        </a>
+      `;
+      petList.appendChild(li);
+    });
+  </script>
 </body>
 </html>
