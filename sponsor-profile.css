@@ -294,22 +294,4 @@ body {
         flex-basis: 100%;
         justify-content: center;
     }
-    
-    .sign-out-btn {
-        order: 2;
-    }
-    
-    .profile-section {
-        padding: 20px 15px;
-    }
-    
-    .section-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-    }
-    
-    .edit-btn {
-        align-self: flex-end;
-    }
 }
