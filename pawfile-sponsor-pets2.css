@@ -1,93 +1,172 @@
-body {
+/*--------------------------------------------------------------------
+  RESET & FONT
+--------------------------------------------------------------------*/
+@font-face {
+  font-family: 'Jellee';
+  src: url('Jellee-Roman.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+* {
+  box-sizing: border-box;
   margin: 0;
+  padding: 0;
+}
+
+body {
   font-family: 'Jellee', sans-serif;
-  background: #f5f5f5;
-  color: #222;
-}
-
-.layout {
-  display: flex;
+  background-color: rgba(244, 244, 244, 0.68);
+  color: #0d2038;
+  line-height: 1.5;
   height: 100vh;
-}
-
-.sidebar {
-  background: #F9C320;
-  width: 240px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 40px 0;
+  overflow: hidden;
+}
+
+/*--------------------------------------------------------------------
+  LAYOUT CONTAINER
+--------------------------------------------------------------------*/
+.container {
+  display: flex;
+  flex: 1;
+  height: 100%;
+}
+
+/*--------------------------------------------------------------------
+  SIDEBAR (sticky on left; moves to top on narrow screens)
+--------------------------------------------------------------------*/
+.sidebar {
+  background-color: #F9C320;
+  width: 220px;
+  padding: 25px 15px;
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  z-index: 100;
 }
 
 .logo {
-  font-size: 2rem;
+  font-size: 2.2rem;
   font-weight: bold;
   color: #0F5AA6;
-  margin-bottom: 60px;
+  margin-bottom: 40px;
+  text-align: center;
+  letter-spacing: 1px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
 }
 
-.sidebar nav ul {
+.logo i {
+  font-size: 1.8rem;
+  margin: 0 1px;
+}
+
+.nav-menu {
   list-style: none;
-  padding: 0;
-  width: 100%;
+  margin-bottom: auto;
 }
 
-.nav-link {
+.nav-menu li {
+  margin: 12px 0;
+}
+
+.nav-menu a {
+  color: #333;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.1rem;
   display: flex;
   align-items: center;
-  padding: 14px 28px;
-  text-decoration: none;
-  color: #222;
-  font-weight: bold;
+  padding: 10px 12px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
 }
 
-.nav-link.active,
-.nav-link:hover {
-  background: #1769aa;
+.nav-menu a.active {
+  background-color: #0F5AA6;
   color: #fff;
 }
 
-.sign-out {
-  margin-top: auto;
-  background: #1769aa;
+.nav-menu a i {
+  margin-right: 10px;
+  font-size: 1.1rem;
+}
+
+.nav-menu a:hover:not(.active) {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.sign-out-btn {
+  background-color: #0F5AA6;
   color: #fff;
   border: none;
-  border-radius: 20px;
-  padding: 10px 28px;
+  padding: 10px 20px;
+  border-radius: 25px;
+  font-weight: bold;
   cursor: pointer;
-  font-family: 'Jellee', cursive;
-  font-size: 1.3rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
+  font-size: 0.95rem;
+  transition: background-color 0.3s;
+  margin-top: auto;
+  margin-bottom: 15px;
 }
 
+.sign-out-btn:hover {
+  background-color: #0d4d8a;
+}
+
+/*--------------------------------------------------------------------
+  MAIN CONTENT
+--------------------------------------------------------------------*/
 .main-content {
   flex: 1;
-  padding: 40px;
+  padding: 30px;
   overflow-y: auto;
-  position: relative;
+  background-color: rgba(244, 244, 244, 0.68);
 }
 
-.main-content h1 {
+.welcome-header {
   font-size: 2.2rem;
-  color: #0F5AA6;
+  font-weight: bold;
+  margin-bottom: 32px;
+  color: #111;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  /* Add vertical margin for better spacing */
+  margin-top: 0;
+  margin-bottom: 28px;
+}
+
+.welcome-header i.fa-paw {
+  margin: 0 4px;
+  font-size: 1.2em;
+  vertical-align: middle;
 }
 
 .pet-id {
-  font-weight: bold;
-  font-size: 1.1rem;
-  color: #1769aa;
-  margin: 10px 0 30px;
+  font-size: 1rem;
+  color: #0d2038;
+  margin-bottom: 25px;
+  font-weight: 600;
 }
 
+/*--------------------------------------------------------------------
+  SECTION: Pet Information & Vaccine History
+--------------------------------------------------------------------*/
 .info-section {
   background: #fff;
+  padding: 25px 30px;
   border-radius: 10px;
-  padding: 30px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
   margin-bottom: 30px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .section-header {
@@ -95,106 +174,262 @@ body {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #e9ecef;
+}
+
+.section-header h2 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #333;
 }
 
 .edit-btn {
-  background: #0F5AA6;
+  background-color: #0F5AA6;
   color: #fff;
   border: none;
-  border-radius: 10px;
-  padding: 6px 16px;
+  padding: 7px 14px;
+  border-radius: 5px;
+  font-size: 0.9rem;
   cursor: pointer;
-  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background-color 0.3s;
+}
+
+.edit-btn:hover {
+  background-color: #0d4d8a;
 }
 
 .info-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
 }
 
-input,
-select {
-  padding: 10px;
-  border: none;
-  background: #eee;
+.info-grid input,
+.info-grid select {
+  width: 100%;
+  height: 44px;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
   border-radius: 6px;
-  font-size: 1rem;
-  color: #222;
-}
-
-input::placeholder {
+  font-size: 0.95rem;
+  font-weight: bold;
   color: #999;
+  background-color: #fff;
+  box-sizing: border-box;
 }
 
-/* Checkbox groups */
+.info-grid input:focus,
+.info-grid select:focus {
+  outline: none;
+  border-color: #0F5AA6;
+  box-shadow: 0 0 6px #0F5AA6aa;
+  background-color: #f0f4ff;
+}
+
+.form-field {
+  position: relative;
+  flex: 1 1 30%;
+  min-width: 0;
+}
+
+.dob-input {
+  width: 100%;
+  height: 44px;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  background-color: #fff;
+  appearance: none;
+  cursor: pointer;
+  color: transparent;
+  position: relative;
+  z-index: 1;
+}
+
+.dob-input:focus,
+.dob-input:valid {
+  color: #555;
+}
+
+.dob-placeholder {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  font-size: 0.95rem;
+  color: #999;
+  pointer-events: none;
+  transition: 0.2s ease all;
+  z-index: 2;
+}
+
+.dob-input:focus + .dob-placeholder,
+.dob-input:valid + .dob-placeholder {
+  opacity: 0;
+  transform: translateY(-5px);
+}
+
+/*--------------------------------------------------------------------
+  CHECKBOX / RADIO GROUPS
+--------------------------------------------------------------------*/
 .checkbox-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  font-size: 0.9rem;
+  justify-content: center;
 }
 
 .checkbox-container {
-  background: #eee;
-  border-radius: 6px;
-  padding: 10px;
+  background-color: #eeeeee;
+  border-radius: 8px;
+  padding: 12px 14px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  font-size: 1rem;
-  color: #222;
-  font-weight: normal;
-  font-family: inherit;
+  gap: 8px;
 }
 
 .checkbox-label {
-  margin-bottom: 4px;
-  user-select: none;
-  color: inherit;
-  font-weight: normal;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #444;
 }
 
 .checkbox-yesno-container {
   display: flex;
-  gap: 16px;
+  gap: 20px;
 }
 
 .checkbox-yesno-container label {
-  font-weight: normal;
-  color: inherit;
-  cursor: pointer;
-  user-select: none;
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-family: inherit;
-  font-size: 1rem;
-}
-
-.checkbox-yesno-container input[type="checkbox"] {
+  font-size: 0.9rem;
   cursor: pointer;
+  user-select: none;
 }
 
-/* Back button styled like sign out button */
+.checkbox-yesno-container input[type="radio"] {
+  margin-right: 6px;
+  accent-color: #0F5AA6;
+}
+
+/*--------------------------------------------------------------------
+  VACCINE SECTION (wrapper inside info-section)
+--------------------------------------------------------------------*/
+.vaccine-section {
+  border: 1px solid #ccc;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+.vaccine-section h3 {
+  margin-top: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #0d2038;
+  margin-bottom: 15px;
+}
+
+/*--------------------------------------------------------------------
+  BACK BUTTON & FORM ACTIONS
+--------------------------------------------------------------------*/
+.form-actions {
+  display: flex;
+  justify-content: flex-start;
+  max-width: 970px;
+  margin-top: 20px;
+}
+
 .back-btn {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  background-color: #1769aa;  /* blue container */
-  color: white;               /* white text */
-  padding: 10px 28px;
-  border-radius: 20px;
-  font-weight: bold;
+  gap: 6px;
+  padding: 10px 18px;
+  background-color: #ffc107;
+  color: #0d2038;
   text-decoration: none;
-  font-size: 1.1rem;
-  margin-top: 40px;
-
-  cursor: pointer;
-
-  float: right;
+  border-radius: 6px;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
 }
-.back-btn i {
-  color: #F9C320;             /* yellow arrow */
-  font-size: 1.4rem;
+
+.back-btn:hover {
+  background-color: #e0a800;
+}
+
+/*--------------------------------------------------------------------
+  RESPONSIVE BREAKPOINTS
+--------------------------------------------------------------------*/
+@media (max-width: 1200px) {
+  .info-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .container {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    position: relative;
+    width: 100%;
+    height: auto;
+    padding: 15px;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .logo {
+    margin-bottom: 0;
+    font-size: 1.8rem;
+  }
+
+  .nav-menu {
+    display: flex;
+    margin-bottom: 0;
+    gap: 12px;
+  }
+
+  .nav-menu li {
+    margin: 0;
+  }
+
+  .sign-out-btn {
+    margin-top: 0;
+    margin-bottom: 0;
+    padding: 8px 16px;
+  }
+
+  .main-content {
+    padding: 20px;
+  }
+
+  .welcome-header {
+    font-size: 2rem;
+    margin-bottom: 20px;
+  }
+}
+
+@media (max-width: 600px) {
+  .sidebar {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+  }
+
+  .nav-menu {
+    order: 3;
+    flex-basis: 100%;
+    justify-content: center;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
 }

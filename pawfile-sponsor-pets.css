@@ -1,105 +1,146 @@
-body {
+/*--------------------------------------------------------------------
+  FUNDAMENTAL RESET & BASE STYLES
+--------------------------------------------------------------------*/
+@font-face {
+  font-family: 'Jellee';
+  src: url('Jellee-Roman.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+* {
+  box-sizing: border-box;
   margin: 0;
-  background: #232323;
+  padding: 0;
+}
+
+body {
   font-family: 'Jellee', Arial, sans-serif;
-}
-
-.layout {
-  display: flex;
+  background-color: #f8f9fa;
+  color: #333;
+  line-height: 1.6;
   height: 100vh;
-}
-
-.sidebar {
-  background: #F9C320;
-  width: 240px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 40px 0 30px 0;
-  min-height: 100vh;
-  position: relative;
+  overflow: hidden;
+}
+
+/*--------------------------------------------------------------------
+  LAYOUT CONTAINER: wraps sidebar + main content
+--------------------------------------------------------------------*/
+.container {
+  display: flex;
+  flex: 1;
+  height: 100%;
+}
+
+/*--------------------------------------------------------------------
+  SIDEBAR (sticky on left; becomes top‐bar on small screens)
+--------------------------------------------------------------------*/
+.sidebar {
+  background-color: #F9C320;
+  width: 220px;
+  padding: 25px 15px;
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  z-index: 100;
 }
 
 .logo {
-  font-size: 2rem;
+  font-size: 2.2rem;
   font-weight: bold;
   color: #0F5AA6;
-  margin-bottom: 60px;
+  margin-bottom: 40px;
+  text-align: center;
   letter-spacing: 1px;
   display: flex;
+  justify-content: center;
   align-items: center;
   gap: 4px;
 }
 
-.sidebar nav ul {
+.logo i {
+  font-size: 1.8rem;
+  margin: 0 1px;
+}
+
+.nav-menu {
   list-style: none;
-  padding: 0;
-  width: 100%;
+  margin-bottom: auto;
 }
 
-.sidebar nav ul li {
-  width: 100%;
+.nav-menu li {
+  margin: 12px 0;
 }
 
-.nav-link {
+.nav-menu a {
+  color: #333;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.1rem;
   display: flex;
   align-items: center;
-  font-size: 1.1rem;
-  color: #222;
-  padding: 14px 28px;
-  text-decoration: none;
-  border-radius: 4px 0 0 4px;
-  margin-bottom: 8px;
-  transition: background 0.2s, color 0.2s;
-  font-weight: 600;
-  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
 }
 
-.nav-link.active, .nav-link:hover {
-  background: #1769aa;
+.nav-menu a.active {
+  background-color: #0F5AA6;
   color: #fff;
 }
 
-.nav-link.active .fa-paw,
-.nav-link.active .fa-user {
-  color: #fff !important;
+.nav-menu a i {
+  margin-right: 10px;
+  font-size: 1.1rem;
 }
 
-.sign-out {
-  margin-top: auto;
-  background: #1769aa;
+.nav-menu a:hover:not(.active) {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.sign-out-btn {
+  background-color: #0F5AA6;
   color: #fff;
   border: none;
-  border-radius: 20px;
-  padding: 10px 28px;
-  font-size: 1rem;
+  padding: 10px 20px;
+  border-radius: 25px;
   font-weight: bold;
   cursor: pointer;
-  letter-spacing: 1px;
-  transition: background 0.2s;
+  font-size: 0.95rem;
+  transition: background-color 0.3s;
+  margin-top: auto;
+  margin-bottom: 15px;
 }
 
-.sign-out:hover {
-  background: #0F5AA6;
+.sign-out-btn:hover {
+  background-color: #0d4d8a;
 }
 
+/*--------------------------------------------------------------------
+  MAIN CONTENT AREA
+--------------------------------------------------------------------*/
 .main-content {
   flex: 1;
-  background: #f5f5f5;
-  padding: 50px 40px;
+  padding: 30px;
+  overflow-y: auto;
+  background-color: #f8f9fa;
 }
 
-.main-title {
+.welcome-header {
+  color: #333;
+  margin-bottom: 25px;
   font-size: 2.2rem;
-  font-weight: bold;
-  margin-bottom: 32px;
-  color: #111;
-  letter-spacing: 1px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  font-weight: 700;
 }
 
+/*--------------------------------------------------------------------
+  PET LIST & PET CARD
+--------------------------------------------------------------------*/
 .pet-list {
   list-style: none;
   padding: 0;
@@ -109,18 +150,22 @@ body {
 .pet-card {
   background: #fff;
   border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(44,44,44,0.06);
+  box-shadow: 0 2px 8px rgba(44, 44, 44, 0.06);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 22px 32px;
   margin-bottom: 18px;
-  transition: box-shadow 0.2s;
+  transition: box-shadow 0.2s, background 0.2s;
   cursor: pointer;
 }
 
 .pet-card:hover {
-  box-shadow: 0 4px 16px rgba(44,44,44,0.13);
+  box-shadow: 0 4px 16px rgba(44, 44, 44, 0.13);
+}
+
+.pet-card.highlight {
+  background: #f0f8ff;
 }
 
 .pet-name {
@@ -150,7 +195,69 @@ body {
   transform: scale(1.2) rotate(-10deg);
 }
 
-.pet-card.highlight {
-  background: #f0f8ff;
-  transition: background 0.2s;
+/*--------------------------------------------------------------------
+  RESPONSIVE BREAKPOINTS
+--------------------------------------------------------------------*/
+@media (max-width: 1200px) {
+  /* No major changes needed here for pet‐list layout */
+}
+
+@media (max-width: 900px) {
+  .container {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    position: relative;
+    width: 100%;
+    height: auto;
+    padding: 15px;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .logo {
+    margin-bottom: 0;
+    font-size: 1.8rem;
+  }
+
+  .nav-menu {
+    display: flex;
+    margin-bottom: 0;
+    gap: 12px;
+  }
+
+  .nav-menu li {
+    margin: 0;
+  }
+
+  .sign-out-btn {
+    margin-top: 0;
+    margin-bottom: 0;
+    padding: 8px 16px;
+  }
+
+  .main-content {
+    padding: 20px;
+  }
+
+  .welcome-header {
+    font-size: 2rem;
+    margin-bottom: 20px;
+  }
+}
+
+@media (max-width: 600px) {
+  .sidebar {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+  }
+
+  .nav-menu {
+    order: 3;
+    flex-basis: 100%;
+    justify-content: center;
+  }
 }
