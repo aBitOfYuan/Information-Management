@@ -141,3 +141,19 @@ body {
   font-size: 1.3rem;
   color: #111;
 }
+
+.pet-card .fa-arrow-up-right-from-square {
+  transition: color 0.2s, transform 0.2s;
+  cursor: pointer;
+}
+
+.pet-card .fa-arrow-up-right-from-square:hover {
+  color: #4caf50; /* or any accent color you prefer */
+  transform: scale(1.2) rotate(-10deg);
+}
+
+.pet-card.highlight {
+  background: #f0f8ff;
+  cursor: pointer;
+  transition: background 0.2s;
+}
