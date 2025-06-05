@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PawFile - Sponsor Profile</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="sponsor-profile.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Sticky Sidebar Panel -->
+        <aside class="sidebar">
+            <div class="logo">P<i class="fa-solid fa-paw"></i>wFile</div>
+            <ul class="nav-menu">
+                <li>
+                    <a href="#" class="active">
+                        <i class="fa-solid fa-user"></i> Profile
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <i class="fa-solid fa-paw"></i> Pets
+                    </a>
+                </li>
+            </ul>
+            <button class="sign-out-btn">Sign Out</button>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <h1 class="welcome-header">Welcome back, Client!</h1>
+
+            <!-- Personal Information Section -->
+            <section class="profile-section">
+                <div class="section-header">
+                    <h2 class="section-title">Personal Info</h2>
+                    <button class="edit-btn">
+                        <i class="fa-solid fa-edit"></i> Edit
+                    </button>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group small">
+                        <input type="text" id="firstName" name="firstName" placeholder="First Name">
+                    </div>
+                    <div class="form-group small">
+                        <input type="text" id="lastName" name="lastName" placeholder="Last Name">
+                    </div>
+                    <div class="form-group small">
+                        <input type="text" id="middleInitial" name="middleInitial" placeholder="Middle Initial">
+                    </div>
+                    <div class="form-group large">
+                        <input type="text" id="spouseName" name="spouseName" placeholder="Spouse's First and Last Name">
+                    </div>
+                    <div class="form-group small">
+                        <input type="text" id="status" name="status" placeholder="Status" value="ACTIVE DUTY" readonly>
+                    </div>
+                    <div class="form-group medium">
+                        <input type="email" id="personalEmail" name="personalEmail" placeholder="Personal Email">
+                    </div>
+                    <div class="form-group medium">
+                        <input type="tel" id="personalContact" name="personalContact" placeholder="Personal Contact No.">
+                    </div>
+                    <div class="form-group medium">
+                        <input type="tel" id="workContact" name="workContact" placeholder="Work Contact No.">
+                    </div>
+                    <div class="form-group medium">
+                        <input type="tel" id="spouseContact" name="spouseContact" placeholder="Spouse / Alternative Contact No.">
+                    </div>
+                    <div class="form-group small">
+                        <input type="text" id="preferredContact" name="preferredContact" placeholder="Preferred Contact" value="PERSONAL" readonly>
+                    </div>
+                    <div class="form-group medium">
+                        <input type="text" id="mailBox" name="mailBox" placeholder="Mail Box No.">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Military Information Section -->
+            <section class="profile-section">
+                <div class="section-header">
+                    <h2 class="section-title">Military Information</h2>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group medium">
+                        <input type="text" id="militaryGrade" name="militaryGrade" placeholder="Military Grade">
+                    </div>
+                    <div class="form-group medium">
+                        <input type="text" id="dualMilitary" name="dualMilitary" placeholder="Dual Military" value="YES" readonly>
+                    </div>
+                    <div class="form-group medium">
+                        <input type="text" id="militaryBranch" name="militaryBranch" placeholder="Military Branch">
+                    </div>
+                    <div class="form-group medium">
+                        <input type="text" id="militaryUnit" name="militaryUnit" placeholder="Military Unit">
+                    </div>
+                    <div class="form-group medium">
+                        <input type="text" id="supervisorId" name="supervisorId" placeholder="Supervisor ID">
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="sponsor-profile.js"></script>
+</body>
+</html>
