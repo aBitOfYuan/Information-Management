@@ -184,6 +184,16 @@ body {
     flex-direction: column;
 }
 
+/* Label styles */
+.form-group label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 6px;
+    font-family: 'Jellee', sans-serif;
+    user-select: none;
+}
+
 .form-group.small {
     grid-column: span 1;
 }

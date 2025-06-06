@@ -1,120 +1,145 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PawFile - Sponsor Profile</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="../CSS/sponsor-profile.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PawFile - Sponsor Profile</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="../CSS/sponsor-profile.css" />
+  <style>
+    .readonly-text {
+      padding: 0.375rem 0.75rem;
+      border: 1px solid #e0e0e0;
+      background-color: #e9ecef;
+      border-radius: 4px;
+      font-size: 1rem;
+      height: 38px;
+      line-height: 38px;
+      color: #495057;
+      user-select: none;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Sticky Sidebar Panel -->
-        <aside class="sidebar">
-            <div class="logo">P<i class="fa-solid fa-paw"></i>wFile</div>
-            <ul class="nav-menu">
-                <li>
-                    <a href="#" class="active">
-                        <i class="fa-solid fa-user"></i> Profile
-                    </a>
-                </li>
-                <li>
-                    <a href="../HTML/sponsor-pets.html">
-                        <i class="fa-solid fa-paw"></i> Pets
-                    </a>
-                </li>
-            </ul>
-            <button class="sign-out-btn">Sign Out</button>
-        </aside>
+  <div class="container">
+    <!-- Sticky Sidebar Panel -->
+    <aside class="sidebar">
+      <div class="logo">P<i class="fa-solid fa-paw"></i>wFile</div>
+      <ul class="nav-menu">
+        <li>
+          <a href="#" class="active">
+            <i class="fa-solid fa-user"></i> Profile
+          </a>
+        </li>
+        <li>
+          <a href="../HTML/sponsor-pets.html">
+            <i class="fa-solid fa-paw"></i> Pets
+          </a>
+        </li>
+      </ul>
+      <button class="sign-out-btn">Sign Out</button>
+    </aside>
 
-        <!-- Main Content Area -->
-        <main class="main-content">
-            <h1 class="welcome-header">Welcome back, Client!</h1>
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <h1 class="welcome-header">Welcome back, Client!</h1>
 
-            <!-- Personal Information Section -->
-            <section class="profile-section">
-                <div class="section-header">
-                    <h2 class="section-title">Personal Info</h2>
-                    <button class="edit-btn">
-                        <i class="fa-solid fa-edit"></i> Edit
-                    </button>
-                </div>
-                <div class="form-grid">
-                    <div class="form-group small">
-                        <input type="text" id="firstName" name="firstName" placeholder="First Name" readonly>
-                    </div>
-                    <div class="form-group small">
-                        <input type="text" id="lastName" name="lastName" placeholder="Last Name" readonly>
-                    </div>
-                    <div class="form-group small">
-                        <input type="text" id="middleInitial" name="middleInitial" placeholder="Middle Initial" readonly>
-                    </div>
-                    <div class="form-group large">
-                        <input type="text" id="spouseName" name="spouseName" placeholder="Spouse's First and Last Name" readonly>
-                    </div>
-                    <div class="form-group small">
-                        <select id="status" name="status" class="dropdown-select" disabled>
-                            <option value="ACTIVE DUTY">Active Duty</option>
-                            <option value="CIVILIAN">Civilian</option>
-                            <option value="RETIRED">Retired</option>
-                        </select>
-                    </div>
-                    <div class="form-group medium">
-                        <input type="email" id="personalEmail" name="personalEmail" placeholder="Personal Email" readonly>
-                    </div>
-                    <div class="form-group medium">
-                        <input type="tel" id="personalContact" name="personalContact" placeholder="Personal Contact No." readonly>
-                    </div>
-                    <div class="form-group medium">
-                        <input type="tel" id="workContact" name="workContact" placeholder="Work Contact No." readonly>
-                    </div>
-                    <div class="form-group medium">
-                        <input type="tel" id="spouseContact" name="spouseContact" placeholder="Spouse / Alternative Contact No." readonly>
-                    </div>
-                    <div class="form-group small">
-                        <select id="preferredContact" name="preferredContact" class="dropdown-select" disabled>
-                            <option value="SPONSOR">Sponsor</option>
-                            <option value="SPOUSE">Spouse</option>
-                            <option value="WORK">Work</option>
-                            <option value="PERSONAL">Personal</option>
-                        </select>
-                    </div>
-                    <div class="form-group medium">
-                        <input type="text" id="mailBox" name="mailBox" placeholder="Mail Box No." readonly>
-                    </div>
-                </div>
-            </section>
+      <!-- Personal Information Section -->
+      <section class="profile-section">
+        <div class="section-header">
+          <h2 class="section-title">Personal Info</h2>
+          <button class="edit-btn">
+            <i class="fa-solid fa-edit"></i> Edit
+          </button>
+        </div>
+        <div class="form-grid">
+          <div class="form-group small">
+            <label for="firstName">First Name</label>
+            <input type="text" id="firstName" name="firstName" readonly>
+          </div>
+          <div class="form-group small">
+            <label for="lastName">Last Name</label>
+            <input type="text" id="lastName" name="lastName" readonly>
+          </div>
+          <div class="form-group small">
+            <label for="middleInitial">Middle Initial</label>
+            <input type="text" id="middleInitial" name="middleInitial" readonly>
+          </div>
+          <div class="form-group large">
+            <label for="spouseName">Spouse's First and Last Name</label>
+            <input type="text" id="spouseName" name="spouseName" readonly>
+          </div>
 
-            <!-- Military Information Section -->
-            <section class="profile-section">
-                <div class="section-header">
-                    <h2 class="section-title">Military Information</h2>
-                </div>
-                <div class="form-grid">
-                    <div class="form-group medium">
-                        <input type="text" id="militaryGrade" name="militaryGrade" placeholder="Military Grade" readonly>
-                    </div>
-                    <div class="form-group medium">
-                        <select id="dualMilitary" name="dualMilitary" class="dropdown-select" disabled>
-                            <option value="YES">Yes</option>
-                            <option value="NO">No</option>
-                            <option value="N/A">N/A</option>
-                        </select>
-                    </div>
-                    <div class="form-group medium">
-                        <input type="text" id="militaryBranch" name="militaryBranch" placeholder="Military Branch" readonly>
-                    </div>
-                    <div class="form-group medium">
-                        <input type="text" id="militaryUnit" name="militaryUnit" placeholder="Military Unit" readonly>
-                    </div>
-                    <div class="form-group medium">
-                        <input type="text" id="supervisorId" name="supervisorId" placeholder="Supervisor ID" readonly>
-                    </div>
-                </div>
-            </section>
-        </main>
-    </div>
+          <!-- Sponsor Status -->
+          <div class="form-group small status-field">
+            <label for="status">Sponsor Status</label>
+            <input type="text" id="status" name="status" readonly>
+          </div>
 
-    <script src="../JS/sponsor-profile.js"></script>
+          <div class="form-group medium">
+            <label for="personalEmail">Personal Email</label>
+            <input type="email" id="personalEmail" name="personalEmail" readonly>
+          </div>
+          <div class="form-group medium">
+            <label for="personalContact">Personal Contact No.</label>
+            <input type="tel" id="personalContact" name="personalContact" readonly>
+          </div>
+          <div class="form-group medium">
+            <label for="workContact">Work Contact No.</label>
+            <input type="tel" id="workContact" name="workContact" readonly>
+          </div>
+          <div class="form-group medium">
+            <label for="spouseContact">Spouse / Alternative Contact No.</label>
+            <input type="tel" id="spouseContact" name="spouseContact" readonly>
+          </div>
+
+          <!-- Preferred Contact -->
+          <div class="form-group small preferred-contact-field">
+            <label for="preferredContact">Preferred Contact</label>
+            <input type="text" id="preferredContact" name="preferredContact" readonly>
+          </div>
+
+          <div class="form-group medium">
+            <label for="mailBox">Mail Box No.</label>
+            <input type="text" id="mailBox" name="mailBox" readonly>
+          </div>
+        </div>
+      </section>
+
+      <!-- Military Information Section -->
+      <section class="profile-section">
+        <div class="section-header">
+          <h2 class="section-title">Military Information</h2>
+        </div>
+        <div class="form-grid">
+          <div class="form-group medium">
+            <label for="militaryGrade">Military Grade</label>
+            <input type="text" id="militaryGrade" name="militaryGrade" readonly>
+          </div>
+
+          <!-- Dual Military -->
+          <div class="form-group medium dual-military-field">
+            <label for="dualMilitary">Dual Military</label>
+            <input type="text" id="dualMilitary" name="dualMilitary" readonly>
+          </div>
+
+          <div class="form-group medium">
+            <label for="militaryBranch">Military Branch</label>
+            <input type="text" id="militaryBranch" name="militaryBranch" readonly>
+          </div>
+          <div class="form-group medium">
+            <label for="militaryUnit">Military Unit</label>
+            <input type="text" id="militaryUnit" name="militaryUnit" readonly>
+          </div>
+          <div class="form-group medium">
+            <label for="supervisorId">Supervisor ID</label>
+            <input type="text" id="supervisorId" name="supervisorId" readonly>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="../JS/sponsor-profile.js"></script>
 </body>
 </html>
