@@ -1,213 +1,65 @@
-// ====================
-// sponsor-pet.js (UPDATED)
-// ====================
+// Function to handle exit button click
+function exitApp() {
+    const confirmExit = confirm("Are you sure you want to exit?");
+    if (confirmExit) {
+        window.close();
 
-function generateRandomAlphaNum(length) {
-  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  const digits = "0123456789";
-  let result = "";
-
-  for (let i = 0; i < length; i++) {
-    if (i % 2 === 0) {
-      result += letters.charAt(Math.floor(Math.random() * letters.length));
-    } else {
-      result += digits.charAt(Math.floor(Math.random() * digits.length));
+        // Fallback for browsers that block window.close()
+        setTimeout(() => {
+            document.body.innerHTML = `
+                <div style="
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    height: 100vh;
+                    background: linear-gradient(135deg, #FFA500, #FFD700);
+                    font-family: Arial, sans-serif;
+                    color: #1E5A8A;
+                    font-size: 2rem;
+                    text-align: center;
+                ">
+                    <div>
+                        <h1>Thank you for using PawFile!</h1>
+                        <p style="margin-top: 1rem; font-size: 1.2rem;">You can now close this tab.</p>
+                    </div>
+                </div>
+            `;
+        }, 100);
     }
-  }
-  return result;
 }
 
-document.addEventListener("click", function (event) {
-  // Handle Add Pet
-  if (event.target.classList.contains("add-pet")) {
-    const wrapper = document.getElementById("pet-forms-wrapper");
-    const formToClone = wrapper.querySelector(".registration-form");
-    const newForm = formToClone.cloneNode(true);
-
-    newForm.querySelectorAll("input, select, textarea").forEach((input) => {
-      if (input.type === "radio" || input.type === "checkbox") {
-        input.checked = false;
-      } else {
-        input.value = "";
-      }
-    });
-
-    const vaccineContainer = newForm.querySelector("#vaccine-section");
-    const allVaccines = vaccineContainer.querySelectorAll(".vaccine-section");
-    allVaccines.forEach((section, index) => {
-      if (index > 0) {
-        section.remove();
-      } else {
-        section.querySelector("p").textContent = "Vaccine #1";
-        section.querySelectorAll("input, select").forEach((inp) => {
-          if (inp.type === "radio" || inp.type === "checkbox") {
-            inp.checked = false;
-          } else {
-            inp.value = "";
-          }
-        });
-        const addBtn = section.querySelector(".add-vaccine");
-        const delBtn = section.querySelector(".delete-vaccine");
-        if (addBtn) addBtn.style.display = "inline-block";
-        if (delBtn) delBtn.style.display = "none";
-      }
-    });
-
-    const allPetForms = wrapper.querySelectorAll(".registration-form");
-    const newIndex = allPetForms.length + 1;
-
-    const titleH3 = newForm.querySelector(".form-name");
-    if (titleH3) {
-      titleH3.textContent = `Pet Information ${newIndex}`;
+// Escape key to trigger exit
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        exitApp();
     }
-
-    newForm.querySelectorAll("input[type=radio]").forEach((radio) => {
-      const baseName = radio.name.replace(/-\d+$/, "");
-      radio.name = `${baseName}-${newIndex}`;
-    });
-
-    wrapper.appendChild(newForm);
-    newForm.classList.add("fade-slide-in");
-  }
-
-  // Handle Delete Pet
-  if (event.target.classList.contains("delete-pet")) {
-    const wrapper = document.getElementById("pet-forms-wrapper");
-    const allPetForms = wrapper.querySelectorAll(".registration-form");
-
-    if (allPetForms.length > 1) {
-      const lastForm = allPetForms[allPetForms.length - 1];
-      lastForm.classList.add("fade-slide-out");
-      lastForm.addEventListener(
-        "animationend",
-        () => {
-          lastForm.remove();
-
-          const updatedForms = wrapper.querySelectorAll(".registration-form");
-          updatedForms.forEach((form, idx) => {
-            const number = idx + 1;
-            const titleH3 = form.querySelector(".form-name");
-            if (titleH3) {
-              titleH3.textContent = `Pet Information ${number}`;
-            }
-            form.querySelectorAll("input[type=radio]").forEach((radio) => {
-              const baseName = radio.name.replace(/-\d+$/, "");
-              radio.name = `${baseName}-${number}`;
-            });
-          });
-        },
-        { once: true }
-      );
-    } else {
-      alert("At least one pet form is required.");
-    }
-  }
-
-  // Handle Add Vaccine
-  if (event.target.classList.contains("add-vaccine")) {
-    const currentForm = event.target.closest(".registration-form");
-    const vaccineContainer = currentForm.querySelector("#vaccine-section");
-
-    const vaccineSections = vaccineContainer.querySelectorAll(".vaccine-section");
-    const lastVaccine = vaccineSections[vaccineSections.length - 1];
-    const newVaccine = lastVaccine.cloneNode(true);
-
-    newVaccine.querySelectorAll("input, select").forEach((input) => {
-      if (input.type === "radio" || input.type === "checkbox") {
-        input.checked = false;
-      } else {
-        input.value = "";
-      }
-    });
-
-    vaccineContainer.appendChild(newVaccine);
-    newVaccine.classList.add("fade-slide-in");
-
-    const allVaccines = vaccineContainer.querySelectorAll(".vaccine-section");
-    allVaccines.forEach((section, index) => {
-      const label = section.querySelector("p");
-      if (label) label.textContent = `Vaccine #${index + 1}`;
-
-      const addBtn = section.querySelector(".add-vaccine");
-      const delBtn = section.querySelector(".delete-vaccine");
-      if (addBtn && delBtn) {
-        if (index === allVaccines.length - 1) {
-          addBtn.style.display = "inline-block";
-          delBtn.style.display = "inline-block";
-        } else {
-          addBtn.style.display = "none";
-          delBtn.style.display = "none";
-        }
-      }
-    });
-  }
-
-  // Handle Delete Vaccine
-  if (event.target.classList.contains("delete-vaccine")) {
-    const currentForm = event.target.closest(".registration-form");
-    const vaccineContainer = currentForm.querySelector("#vaccine-section");
-    const allVaccines = vaccineContainer.querySelectorAll(".vaccine-section");
-
-    if (allVaccines.length > 1) {
-      const lastVaccine = allVaccines[allVaccines.length - 1];
-      lastVaccine.classList.add("fade-slide-out");
-      lastVaccine.addEventListener(
-        "animationend",
-        () => {
-          lastVaccine.remove();
-          const updatedVaccines = vaccineContainer.querySelectorAll(".vaccine-section");
-          updatedVaccines.forEach((section, index) => {
-            const label = section.querySelector("p");
-            if (label) label.textContent = `Vaccine #${index + 1}`;
-
-            const addBtn = section.querySelector(".add-vaccine");
-            const delBtn = section.querySelector(".delete-vaccine");
-            if (addBtn && delBtn) {
-              if (index === updatedVaccines.length - 1) {
-                addBtn.style.display = "inline-block";
-                delBtn.style.display = "inline-block";
-              } else {
-                addBtn.style.display = "none";
-                delBtn.style.display = "none";
-              }
-            }
-          });
-        },
-        { once: true }
-      );
-    } else {
-      alert("At least one vaccine section is required.");
-    }
-  }
 });
 
-// ====================
-// Save Button Logic
-// ====================
-document.getElementById("save-information")?.addEventListener("click", () => {
-  const allForms = document.querySelectorAll(".registration-form");
-  const data = [];
-  allForms.forEach((form) => {
-    const formData = new FormData(form);
-    const obj = {};
-    formData.forEach((value, key) => {
-      obj[key] = value;
+// On load: animate and populate sponsor info
+document.addEventListener('DOMContentLoaded', function() {
+    const container = document.querySelector('.container');
+    container.style.opacity = '0';
+    container.style.transform = 'translateY(20px)';
+    container.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+
+    setTimeout(() => {
+        container.style.opacity = '1';
+        container.style.transform = 'translateY(0)';
+    }, 100);
+
+    // Card click effect
+    const accountCard = document.querySelector('.account-card');
+    accountCard.style.transition = 'transform 0.2s ease';
+    accountCard.addEventListener('click', function () {
+        this.style.transform = 'scale(0.98)';
+        setTimeout(() => {
+            this.style.transform = 'scale(1)';
+        }, 150);
     });
-    data.push(obj);
-  });
 
-  console.log("All Pet Data:", data);
-
-  // Generate sponsor ID and password
-  const sponsorId = generateRandomAlphaNum(5);
-  const password = generateRandomAlphaNum(5);
-
-  // Save to sessionStorage
-  sessionStorage.setItem("sponsorId", sponsorId);
-  sessionStorage.setItem("password", password);
-
-  alert("Data saved. Sponsor ID and password have been generated.");
-
-  // Redirect to client-details page
-  window.location.href = "/forms/client-details.html";
+    // Populate sponsor data
+    const sponsorId = sessionStorage.getItem("sponsorId");
+    const password = sessionStorage.getItem("password");
+    document.getElementById("sponsor-id").textContent = sponsorId || "Not available";
+    document.getElementById("password").textContent = password || "Not available";
 });
