@@ -1,0 +1,119 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #FFA500, #FFD700);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    text-align: center;
+    width: 100%;
+    max-width: 600px;
+    padding: 20px;
+}
+
+.logo h1 {
+    font-size: 4rem;
+    font-weight: bold;
+    color: #1E5A8A;
+    margin-bottom: 3rem;
+    letter-spacing: 2px;
+}
+
+.account-card {
+    background: white;
+    border-radius: 20px;
+    padding: 3rem 2rem;
+    margin-bottom: 3rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 3rem;
+}
+
+.account-card h2 {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 2.5rem;
+}
+
+.details {
+    text-align: left;
+    max-width: 350px;
+    margin: 0 auto;
+}
+
+.detail-row {
+    display: flex;
+    margin-bottom: 1.5rem;
+    font-size: 1.3rem;
+}
+
+.detail-row:last-child {
+    margin-bottom: 0;
+}
+
+.label {
+    color: #333;
+    font-weight: bold;
+    min-width: 140px;
+}
+
+.value {
+    color: #333;
+    margin-left: 1rem;
+}
+
+.exit-btn {
+    background: #1E5A8A;
+    color: white;
+    border: none;
+    padding: 1rem 2.5rem;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    letter-spacing: 1px;
+}
+
+.exit-btn:hover {
+    background: #1A4F7A;
+}
+
+.exit-btn:active {
+    transform: translateY(1px);
+}
+
+@media (max-width: 768px) {
+    .logo h1 {
+        font-size: 3rem;
+    }
+    
+    .account-card {
+        padding: 2rem 1.5rem;
+        margin: 0 1rem 2rem 1rem;
+    }
+    
+    .account-card h2 {
+        font-size: 2rem;
+    }
+    
+    .detail-row {
+        font-size: 1.1rem;
+    }
+    
+    .label {
+        min-width: 120px;
+    }
+}
