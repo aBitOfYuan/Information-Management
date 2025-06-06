@@ -1,6 +1,7 @@
 /*--------------------------------------------------------------------
-  FUNDAMENTAL RESET & BASE STYLES
+  FONT IMPORT & RESET
 --------------------------------------------------------------------*/
+/* Custom font */
 @font-face {
   font-family: 'Jellee';
   src: url('../Fonts/Jellee-Roman.ttf') format('truetype');
@@ -8,12 +9,14 @@
   font-style: normal;
 }
 
+/* Reset box model and remove margin/padding */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
+/* Base styles for body */
 body {
   font-family: 'Jellee', Arial, sans-serif;
   background-color: #f8f9fa;
@@ -26,7 +29,7 @@ body {
 }
 
 /*--------------------------------------------------------------------
-  LAYOUT CONTAINER: wraps sidebar + main content
+  CONTAINER FOR LAYOUT (sidebar + main content)
 --------------------------------------------------------------------*/
 .container {
   display: flex;
@@ -35,21 +38,22 @@ body {
 }
 
 /*--------------------------------------------------------------------
-  SIDEBAR (sticky on left; becomes top‐bar on small screens)
+  SIDEBAR
 --------------------------------------------------------------------*/
 .sidebar {
-  background-color: #F9C320;
-  width: 220px;
+  background-color: #F9C320;        /* Sidebar background color */
+  width: 220px;                     /* Fixed width */
   padding: 25px 15px;
   display: flex;
   flex-direction: column;
-  position: sticky;
+  position: sticky;                 /* Sticky sidebar */
   top: 0;
   height: 100vh;
   overflow-y: auto;
   z-index: 100;
 }
 
+/* Logo styles */
 .logo {
   font-size: 2.2rem;
   font-weight: bold;
@@ -60,7 +64,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 4px;
+  gap: 4px;                        /* space between letters and paw */
 }
 
 .logo i {
@@ -68,15 +72,17 @@ body {
   margin: 0 1px;
 }
 
+/* Sidebar navigation menu */
 .nav-menu {
   list-style: none;
-  margin-bottom: auto;
+  margin-bottom: auto;             /* Push sign out button to bottom */
 }
 
 .nav-menu li {
   margin: 12px 0;
 }
 
+/* Navigation links */
 .nav-menu a {
   color: #333;
   text-decoration: none;
@@ -89,20 +95,24 @@ body {
   transition: all 0.3s ease;
 }
 
+/* Active nav item */
 .nav-menu a.active {
   background-color: #0F5AA6;
   color: #fff;
 }
 
+/* Icon spacing */
 .nav-menu a i {
   margin-right: 10px;
   font-size: 1.1rem;
 }
 
+/* Hover effect for nav links */
 .nav-menu a:hover:not(.active) {
   background-color: rgba(255, 255, 255, 0.3);
 }
 
+/* Sign out button styles */
 .sign-out-btn {
   background-color: #0F5AA6;
   color: #fff;
@@ -113,7 +123,7 @@ body {
   cursor: pointer;
   font-size: 0.95rem;
   transition: background-color 0.3s;
-  margin-top: auto;
+  margin-top: auto;               /* Stick at bottom */
   margin-bottom: 15px;
 }
 
@@ -122,7 +132,7 @@ body {
 }
 
 /*--------------------------------------------------------------------
-  MAIN CONTENT AREA
+  MAIN CONTENT
 --------------------------------------------------------------------*/
 .main-content {
   flex: 1;
@@ -131,6 +141,7 @@ body {
   background-color: #f8f9fa;
 }
 
+/* Header text */
 .welcome-header {
   color: #333;
   margin-bottom: 25px;
@@ -139,7 +150,7 @@ body {
 }
 
 /*--------------------------------------------------------------------
-  PET LIST & PET CARD
+  PET LIST & PET CARD STYLES
 --------------------------------------------------------------------*/
 .pet-list {
   list-style: none;
@@ -147,6 +158,7 @@ body {
   margin: 0;
 }
 
+/* Single pet card container */
 .pet-card {
   background: #fff;
   border-radius: 10px;
@@ -160,14 +172,17 @@ body {
   cursor: pointer;
 }
 
+/* Hover highlight on pet card */
 .pet-card:hover {
   box-shadow: 0 4px 16px rgba(44, 44, 44, 0.13);
 }
 
+/* Highlight class for additional emphasis */
 .pet-card.highlight {
   background: #f0f8ff;
 }
 
+/* Pet name */
 .pet-name {
   font-size: 1.2rem;
   font-weight: bold;
@@ -177,12 +192,35 @@ body {
   display: block;
 }
 
+/* Pet ID below name */
 .pet-id {
   font-size: 0.98rem;
   color: #222;
   letter-spacing: 1px;
 }
 
+/* Container holding both remove and edit icons */
+.pet-card .icon-group {
+  display: flex;
+  align-items: center;
+  gap: 18px;                     /* Space between trash and edit icons */
+}
+
+/* Remove (trash) icon styles */
+.pet-card i.remove-icon {
+  font-size: 1.4rem;
+  color: #222;                   /* Black color for trash icon */
+  cursor: pointer;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+/* Remove icon hover effect */
+.pet-card i.remove-icon:hover {
+  color: #555;                  /* Slightly lighter black on hover */
+  transform: scale(1.2);
+}
+
+/* Edit detail icon styles */
 .pet-card i.fa-arrow-up-right-from-square {
   font-size: 1.3rem;
   color: #111;
@@ -190,6 +228,7 @@ body {
   transition: color 0.2s, transform 0.2s;
 }
 
+/* Edit icon hover effect */
 .pet-card i.fa-arrow-up-right-from-square:hover {
   color: #4caf50;
   transform: scale(1.2) rotate(-10deg);
@@ -199,7 +238,7 @@ body {
   RESPONSIVE BREAKPOINTS
 --------------------------------------------------------------------*/
 @media (max-width: 1200px) {
-  /* No major changes needed here for pet‐list layout */
+  /* No major changes */
 }
 
 @media (max-width: 900px) {
