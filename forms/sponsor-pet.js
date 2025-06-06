@@ -1,17 +1,29 @@
-document.addEventListener("click", function (event) {
-  // ====================
-  // Handle Add Pet
-  // ====================
-  if (event.target.classList.contains("add-pet")) {
-    // Instead of appending into #pet-form-container directly,
-    // we append each new <section class="registration-form"> into #pet-forms-wrapper.
-    const wrapper = document.getElementById("pet-forms-wrapper");
+// ====================
+// sponsor-pet.js (UPDATED)
+// ====================
 
-    // Clone the very first registration-form inside the wrapper
+function generateRandomAlphaNum(length) {
+  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const digits = "0123456789";
+  let result = "";
+
+  for (let i = 0; i < length; i++) {
+    if (i % 2 === 0) {
+      result += letters.charAt(Math.floor(Math.random() * letters.length));
+    } else {
+      result += digits.charAt(Math.floor(Math.random() * digits.length));
+    }
+  }
+  return result;
+}
+
+document.addEventListener("click", function (event) {
+  // Handle Add Pet
+  if (event.target.classList.contains("add-pet")) {
+    const wrapper = document.getElementById("pet-forms-wrapper");
     const formToClone = wrapper.querySelector(".registration-form");
     const newForm = formToClone.cloneNode(true);
 
-    // 1) Clear all input/select/textarea values in the cloned form
     newForm.querySelectorAll("input, select, textarea").forEach((input) => {
       if (input.type === "radio" || input.type === "checkbox") {
         input.checked = false;
@@ -20,15 +32,12 @@ document.addEventListener("click", function (event) {
       }
     });
 
-    // 2) Reset vaccine sections inside the cloned form
     const vaccineContainer = newForm.querySelector("#vaccine-section");
     const allVaccines = vaccineContainer.querySelectorAll(".vaccine-section");
     allVaccines.forEach((section, index) => {
       if (index > 0) {
-        // Remove every vaccine block except the first
         section.remove();
       } else {
-        // Reset fields in Vaccine #1
         section.querySelector("p").textContent = "Vaccine #1";
         section.querySelectorAll("input, select").forEach((inp) => {
           if (inp.type === "radio" || inp.type === "checkbox") {
@@ -37,7 +46,6 @@ document.addEventListener("click", function (event) {
             inp.value = "";
           }
         });
-        // Ensure only “Add Vaccine” is visible on the first vaccine block
         const addBtn = section.querySelector(".add-vaccine");
         const delBtn = section.querySelector(".delete-vaccine");
         if (addBtn) addBtn.style.display = "inline-block";
@@ -45,30 +53,24 @@ document.addEventListener("click", function (event) {
       }
     });
 
-    // 3) Figure out the new pet’s index (1-based)
     const allPetForms = wrapper.querySelectorAll(".registration-form");
     const newIndex = allPetForms.length + 1;
 
-    // 4) Rename the heading (“Pet Information X”)
     const titleH3 = newForm.querySelector(".form-name");
     if (titleH3) {
       titleH3.textContent = `Pet Information ${newIndex}`;
     }
 
-    // 5) Append an index suffix to every radio name in the cloned form
     newForm.querySelectorAll("input[type=radio]").forEach((radio) => {
       const baseName = radio.name.replace(/-\d+$/, "");
       radio.name = `${baseName}-${newIndex}`;
     });
 
-    // 6) Finally, append the cloned form to WRAPPER (not to pet-form-container directly)
     wrapper.appendChild(newForm);
     newForm.classList.add("fade-slide-in");
   }
 
-  // ====================
   // Handle Delete Pet
-  // ====================
   if (event.target.classList.contains("delete-pet")) {
     const wrapper = document.getElementById("pet-forms-wrapper");
     const allPetForms = wrapper.querySelectorAll(".registration-form");
@@ -81,16 +83,13 @@ document.addEventListener("click", function (event) {
         () => {
           lastForm.remove();
 
-          // Renumber all remaining pet forms
           const updatedForms = wrapper.querySelectorAll(".registration-form");
           updatedForms.forEach((form, idx) => {
             const number = idx + 1;
-            // Update heading text
             const titleH3 = form.querySelector(".form-name");
             if (titleH3) {
               titleH3.textContent = `Pet Information ${number}`;
             }
-            // Update each radio group’s name suffix
             form.querySelectorAll("input[type=radio]").forEach((radio) => {
               const baseName = radio.name.replace(/-\d+$/, "");
               radio.name = `${baseName}-${number}`;
@@ -104,9 +103,7 @@ document.addEventListener("click", function (event) {
     }
   }
 
-  // ====================
-  // Handle Add Vaccine (unchanged)
-  // ====================
+  // Handle Add Vaccine
   if (event.target.classList.contains("add-vaccine")) {
     const currentForm = event.target.closest(".registration-form");
     const vaccineContainer = currentForm.querySelector("#vaccine-section");
@@ -126,7 +123,6 @@ document.addEventListener("click", function (event) {
     vaccineContainer.appendChild(newVaccine);
     newVaccine.classList.add("fade-slide-in");
 
-    // Renumber all vaccine blocks and toggle button visibility
     const allVaccines = vaccineContainer.querySelectorAll(".vaccine-section");
     allVaccines.forEach((section, index) => {
       const label = section.querySelector("p");
@@ -146,9 +142,7 @@ document.addEventListener("click", function (event) {
     });
   }
 
-  // ====================
-  // Handle Delete Vaccine (unchanged)
-  // ====================
+  // Handle Delete Vaccine
   if (event.target.classList.contains("delete-vaccine")) {
     const currentForm = event.target.closest(".registration-form");
     const vaccineContainer = currentForm.querySelector("#vaccine-section");
@@ -161,7 +155,6 @@ document.addEventListener("click", function (event) {
         "animationend",
         () => {
           lastVaccine.remove();
-          // Re-label remaining vaccine blocks
           const updatedVaccines = vaccineContainer.querySelectorAll(".vaccine-section");
           updatedVaccines.forEach((section, index) => {
             const label = section.querySelector("p");
@@ -189,19 +182,35 @@ document.addEventListener("click", function (event) {
 });
 
 // ====================
-// Back / Save Buttons (unchanged except for searching by ID)
+// Save Button Logic
 // ====================
-document.getElementById("save-information")?.addEventListener("click", () => {
-  const allForms = document.querySelectorAll(".registration-form");
-  const data = [];
-  allForms.forEach((form) => {
-    const formData = new FormData(form);
-    const obj = {};
-    formData.forEach((value, key) => {
-      obj[key] = value;
-    });
-    data.push(obj);
-  });
-  console.log("All Pet Data:", data);
-  alert("Data saved to console. Check browser console for details.");
+document.getElementById("save-information")?.addEventListener("click", (e) => {
+  e.preventDefault();
+
+  const letters = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+  const numbers = '23456789';
+  let sponsorID = '';
+  let password = '';
+
+  for (let i = 0; i < 5; i++) {
+    if (i % 2 === 0) {
+      sponsorID += letters.charAt(Math.floor(Math.random() * letters.length));
+      password += letters.charAt(Math.floor(Math.random() * letters.length));
+    } else {
+      sponsorID += numbers.charAt(Math.floor(Math.random() * numbers.length));
+      password += numbers.charAt(Math.floor(Math.random() * numbers.length));
+    }
+  }
+
+  // Store in localStorage if needed
+  localStorage.setItem('sponsorCredentials', JSON.stringify({
+    sponsorID,
+    password
+  }));
+
+  // Show popup (alert-style for now)
+  alert(`Account Created!\n\nSponsor ID: ${sponsorID}\nPassword: ${password}`);
+
+  // Redirect after user clicks OK
+  window.location.href = 'client-details.html';
 });

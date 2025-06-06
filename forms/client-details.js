@@ -62,21 +62,31 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-document.addEventListener("DOMContentLoaded", () => {
-  const sponsorId = sessionStorage.getItem("sponsorId");
-  const password = sessionStorage.getItem("password");
-
-  const sponsorIdElem = document.getElementById("sponsor-id");
-  const passwordElem = document.getElementById("password");
-
-  if (sponsorId && password) {
-    sponsorIdElem.textContent = sponsorId;
-    passwordElem.textContent = password;
-  } else {
-    sponsorIdElem.textContent = "Not available";
-    passwordElem.textContent = "Not available";
-  }
-});
+document.getElementById("save-information")?.addEventListener("click", (e) => {
+    e.preventDefault();
+    
+    const letters = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+    const numbers = '23456789';
+    let sponsorID = 'SP-';
+    let password = 'PW-';
+    
+    for (let i = 0; i < 5; i++) {
+      if (i % 2 === 0) {
+        sponsorID += letters.charAt(Math.floor(Math.random() * letters.length));
+        password += letters.charAt(Math.floor(Math.random() * letters.length));
+      } else {
+        sponsorID += numbers.charAt(Math.floor(Math.random() * numbers.length));
+        password += numbers.charAt(Math.floor(Math.random() * numbers.length));
+      }
+    }
+    
+    localStorage.setItem('sponsorCredentials', JSON.stringify({
+      sponsorID,
+      password
+    }));
+    
+    window.location.href = 'client-details.html';
+  });
 
 function exitApp() {
   // Define your exit logic here, for example:
