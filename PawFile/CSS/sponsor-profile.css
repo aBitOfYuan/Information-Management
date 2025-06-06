@@ -186,8 +186,8 @@ body {
 
 /* Label styles */
 .form-group label {
-    font-size: 0.9rem;
-    font-weight: 600;
+    font-size: 13px;
+    font-weight: normal;
     color: #333;
     margin-bottom: 6px;
     font-family: 'Jellee', sans-serif;
