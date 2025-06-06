@@ -1,25 +1,13 @@
-document.getElementById("save-information")?.addEventListener("click", (e) => {
-    e.preventDefault();
-    
-    const letters = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
-    const numbers = '23456789';
-    let sponsorID = 'SP-';
-    let password = 'PW-';
-    
-    for (let i = 0; i < 5; i++) {
-      if (i % 2 === 0) {
-        sponsorID += letters.charAt(Math.floor(Math.random() * letters.length));
-        password += letters.charAt(Math.floor(Math.random() * letters.length));
-      } else {
-        sponsorID += numbers.charAt(Math.floor(Math.random() * numbers.length));
-        password += numbers.charAt(Math.floor(Math.random() * numbers.length));
-      }
-    }
-    
-    localStorage.setItem('sponsorCredentials', JSON.stringify({
-      sponsorID,
-      password
-    }));
-    
-    window.location.href = 'client-details.html';
+document.addEventListener('DOMContentLoaded', () => {
+  const credentials = JSON.parse(localStorage.getItem('sponsorCredentials'));
+  
+  if (credentials) {
+    document.getElementById('sponsor-id').textContent = credentials.sponsorID;
+    document.getElementById('password').textContent = credentials.password;
+    localStorage.removeItem('sponsorCredentials');
+  }
+  
+  document.querySelector('.exit-btn').addEventListener('click', () => {
+    window.location.href = 'about:blank';
   });
+});
