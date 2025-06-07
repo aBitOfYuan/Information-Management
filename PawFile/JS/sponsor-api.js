@@ -1,5 +1,5 @@
-const express = require('express');
-const mysql = require('mysql');
+const express = require('express'); 
+const mysql = require('mysql2');
 const cors = require('cors');
 const app = express();
 const PORT = 3000;
@@ -7,12 +7,12 @@ const PORT = 3000;
 app.use(cors());
 app.use(express.json());
 
-// Create MySQL connection
 const db = mysql.createConnection({
-  host: 'localhost',
+  host: '127.0.0.1',
+  port: 3306,
   user: 'root',
-  password: '010123',
-  database: 'pawfile_db'
+  password: '123456',
+  database: 'pawfile'
 });
 
 db.connect(err => {
@@ -23,20 +23,18 @@ db.connect(err => {
   console.log('Connected to MySQL');
 });
 
-// GET sponsor by ID
 app.get('/api/sponsor/:id', (req, res) => {
-    const sponsorID = req.params.id;
-    const query = 'SELECT * FROM Sponsor WHERE Sponsor_ID = ?';
-    
-    db.query(query, [sponsorID], (err, results) => {
-        if (err) return res.status(500).json({ error: err.message });
-        if (results.length === 0) return res.status(404).json({ error: 'Sponsor not found' });
+  const sponsorID = req.params.id;
+  const query = 'SELECT * FROM Sponsor WHERE Sponsor_ID = ?';
+  
+  db.query(query, [sponsorID], (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (results.length === 0) return res.status(404).json({ error: 'Sponsor not found' });
 
-        res.json(results[0]); // Return the sponsor data as JSON
-    });
+    res.json(results[0]);
+  });
 });
 
-// PUT sponsor by ID (update sponsor info)
 app.put('/api/sponsor/:id', (req, res) => {
   const sponsorID = req.params.id;
   const data = req.body;
@@ -56,43 +54,35 @@ app.put('/api/sponsor/:id', (req, res) => {
   });
 });
 
-// ✅ Fetch pets for a sponsor
 app.get('/api/sponsor/:id/pets', (req, res) => {
   const sponsorID = req.params.id.toUpperCase();
-  console.log('Fetching pets for sponsor:', sponsorID);
-
   const sql = `SELECT * FROM Pets WHERE UPPER(Sponsor_ID) = ?`;
 
   db.query(sql, [sponsorID], (err, results) => {
-    if (err) {
-      console.error('Pet fetch error:', err);
-      return res.status(500).json({ error: 'Error fetching pets' });
-    }
+    if (err) return res.status(500).json({ error: 'Error fetching pets' });
 
     const formattedPets = results.map(pet => ({
-      id: pet.Microchip_No?.toString(), // use Microchip_No as id
+      id: pet.Microchip_No?.toString(),
       name: pet.Pet_Name,
       sponsor_id: pet.Sponsor_ID
     }));
 
-    console.log('Pet results:', formattedPets);
     res.json(formattedPets);
   });
 });
 
 app.get('/api/pet/:microchip', (req, res) => {
-    const microchip = req.params.microchip;
-    const query = 'SELECT * FROM Pets WHERE Microchip_No = ?';
+  const microchip = req.params.microchip;
+  const query = 'SELECT * FROM Pets WHERE Microchip_No = ?';
 
-    db.query(query, [microchip], (err, results) => {
-        if (err) return res.status(500).json({ error: err.message });
-        if (results.length === 0) return res.status(404).json({ error: 'Pet not found' });
+  db.query(query, [microchip], (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (results.length === 0) return res.status(404).json({ error: 'Pet not found' });
 
-        res.json(results[0]);
-    });
+    res.json(results[0]);
+  });
 });
 
-// ✅ Add pet (based on your request #4)
 app.post('/api/pets', (req, res) => {
   const { Pet_ID, Pet_Name, Sponsor_ID } = req.body;
 
@@ -102,16 +92,11 @@ app.post('/api/pets', (req, res) => {
 
   const query = 'INSERT INTO Pets (Pet_ID, Pet_Name, Sponsor_ID) VALUES (?, ?, ?)';
   db.query(query, [Pet_ID, Pet_Name, Sponsor_ID], (err, result) => {
-    if (err) {
-      console.error('Add pet error:', err);
-      res.status(500).json({ error: 'Error adding pet' });
-      return;
-    }
+    if (err) return res.status(500).json({ error: 'Error adding pet' });
     res.status(201).json({ message: 'Pet added successfully' });
   });
 });
 
-// Get all vaccine records for a pet (with reaction info)
 app.get('/api/pet/:microchip/vaccines', (req, res) => {
   const microchip = req.params.microchip;
   const sql = `
