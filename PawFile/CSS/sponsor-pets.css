@@ -19,8 +19,8 @@
 /* Base styles for body */
 body {
   font-family: 'Jellee', Arial, sans-serif;
-  background-color: #f8f9fa;
-  color: #333;
+  background-color: #f8f9fa !important;
+  color: #333 !important;
   line-height: 1.6;
   height: 100vh;
   display: flex;

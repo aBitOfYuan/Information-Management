@@ -59,7 +59,7 @@ body {
 .logo {
     font-size: 5rem;
     font-weight: bold;
-    color: #0F5AA6;
+    color: #0F5AA6 !important;
     font-weight: bold;
     margin-bottom: 30px;
 }

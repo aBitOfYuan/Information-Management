@@ -16,8 +16,8 @@
 
 body {
   font-family: 'Jellee', sans-serif;
-  background-color: rgba(244, 244, 244, 0.68);
-  color: #0d2038;
+  background-color: rgba(244, 244, 244, 0.68) !important;
+  color: #0d2038 !important;
   line-height: 1.5;
   height: 100vh;
   display: flex;
@@ -206,9 +206,9 @@ body {
   border: 1px solid #ccc;
   border-radius: 6px;
   font-size: 0.95rem;
+  color: #333;
   font-weight: bold;
-  color: #999;
-  background-color: #fff;
+  background-color: #f8f9fa;
   box-sizing: border-box;
 }
 
@@ -218,6 +218,35 @@ body {
   border-color: #0F5AA6;
   box-shadow: 0 0 6px #0F5AA6aa;
   background-color: #f0f4ff;
+}
+
+.info-grid input[readonly],
+.info-grid select:disabled {
+  background-color: #e9ecef;
+  color: #333;
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+/* Show not-allowed cursor on hover for readonly/disabled fields */
+.info-grid input[readonly]:hover,
+.info-grid select:disabled:hover,
+.vaccine-section .info-grid input[readonly]:hover,
+.vaccine-section .info-grid select:disabled:hover {
+  cursor: not-allowed;
+}
+
+/* Also apply to dob-input fields */
+.dob-input[readonly],
+.dob-input:disabled {
+  background-color: #e9ecef;
+  color: #333;
+  cursor: not-allowed;
+}
+
+.dob-input[readonly]:hover,
+.dob-input:disabled:hover {
+  cursor: not-allowed;
 }
 
 .form-field {
@@ -239,6 +268,7 @@ body {
   color: transparent;
   position: relative;
   z-index: 1;
+  font-weight: bold;
 }
 
 .dob-input:focus,
@@ -302,8 +332,13 @@ body {
 
 .checkbox-yesno-container input[type="radio"] {
   margin-right: 6px;
-  accent-color: #0F5AA6;
+  accent-color: #0B3E73; /* Darker blue */
 }
+
+.checkbox-yesno-container input[type="radio"]:hover {
+  accent-color: #072E56;
+}
+
 
 /*--------------------------------------------------------------------
   VACCINE SECTION (wrapper inside info-section)

@@ -5,10 +5,11 @@ const app = express();
 const port = 3000;
 
 const db = mysql.createConnection({
-  host: '127.0.0.1',
+  host: 'localhost',
+  port: 3306,
   user: 'root',
-  password: 'root@password1',
-  database: 'pawfiledb2'
+  password: '010123',
+  database: 'pawfile_db'
 });
 
 db.connect(err => {
