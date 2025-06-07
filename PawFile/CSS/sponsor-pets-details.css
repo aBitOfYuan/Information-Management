@@ -360,6 +360,34 @@ body {
 }
 
 /*--------------------------------------------------------------------
+  VACCINE HISTORY TABLE
+--------------------------------------------------------------------*/
+.vaccine-history-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 10px 0 0 0;
+  font-size: 1rem;
+  background: #fff;
+}
+
+.vaccine-history-table th,
+.vaccine-history-table td {
+  border: 1px solid #e0e0e0;
+  padding: 8px 10px;
+  text-align: center;
+}
+
+.vaccine-history-table th {
+  background: #f9c320;
+  color: #0d2038;
+  font-weight: bold;
+}
+
+.vaccine-history-table tr:nth-child(even) {
+  background: #f8f9fa;
+}
+
+/*--------------------------------------------------------------------
   BACK BUTTON & FORM ACTIONS
 --------------------------------------------------------------------*/
 /* Container for action buttons (Back, Save, etc.) */

@@ -111,6 +111,30 @@ app.post('/api/pets', (req, res) => {
   });
 });
 
+// Get all vaccine records for a pet (with reaction info)
+app.get('/api/pet/:microchip/vaccines', (req, res) => {
+  const microchip = req.params.microchip;
+  const sql = `
+    SELECT 
+      vr.Vaccine_Lot,
+      v.Vaccine_Name,
+      v.Vaccine_Type,
+      v.Vaccine_Duration,
+      vr.Date_Vaccination,
+      vr.Vaccination_Effectiveness_Until,
+      vr.Has_Vaccine_Reaction,
+      vr.Vaccine_Reaction_Symptoms
+    FROM Vaccine_Reaction vr
+    JOIN Vaccine v ON vr.Vaccine_Lot = v.Vaccine_Lot
+    WHERE vr.Microchip_No = ?
+    ORDER BY vr.Date_Vaccination DESC
+  `;
+  db.query(sql, [microchip], (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(results);
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });

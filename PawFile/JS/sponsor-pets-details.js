@@ -104,47 +104,73 @@ document.addEventListener("DOMContentLoaded", async () => {
     setRadio("clinicHistory", data.Has_Recent_Clinic_History);
     setRadio("sex", data.Sex);
 
-    // Vaccine sections
-    const vaccineSections = document.querySelectorAll(".vaccine-section");
-    // Vaccine #1
-    if (vaccineSections[0]) {
-      const v1Inputs = vaccineSections[0].querySelectorAll("input, select");
-      // 0: Vaccine1_Lot, 1: Vaccine1_Name, 2: Vaccine1_Type (select), 3: Vaccine1_Duration, 4: Vaccine1_Date, 5: Vaccine1_End_Date, 6: Vaccine1_Symptom
-      if (v1Inputs[0] && data.Vaccine1_Lot) v1Inputs[0].value = data.Vaccine1_Lot;
-      if (v1Inputs[1] && data.Vaccine1_Name) v1Inputs[1].value = data.Vaccine1_Name;
-      if (v1Inputs[2] && data.Vaccine1_Type) {
-        Array.from(v1Inputs[2].options).forEach(opt => {
-          if (opt.textContent.trim().toLowerCase() === data.Vaccine1_Type.trim().toLowerCase() ||
-              opt.value.trim().toLowerCase() === data.Vaccine1_Type.trim().toLowerCase()) {
-            opt.selected = true;
-          }
-        });
+    // --- DYNAMIC VACCINE HISTORY ---
+    // Remove existing vaccine sections (if any)
+    const vaccineHistoryContainer = document.getElementById("vaccine-history");
+    if (vaccineHistoryContainer) vaccineHistoryContainer.innerHTML = "";
+
+    // Fetch all vaccines for this pet
+    let vaccines = [];
+    try {
+      const vaccinesRes = await fetch(`http://localhost:3000/api/pet/${data.Microchip_No || data.Pet_ID || petId}/vaccines`);
+      if (vaccinesRes.ok) {
+        vaccines = await vaccinesRes.json();
       }
-      if (v1Inputs[3] && data.Vaccine1_Duration) v1Inputs[3].value = data.Vaccine1_Duration;
-      if (v1Inputs[4] && data.Vaccine1_Date) v1Inputs[4].value = data.Vaccine1_Date;
-      if (v1Inputs[5] && data.Vaccine1_End_Date) v1Inputs[5].value = data.Vaccine1_End_Date;
-      if (v1Inputs[6] && data.Vaccine1_Symptom) v1Inputs[6].value = data.Vaccine1_Symptom;
-      setRadio("reaction1", data.Vaccine1_Reaction);
+    } catch (e) {
+      console.warn("Could not fetch vaccine history", e);
     }
-    // Vaccine #2
-    if (vaccineSections[1]) {
-      const v2Inputs = vaccineSections[1].querySelectorAll("input, select");
-      if (v2Inputs[0] && data.Vaccine2_Lot) v2Inputs[0].value = data.Vaccine2_Lot;
-      if (v2Inputs[1] && data.Vaccine2_Name) v2Inputs[1].value = data.Vaccine2_Name;
-      if (v2Inputs[2] && data.Vaccine2_Type) {
-        Array.from(v2Inputs[2].options).forEach(opt => {
-          if (opt.textContent.trim().toLowerCase() === data.Vaccine2_Type.trim().toLowerCase() ||
-              opt.value.trim().toLowerCase() === data.Vaccine2_Type.trim().toLowerCase()) {
-            opt.selected = true;
-          }
-        });
-      }
-      if (v2Inputs[3] && data.Vaccine2_Duration) v2Inputs[3].value = data.Vaccine2_Duration;
-      if (v2Inputs[4] && data.Vaccine2_Date) v2Inputs[4].value = data.Vaccine2_Date;
-      if (v2Inputs[5] && data.Vaccine2_End_Date) v2Inputs[5].value = data.Vaccine2_End_Date;
-      if (v2Inputs[6] && data.Vaccine2_Symptom) v2Inputs[6].value = data.Vaccine2_Symptom;
-      setRadio("reaction2", data.Vaccine2_Reaction);
+
+    if (Array.isArray(vaccines) && vaccines.length > 0) {
+      vaccines.forEach((vaccine, idx) => {
+        // Create a new vaccine section
+        const section = document.createElement("div");
+        section.className = "vaccine-section";
+        section.innerHTML = `
+          <h3>Vaccine #${idx + 1}</h3>
+          <div class="info-grid">
+            <div class="form-field">
+              <label>Vaccine Lot</label>
+              <input type="text" placeholder="Vaccine LOT" value="${vaccine.Vaccine_Lot || ''}" readonly />
+            </div>
+            <div class="form-field">
+              <label>Vaccine Name</label>
+              <input type="text" placeholder="Vaccine Name" value="${vaccine.Vaccine_Name || ''}" readonly />
+            </div>
+            <div class="form-field">
+              <label>Vaccine Type</label>
+              <input type="text" placeholder="Vaccine Type" value="${vaccine.Vaccine_Type || ''}" readonly />
+            </div>
+            <div class="form-field">
+              <label>Vaccine Duration</label>
+              <input type="text" placeholder="Vaccine Duration" value="${vaccine.Vaccine_Duration || ''}" readonly />
+            </div>
+            <div class="form-field">
+              <label>Date of Vaccination</label>
+              <input type="text" class="dob-input" placeholder="Date of Vaccination" value="${vaccine.Date_Vaccination ? vaccine.Date_Vaccination.substring(0,10) : ''}" readonly />
+            </div>
+            <div class="form-field">
+              <label>End Date of Vaccine Effectiveness</label>
+              <input type="text" class="dob-input" placeholder="End Date of Vaccine Effectiveness" value="${vaccine.Vaccination_Effectiveness_Until ? vaccine.Vaccination_Effectiveness_Until.substring(0,10) : ''}" readonly />
+            </div>
+            <div class="form-field">
+              <label>Had Vaccine Reaction</label>
+              <div class="checkbox-yesno-container">
+                <label><input type="radio" name="reaction${idx+1}" ${vaccine.Has_Vaccine_Reaction === 1 ? "checked" : ""} disabled /> YES</label>
+                <label><input type="radio" name="reaction${idx+1}" ${vaccine.Has_Vaccine_Reaction === 0 ? "checked" : ""} disabled /> NO</label>
+              </div>
+            </div>
+            <div class="form-field">
+              <label>Vaccine Symptom</label>
+              <input type="text" placeholder="Vaccine Symptom" value="${vaccine.Vaccine_Reaction_Symptoms || ''}" readonly />
+            </div>
+          </div>
+        `;
+        vaccineHistoryContainer.appendChild(section);
+      });
+    } else if (vaccineHistoryContainer) {
+      vaccineHistoryContainer.innerHTML = '<div style="color:#888;">No vaccine history found for this pet.</div>';
     }
+
   } catch (err) {
     setAllFieldsToNA();
     console.error("Error fetching pet details:", err);
