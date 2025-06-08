@@ -1,5 +1,5 @@
 const express = require('express'); 
-const mysql = require('mysql2');
+const mysql = require('mysql');
 const cors = require('cors');
 const app = express();
 const PORT = 3000;
@@ -8,11 +8,10 @@ app.use(cors());
 app.use(express.json());
 
 const db = mysql.createConnection({
-  host: '127.0.0.1',
-  port: 3306,
+  host: 'localhost',
   user: 'root',
-  password: '123456',
-  database: 'pawfile'
+  password: '010123',
+  database: 'pawfile_db'
 });
 
 db.connect(err => {
