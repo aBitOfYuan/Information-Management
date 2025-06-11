@@ -212,5 +212,5 @@ document.getElementById("save-information")?.addEventListener("click", (e) => {
   alert(`Account Created!\n\nSponsor ID: ${sponsorID}\nPassword: ${password}`);
 
   // Redirect after user clicks OK
-  window.location.href = 'client-details.html';
+  window.location.href = '../../PawFile/HTML/pawfile-login.html';
 });
