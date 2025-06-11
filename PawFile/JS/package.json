@@ -4,7 +4,7 @@
   "description": "API server for PawFile application",
   "main": "sponsor-api.js",
   "scripts": {
-    "start": "node sponsor-api.js"
+    "start": "nodemon sponsor-api.js"
   },
   "dependencies": {
     "cors": "^2.8.5",

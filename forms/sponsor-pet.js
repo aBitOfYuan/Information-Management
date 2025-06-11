@@ -191,6 +191,7 @@ document.addEventListener("click", function (event) {
     }
 });
 
+<<<<<<< HEAD
 document.getElementById("back-button").addEventListener("click", () => {
     alert("Back button clicked!");
 });
@@ -208,4 +209,38 @@ document.getElementById("save-information").addEventListener("click", () => {
     });
     console.log("All Pet Data:", data);
     alert("Data saved to console. Check browser console for details.");
+=======
+// ====================
+// Save Button Logic
+// ====================
+document.getElementById("save-information")?.addEventListener("click", (e) => {
+  e.preventDefault();
+
+  const letters = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+  const numbers = '23456789';
+  let sponsorID = '';
+  let password = '';
+
+  for (let i = 0; i < 5; i++) {
+    if (i % 2 === 0) {
+      sponsorID += letters.charAt(Math.floor(Math.random() * letters.length));
+      password += letters.charAt(Math.floor(Math.random() * letters.length));
+    } else {
+      sponsorID += numbers.charAt(Math.floor(Math.random() * numbers.length));
+      password += numbers.charAt(Math.floor(Math.random() * numbers.length));
+    }
+  }
+
+  // Store in localStorage if needed
+  localStorage.setItem('sponsorCredentials', JSON.stringify({
+    sponsorID,
+    password
+  }));
+
+  // Show popup (alert-style for now)
+  alert(`Account Created!\n\nSponsor ID: ${sponsorID}\nPassword: ${password}`);
+
+  // Redirect after user clicks OK
+  window.location.href = '../../PawFile/HTML/pawfile-login.html';
+>>>>>>> cf85ec3c8a7728b53307660a12ca256c366112eb
 });

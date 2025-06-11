@@ -145,7 +145,8 @@ document.addEventListener("click", function (event) {
         alert("Back button clicked!");
     });
 
-    document.getElementById("save-information").addEventListener("click", () => {
+    document.getElementById("save-information").addEventListener("click", (e) => {
+        e.preventDefault();
         const allForms = document.querySelectorAll(".registration-form");
         const data = [];
         allForms.forEach((form) => {

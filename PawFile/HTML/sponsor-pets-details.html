@@ -35,7 +35,7 @@
         My P<i class="fa-solid fa-paw"></i>wmily!
       </h1>
       <div class="pet-id">
-        PET ID: <span id="petId">A7B9K</span>
+        PET ID: <span id="petId"></span>
       </div>
 
       <!-- Pet Information Section -->
@@ -47,17 +47,32 @@
           </button>
         </div>
         <div class="info-grid">
-          <input type="text" placeholder="Pet Name" />
-          <input type="text" placeholder="Species" />
           <div class="form-field">
-            <input type="text" class="dob-input" placeholder="Date of Birth" />
-            <label class="dob-placeholder">Date of Birth</label>
+            <label for="petName">Pet Name</label>
+            <input type="text" id="petName" placeholder="Pet Name" readonly />
           </div>
-          <input type="text" placeholder="Age" />
-          <input type="text" placeholder="Breed" />
-          <select>
-            <option>Solid Color</option>
-          </select>
+          <div class="form-field">
+            <label for="species">Species</label>
+            <input type="text" id="species" placeholder="Species" readonly />
+          </div>
+          <div class="form-field">
+            <label for="dob">Date of Birth</label>
+            <input type="text" id="dob" class="dob-input" placeholder="Date of Birth" readonly />
+          </div>
+          <div class="form-field">
+            <label for="age">Age</label>
+            <input type="text" id="age" placeholder="Age" readonly />
+          </div>
+          <div class="form-field">
+            <label for="breed">Breed</label>
+            <input type="text" id="breed" placeholder="Breed" readonly />
+          </div>
+          <div class="form-field">
+            <label for="color">Color</label>
+            <select id="color" disabled>
+              <option>Solid Color</option>
+            </select>
+          </div>
 
           <div class="checkbox-group">
             <div class="checkbox-container">
@@ -89,7 +104,10 @@
             </div>
           </div>
 
-          <input type="text" placeholder="Clinic Name" />
+          <div class="form-field">
+            <label for="clinicName">Clinic Name</label>
+            <input type="text" id="clinicName" placeholder="Clinic Name" readonly />
+          </div>
 
           <div class="checkbox-group">
             <div class="checkbox-container">
@@ -112,69 +130,8 @@
           </button>
         </div>
 
-        <div class="vaccine-section">
-          <h3>Vaccine #1</h3>
-          <div class="info-grid">
-            <input type="text" placeholder="Vaccine LOT" />
-            <input type="text" placeholder="Vaccine Name" />
-            <select>
-              <option>CORE</option>
-            </select>
-            <input type="text" placeholder="Vaccine Duration" />
-            <div class="form-field">
-              <input type="text" class="dob-input" placeholder="Date of Vaccination" />
-              <label class="dob-placeholder">Date of Vaccination</label>
-            </div>
-            <div class="form-field">
-              <input type="text" class="dob-input" placeholder="End Date of Vaccine Effectiveness" />
-              <label class="dob-placeholder">End Date of Vaccine Effectiveness</label>
-            </div>
-
-            <div class="checkbox-group">
-              <div class="checkbox-container">
-                <label class="checkbox-label">Had Vaccine Reaction</label>
-                <div class="checkbox-yesno-container">
-                  <label><input type="radio" name="reaction1" /> YES</label>
-                  <label><input type="radio" name="reaction1" /> NO</label>
-                </div>
-              </div>
-            </div>
-
-            <input type="text" placeholder="Vaccine Symptom" />
-          </div>
-        </div>
-
-        <div class="vaccine-section">
-          <h3>Vaccine #2</h3>
-          <div class="info-grid">
-            <input type="text" placeholder="Vaccine LOT" />
-            <input type="text" placeholder="Vaccine Name" />
-            <select>
-              <option>CORE</option>
-            </select>
-            <input type="text" placeholder="Vaccine Duration" />
-            <div class="form-field">
-              <input type="text" class="dob-input" placeholder="Date of Vaccination" />
-              <label class="dob-placeholder">Date of Vaccination</label>
-            </div>
-            <div class="form-field">
-              <input type="text" class="dob-input" placeholder="End Date of Vaccine Effectiveness" />
-              <label class="dob-placeholder">End Date of Vaccine Effectiveness</label>
-            </div>
-
-            <div class="checkbox-group">
-              <div class="checkbox-container">
-                <label class="checkbox-label">Had Vaccine Reaction</label>
-                <div class="checkbox-yesno-container">
-                  <label><input type="radio" name="reaction2" /> YES</label>
-                  <label><input type="radio" name="reaction2" /> NO</label>
-                </div>
-              </div>
-            </div>
-
-            <input type="text" placeholder="Vaccine Symptom" />
-          </div>
-        </div>
+        <!-- Dynamic vaccine sections will be inserted here -->
+        <div id="vaccine-history"></div>
       </section>
 
       <div class="form-actions">
@@ -190,3 +147,4 @@
   <script src="../JS/sponsor-pets-details.js"></script>
 </body>
 </html>
+

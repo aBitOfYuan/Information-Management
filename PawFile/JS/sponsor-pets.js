@@ -1,18 +1,40 @@
 // Sample pet data — replace with API or database data as needed
-const pets = [
-  { id: 'A7B9K', name: 'KingKong' },
-  { id: 'C2B2K', name: 'Tiger' },
-  { id: 'A2Z4D', name: 'Dora' }
-];
+let pets = []; // Will be loaded from API
 
 // Reference to the pet list container in DOM
 const petList = document.getElementById('petList');
+
+// Fetch pets for the logged-in sponsor
+function fetchPetsAndRender() {
+  const sponsorID = sessionStorage.getItem('userId');
+  if (!sponsorID) {
+    alert('No logged-in user detected. Redirecting to login page.');
+    window.location.href = '../HTML/pawfile-login.html';
+    return;
+  }
+  fetch(`http://localhost:3000/api/sponsor/${sponsorID}/pets`)
+    .then(res => res.json())
+    .then(data => {
+      pets = data;
+      renderPets();
+    })
+    .catch(err => {
+      console.error("Fetch pets error:", err);
+      pets = [];
+      renderPets();
+    });
+}
 
 /**
  * Render the pet cards dynamically based on the pets array
  */
 function renderPets() {
   petList.innerHTML = ''; // Clear previous content
+
+  if (!pets.length) {
+    petList.innerHTML = '<li style="color:#888; padding:20px;">No pets found for your account.</li>';
+    return;
+  }
 
   pets.forEach(pet => {
     // Create a list item for each pet
@@ -90,4 +112,4 @@ function removePet(petId) {
 }
 
 // Initial rendering of pets when page loads
-renderPets();
+fetchPetsAndRender();

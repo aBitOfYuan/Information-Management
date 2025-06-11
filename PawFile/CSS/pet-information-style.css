@@ -2,8 +2,8 @@ body {
   font-family: 'Jellee', sans-serif;
   margin: 0;
   padding: 0;
-  background-color: rgba(244, 244, 244, 0.68);
-  color: #0d2038;
+  background-color: rgba(244, 244, 244, 0.68) !important;
+  color: #0d2038 !important;
   line-height: 1.5;
 }
 
