@@ -1,3 +1,10 @@
+@font-face {
+    font-family: 'Jellee';
+    src: url('../Fonts/Jellee-Roman.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
 /* Reset and global styles */
 * {
     margin: 0;

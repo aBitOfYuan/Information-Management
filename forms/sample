@@ -1,0 +1,13 @@
+document.addEventListener('DOMContentLoaded', () => {
+  const credentials = JSON.parse(localStorage.getItem('sponsorCredentials'));
+  
+  if (credentials) {
+    document.getElementById('sponsor-id').textContent = credentials.sponsorID;
+    document.getElementById('password').textContent = credentials.password;
+    localStorage.removeItem('sponsorCredentials');
+  }
+  
+  document.querySelector('.exit-btn').addEventListener('click', () => {
+    window.location.href = 'about:blank';
+  });
+});
