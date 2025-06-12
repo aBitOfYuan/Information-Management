@@ -11,8 +11,8 @@ const db = mysql.createConnection({
   host: '127.0.0.1',
   port: 3306,
   user: 'root',
-  password: '123456',
-  database: 'pawfile'
+  password: 'yosefff1133',
+  database: 'prac_schema'
 });
 
 db.connect(err => {
@@ -290,6 +290,72 @@ app.put('/api/sponsor/:id', (req, res) => {
       });
     });
   }
+});
+
+app.get('/api/sponsor/:id/pets', (req, res) => {
+  const sponsorID = req.params.id.toUpperCase();
+  const sql = `SELECT * FROM Pets WHERE UPPER(Sponsor_ID) = ?`;
+
+  db.query(sql, [sponsorID], (err, results) => {
+    if (err) return res.status(500).json({ error: 'Error fetching pets' });
+
+    const formattedPets = results.map(pet => ({
+      id: pet.Microchip_No?.toString(),
+      name: pet.Pet_Name,
+      sponsor_id: pet.Sponsor_ID
+    }));
+
+    res.json(formattedPets);
+  });
+});
+
+app.get('/api/pet/:microchip', (req, res) => {
+  const microchip = req.params.microchip;
+  const query = 'SELECT * FROM Pets WHERE Microchip_No = ?';
+
+  db.query(query, [microchip], (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (results.length === 0) return res.status(404).json({ error: 'Pet not found' });
+
+    res.json(results[0]);
+  });
+});
+
+app.post('/api/pets', (req, res) => {
+  const { Pet_ID, Pet_Name, Sponsor_ID } = req.body;
+
+  if (!Pet_ID || !Pet_Name || !Sponsor_ID) {
+    return res.status(400).json({ error: 'Missing pet data' });
+  }
+
+  const query = 'INSERT INTO Pets (Pet_ID, Pet_Name, Sponsor_ID) VALUES (?, ?, ?)';
+  db.query(query, [Pet_ID, Pet_Name, Sponsor_ID], (err, result) => {
+    if (err) return res.status(500).json({ error: 'Error adding pet' });
+    res.status(201).json({ message: 'Pet added successfully' });
+  });
+});
+
+app.get('/api/pet/:microchip/vaccines', (req, res) => {
+  const microchip = req.params.microchip;
+  const sql = `
+    SELECT 
+      vr.Vaccine_Lot,
+      v.Vaccine_Name,
+      v.Vaccine_Type,
+      v.Vaccine_Duration,
+      vr.Date_Vaccination,
+      vr.Vaccination_Effectiveness_Until,
+      vr.Has_Vaccine_Reaction,
+      vr.Vaccine_Reaction_Symptoms
+    FROM Vaccine_Reaction vr
+    JOIN Vaccine v ON vr.Vaccine_Lot = v.Vaccine_Lot
+    WHERE vr.Microchip_No = ?
+    ORDER BY vr.Date_Vaccination DESC
+  `;
+  db.query(sql, [microchip], (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json(results);
+  });
 });
 
 app.listen(PORT, () => {

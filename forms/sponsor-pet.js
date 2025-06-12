@@ -18,95 +18,72 @@ function generateRandomAlphaNum(length) {
 }
 
 document.addEventListener("click", function (event) {
-  // Handle Add Pet
-  if (event.target.classList.contains("add-pet")) {
-    const wrapper = document.getElementById("pet-forms-wrapper");
-    const formToClone = wrapper.querySelector(".registration-form");
-    const newForm = formToClone.cloneNode(true);
+    // Handle Add Pet
+    if (event.target.classList.contains("add-pet")) {
+        const container = document.getElementById("pet-form-container");
+        const formToClone = document.querySelector(".registration-form");
 
-    newForm.querySelectorAll("input, select, textarea").forEach((input) => {
-      if (input.type === "radio" || input.type === "checkbox") {
-        input.checked = false;
-      } else {
-        input.value = "";
-      }
-    });
+        const newForm = formToClone.cloneNode(true);
 
-    const vaccineContainer = newForm.querySelector("#vaccine-section");
-    const allVaccines = vaccineContainer.querySelectorAll(".vaccine-section");
-    allVaccines.forEach((section, index) => {
-      if (index > 0) {
-        section.remove();
-      } else {
-        section.querySelector("p").textContent = "Vaccine #1";
-        section.querySelectorAll("input, select").forEach((inp) => {
-          if (inp.type === "radio" || inp.type === "checkbox") {
-            inp.checked = false;
-          } else {
-            inp.value = "";
-          }
-        });
-        const addBtn = section.querySelector(".add-vaccine");
-        const delBtn = section.querySelector(".delete-vaccine");
-        if (addBtn) addBtn.style.display = "inline-block";
-        if (delBtn) delBtn.style.display = "none";
-      }
-    });
-
-    const allPetForms = wrapper.querySelectorAll(".registration-form");
-    const newIndex = allPetForms.length + 1;
-
-    const titleH3 = newForm.querySelector(".form-name");
-    if (titleH3) {
-      titleH3.textContent = `Pet Information ${newIndex}`;
-    }
-
-    newForm.querySelectorAll("input[type=radio]").forEach((radio) => {
-      const baseName = radio.name.replace(/-\d+$/, "");
-      radio.name = `${baseName}-${newIndex}`;
-    });
-
-    wrapper.appendChild(newForm);
-    newForm.classList.add("fade-slide-in");
-  }
-
-  // Handle Delete Pet
-  if (event.target.classList.contains("delete-pet")) {
-    const wrapper = document.getElementById("pet-forms-wrapper");
-    const allPetForms = wrapper.querySelectorAll(".registration-form");
-
-    if (allPetForms.length > 1) {
-      const lastForm = allPetForms[allPetForms.length - 1];
-      lastForm.classList.add("fade-slide-out");
-      lastForm.addEventListener(
-        "animationend",
-        () => {
-          lastForm.remove();
-
-          const updatedForms = wrapper.querySelectorAll(".registration-form");
-          updatedForms.forEach((form, idx) => {
-            const number = idx + 1;
-            const titleH3 = form.querySelector(".form-name");
-            if (titleH3) {
-              titleH3.textContent = `Pet Information ${number}`;
+        // Clear all inputs and radios
+        const inputs = newForm.querySelectorAll("input, select");
+        inputs.forEach((input) => {
+            if (input.type === "radio" || input.type === "checkbox") {
+                input.checked = false;
+            } else {
+                input.value = "";
             }
-            form.querySelectorAll("input[type=radio]").forEach((radio) => {
-              const baseName = radio.name.replace(/-\d+$/, "");
-              radio.name = `${baseName}-${number}`;
-            });
-          });
-        },
-        { once: true }
-      );
-    } else {
-      alert("At least one pet form is required.");
-    }
-  }
+        });
 
-  // Handle Add Vaccine
-  if (event.target.classList.contains("add-vaccine")) {
-    const currentForm = event.target.closest(".registration-form");
-    const vaccineContainer = currentForm.querySelector("#vaccine-section");
+        // Reset vaccine sections inside new form to only 1 vaccine section
+        const vaccineContainer = newForm.querySelector("#vaccine-section");
+        const allVaccines = vaccineContainer.querySelectorAll(".vaccine-section");
+        allVaccines.forEach((section, index) => {
+            if (index > 0) section.remove(); // remove all but first
+            else {
+                // Reset first vaccine section's label and inputs
+                const label = section.querySelector("p");
+                if (label) label.textContent = "Vaccine #1";
+
+                const inputs = section.querySelectorAll("input, select");
+                inputs.forEach((input) => {
+                    if (input.type === "radio" || input.type === "checkbox") {
+                        input.checked = false;
+                    } else {
+                        input.value = "";
+                    }
+                });
+
+                // Show Add/Delete buttons only on first vaccine section
+                const addBtn = section.querySelector(".add-vaccine");
+                const delBtn = section.querySelector(".delete-vaccine");
+                if (addBtn && delBtn) {
+                    addBtn.style.display = "inline-block";
+                    delBtn.style.display = "none"; // only one vaccine, no delete button
+                }
+            }
+        });
+
+        // Update pet number in title
+        const allForms = container.querySelectorAll(".registration-form");
+        const newFormNumber = allForms.length + 1;
+        const title = newForm.querySelector(".form-name");
+        if (title) title.textContent = `Pet Information ${newFormNumber}`;
+
+        // Update radio input names for new form (so they don't clash)
+        newForm.querySelectorAll("input[type=radio]").forEach((radio) => {
+            let baseName = radio.name.replace(/-\d+$/, "");
+            radio.name = baseName + "-" + newFormNumber;
+        });
+
+        container.appendChild(newForm);
+        newForm.classList.add("fade-slide-in");
+    }
+
+    // Handle Add Vaccine
+    if (event.target.classList.contains("add-vaccine")) {
+        const currentForm = event.target.closest(".registration-form");
+        const vaccineContainer = currentForm.querySelector("#vaccine-section");
 
     const vaccineSections = vaccineContainer.querySelectorAll(".vaccine-section");
     const lastVaccine = vaccineSections[vaccineSections.length - 1];
@@ -123,10 +100,11 @@ document.addEventListener("click", function (event) {
     vaccineContainer.appendChild(newVaccine);
     newVaccine.classList.add("fade-slide-in");
 
-    const allVaccines = vaccineContainer.querySelectorAll(".vaccine-section");
-    allVaccines.forEach((section, index) => {
-      const label = section.querySelector("p");
-      if (label) label.textContent = `Vaccine #${index + 1}`;
+        // Update vaccine labels
+        const allVaccines = vaccineContainer.querySelectorAll(".vaccine-section");
+        allVaccines.forEach((section, index) => {
+            const label = section.querySelector("p");
+            if (label) label.textContent = `Vaccine #${index + 1}`;
 
       const addBtn = section.querySelector(".add-vaccine");
       const delBtn = section.querySelector(".delete-vaccine");
@@ -142,45 +120,96 @@ document.addEventListener("click", function (event) {
     });
   }
 
-  // Handle Delete Vaccine
-  if (event.target.classList.contains("delete-vaccine")) {
-    const currentForm = event.target.closest(".registration-form");
-    const vaccineContainer = currentForm.querySelector("#vaccine-section");
-    const allVaccines = vaccineContainer.querySelectorAll(".vaccine-section");
+    // Handle Delete Vaccine
+    if (event.target.classList.contains("delete-vaccine")) {
+        const currentForm = event.target.closest(".registration-form");
+        const vaccineContainer = currentForm.querySelector("#vaccine-section");
+        const allVaccines = vaccineContainer.querySelectorAll(".vaccine-section");
 
-    if (allVaccines.length > 1) {
-      const lastVaccine = allVaccines[allVaccines.length - 1];
-      lastVaccine.classList.add("fade-slide-out");
-      lastVaccine.addEventListener(
-        "animationend",
-        () => {
-          lastVaccine.remove();
-          const updatedVaccines = vaccineContainer.querySelectorAll(".vaccine-section");
-          updatedVaccines.forEach((section, index) => {
-            const label = section.querySelector("p");
-            if (label) label.textContent = `Vaccine #${index + 1}`;
+        if (allVaccines.length > 1) {
+            const lastVaccine = allVaccines[allVaccines.length - 1];
+            lastVaccine.classList.add("fade-slide-out");
 
-            const addBtn = section.querySelector(".add-vaccine");
-            const delBtn = section.querySelector(".delete-vaccine");
-            if (addBtn && delBtn) {
-              if (index === updatedVaccines.length - 1) {
-                addBtn.style.display = "inline-block";
-                delBtn.style.display = "inline-block";
-              } else {
-                addBtn.style.display = "none";
-                delBtn.style.display = "none";
-              }
-            }
-          });
-        },
-        { once: true }
-      );
-    } else {
-      alert("At least one vaccine section is required.");
+            lastVaccine.addEventListener("animationend", () => {
+                lastVaccine.remove();
+
+                // Update labels after removal
+                const updatedVaccines = vaccineContainer.querySelectorAll(".vaccine-section");
+                updatedVaccines.forEach((section, index) => {
+                    const label = section.querySelector("p");
+                    if (label) label.textContent = `Vaccine #${index + 1}`;
+                });
+
+                // Show Add/Delete buttons only on last vaccine section
+                updatedVaccines.forEach((section, index) => {
+                    const addBtn = section.querySelector(".add-vaccine");
+                    const delBtn = section.querySelector(".delete-vaccine");
+                    if (addBtn && delBtn) {
+                        if (index === updatedVaccines.length - 1) {
+                            addBtn.style.display = "inline-block";
+                            delBtn.style.display = "inline-block";
+                        } else {
+                            addBtn.style.display = "none";
+                            delBtn.style.display = "none";
+                        }
+                    }
+                });
+            }, { once: true });
+        } else {
+            alert("At least one vaccine section is required.");
+        }
     }
-  }
+
+    // Handle Delete Pet
+    if (event.target.classList.contains("delete-pet")) {
+        const container = document.getElementById("pet-form-container");
+        const allForms = container.querySelectorAll(".registration-form");
+
+        if (allForms.length > 1) {
+            const lastForm = allForms[allForms.length - 1];
+            lastForm.classList.add("fade-slide-out");
+
+            lastForm.addEventListener("animationend", () => {
+                lastForm.remove();
+
+                // Update pet form numbers and radio names
+                const updatedForms = container.querySelectorAll(".registration-form");
+                updatedForms.forEach((form, index) => {
+                    const formNumber = index + 1;
+                    const title = form.querySelector(".form-name");
+                    if (title) title.textContent = `Pet Information ${formNumber}`;
+
+                    form.querySelectorAll("input[type=radio]").forEach((radio) => {
+                        let baseName = radio.name.replace(/-\d+$/, "");
+                        radio.name = baseName + "-" + formNumber;
+                    });
+                });
+            }, { once: true });
+        } else {
+            alert("At least one pet form is required.");
+        }
+    }
 });
 
+<<<<<<< HEAD
+document.getElementById("back-button").addEventListener("click", () => {
+    alert("Back button clicked!");
+});
+
+document.getElementById("save-information").addEventListener("click", () => {
+    const allForms = document.querySelectorAll(".registration-form");
+    const data = [];
+    allForms.forEach((form) => {
+        const formData = new FormData(form);
+        const obj = {};
+        formData.forEach((value, key) => {
+            obj[key] = value;
+        });
+        data.push(obj);
+    });
+    console.log("All Pet Data:", data);
+    alert("Data saved to console. Check browser console for details.");
+=======
 // ====================
 // Save Button Logic
 // ====================
@@ -212,5 +241,6 @@ document.getElementById("save-information")?.addEventListener("click", (e) => {
   alert(`Account Created!\n\nSponsor ID: ${sponsorID}\nPassword: ${password}`);
 
   // Redirect after user clicks OK
-  window.location.href = 'client-details.html';
+  window.location.href = '../../PawFile/HTML/pawfile-login.html';
+>>>>>>> cf85ec3c8a7728b53307660a12ca256c366112eb
 });
