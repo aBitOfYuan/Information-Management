@@ -2,9 +2,9 @@
   "name": "pawfile",
   "version": "1.0.0",
   "description": "API server for PawFile application",
-  "main": "sponsor-api.js",
+  "main": "forms-server.js",
   "scripts": {
-    "start": "nodemon sponsor-api.js"
+    "start": "nodemon forms-server.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
