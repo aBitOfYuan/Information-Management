@@ -1,0 +1,524 @@
+@import url('https://fonts.googleapis.com/css2?family=Jellee:wght@400;700&display=swap');
+
+body {
+  font-family: 'Jellee', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: rgba(244, 244, 244, 0.68);
+  color: #0d2038;
+  line-height: 1.5;
+  position: relative;
+  z-index: 0;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('../Images/dog_and_cat_pattern-11.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  opacity: 0.3;
+  z-index: -1;
+}
+
+/* --- Header Section --- */
+.header {
+  background: linear-gradient(to right, #ffc107, #ffdd57);
+  text-align: center;
+  padding: 20px 20px 0;
+  color: #000;
+  position: relative;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+
+.header h1 {
+  margin-top: 50px;
+  margin-bottom: 0;
+  font-size: 5.25rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+  animation: fadeInDown 1s ease-out;
+}
+
+@keyframes fadeInDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-40px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tagline {
+  padding-top: 10px;
+}
+
+.subtagline {
+  font-size: 1.3rem;
+  color: #333;
+  margin-top: 5px;
+  animation: fadeIn 2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.header-img {
+  max-height: 480px;
+  display: block;
+  margin: 0 auto 10px;
+}
+
+/* --- Highlights --- */
+.highlight {
+  font-weight: 700;
+}
+
+.highlight-blue {
+  color: #007bff;
+  transition: color 0.3s ease, transform 0.3s ease;
+  cursor: pointer;
+}
+
+.highlight-blue:hover {
+  color: #0056b3;
+  transform: scale(1.05);
+}
+
+legend {
+  font-weight: 700;
+  font-size: 1.3em;
+  margin-bottom: 15px;
+  color: #000000;
+  border-left: 4px solid #acbb09;
+  padding-left: 10px;
+}
+
+.form-title {
+  color: #0044cc;
+  font-size: 2rem;
+  max-width: 1200px;
+  margin: 40px auto 20px;
+  text-align: left;
+  font-weight: 700;
+}
+
+.form-container {
+  background-color: #ffffff;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  max-width: 1100px;
+  margin: 30px auto; /* Center horizontally */
+  width: 95%; /* Makes it responsive */
+}
+
+.form-container:hover {
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4);
+}
+
+.form-container h2 {
+  color: #0044cc;
+  font-weight: 700;
+  margin-bottom: 25px;
+  font-size: 2rem;
+  border-bottom: 2px solid #0044cc;
+  padding-bottom: 8px;
+}
+
+
+fieldset {
+  border: none;
+  margin-bottom: 25px;
+  padding: 0;
+}
+
+    #pet-form-container {
+      max-width: 1200px;  /* Match sponsor form width */
+      margin: 0 auto;     /* Center the container */
+    }
+    
+    #pet-form-container .form-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 1rem;
+    }
+
+    #pet-forms-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      width: 100%;        /* Take full container width */
+    }
+
+    .registration-form {
+      width: 100%;        /* Take full container width */
+    }
+
+    .form-title {
+      max-width: 1200px;  /* Match form width */
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* Modal styles */
+    .modal {
+      position: fixed; z-index: 9999; left: 0; top: 0; width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center;
+    }
+    .modal-content {
+      background: #ffc107;; padding: 2rem; border-radius: 8px; text-align: center; min-width: 300px;
+      position: relative;
+    }
+    .close-modal {
+      position: absolute; right: 1rem; top: 1rem; font-size: 1.5rem; cursor: pointer;
+    }
+
+.form-row {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-weight: 600;
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+
+input,
+select {
+  font-family: 'Jellee', sans-serif !important;
+}
+
+.form-row input,
+.form-row select {
+  flex: 1 1 10%;
+  min-width: 0;
+  height: 46px;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+  box-sizing: border-box;
+  color: #000; /* Black text color */
+}
+
+.form-row input::placeholder {
+  color: #000; /* Black placeholder color */
+}
+
+.form-row select option {
+  color: #000; /* Black option text color */
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: #0044cc;
+  box-shadow: 0 0 6px #0044ccaa;
+  background-color: #f0f4ff;
+}
+
+/* Radio Button Containers */
+.radio-field {
+  flex: 1 1 10%;
+  height: 46px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 0 30px;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.field-label {
+  margin: 0;
+  margin-right: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Style for the inline span in radio fields (like "Is Dual Military:") */
+.radio-field span {
+  font-family: 'Jellee', sans-serif !important;
+  font-weight: normal !important;
+  font-size: 15px;
+  color: #000; /* Same color as input placeholder */
+}
+
+.radio-options {
+  display: flex;
+  gap: 10px;
+}
+
+/* Individual Radio Button Wrapper */
+.radio-wrapper {
+  position: relative;
+  padding-left: 28px;
+  font-size: 16px;
+  color: #000; /* Black color */
+  cursor: pointer;
+  user-select: none;
+  line-height: 1.4;
+  font-family: 'Jellee', sans-serif !important;/* Use different font family */
+  font-weight: normal !important;
+}
+
+/* Target the radio button labels specifically */
+.radio-field label.radio-wrapper {
+  font-family: 'Jellee', sans-serif !important;
+  font-weight: normal !important;
+  color: #000; /* Black color */
+}
+
+/* Override any inherited bold styling */
+.radio-options label {
+  font-family: 'Jellee', sans-serif !important;
+  font-weight: normal !important;
+  color: #000; /* Black color */
+}
+
+/* Try targeting with even more specificity */
+fieldset .radio-field .radio-options .radio-wrapper {
+  font-family: 'Jellee', sans-serif !important;
+  font-weight: normal !important;
+  color: #000; /* Black color */
+}
+
+/* Reset any label styling that might be inherited */
+.radio-field label {
+  font-family: 'Jellee', sans-serif !important;
+  font-weight: normal !important;
+  color: #000; /* Black color */
+}
+
+/* Hide Default Radio Button */
+.radio-wrapper input[type="radio"] {
+  display: none;
+}
+
+/* Custom Radio Style */
+.custom-radio {
+  position: absolute;
+  left: 0;
+  top: 2px;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #000;
+  border-radius: 50%;
+  background-color: #fff;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+/* Filled Dot When Selected */
+.radio-wrapper input[type="radio"]:checked + .custom-radio::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 8px;
+  height: 8px;
+  background-color: #000;
+  border-radius: 50%;
+}
+
+/* Hover Effect */
+.radio-wrapper:hover .custom-radio {
+  border-color: #0044cc;
+}
+
+.form-name {
+    display: flex;
+    margin-top: 0;
+    padding-top: 0;
+}
+
+/* Radio Button Containers */
+.field-container {
+  flex: 1 1 30%;
+  min-width: 0;
+  background-color: #eeeeee;
+  border-radius: 10px;
+  padding: 12px 18px;
+  box-sizing: border-box;
+}
+
+/* Label Above the Options */
+.field-label {
+  display: block;
+  color: #444;
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.vaccine-section {
+  border: 1px solid #ccc;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+button[type="submit"] {
+  padding: 12px 25px;
+  background-color: #ffc107;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;  /* Changed from space-between */
+  max-width: 1475px;         /* Increased to match new form width + padding */
+  margin: 40px auto 20px;
+  gap: 10px;                 /* Added gap between buttons */
+}
+
+/* Remove separate alignment for left/right buttons since everything is right-aligned now */
+.left-buttons {
+  display: flex;
+  gap: 10px;
+}
+.right-buttons {
+  display: flex;
+  gap: 10px;
+  margin-right: 975px;
+}
+
+
+.form-actions button {
+  padding: 12px 25px;
+  background-color: #ffc107;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.form-actions button:hover {
+  background-color: #e0a800;
+}
+
+#modal-ok-btn {
+  margin-top: 1.5rem;
+  padding: 0.7rem 2.5rem;
+  background: #1976d2;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  box-shadow: 0 2px 8px rgba(25, 118, 210, 0.08);
+}
+#modal-ok-btn:hover, #modal-ok-btn:focus {
+  background: #1251a3;
+  outline: none;
+}
+
+#military-info {
+  overflow: hidden;
+  margin-bottom: 0px;
+  transition: height 0.5s ease, opacity 0.5s ease;
+  height: auto;
+  opacity: 1;
+}
+
+#military-info.collapsing {
+  height: 0 !important;
+  opacity: 0;
+}
+
+#military-info.hidden {
+  display: none;
+}
+
+#sponsor-information {
+  margin-bottom: 30px; /* Your original margin */
+  transition: margin-bottom 0.5s ease;
+}
+
+#sponsor-information.no-margin {
+  margin-bottom: 0;
+}
+
+/* Common animation for fade & slide in */
+.fade-slide-in {
+  animation: fadeSlideIn 0.4s ease forwards;
+}
+
+@keyframes fadeSlideIn {
+  0% {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-10px);
+  }
+  100% {
+    opacity: 1;
+    max-height: 1000px; /* big enough for the content */
+    transform: translateY(0);
+  }
+}
+
+/* Common animation for fade & slide out */
+/* Fade and scale in */
+.fade-slide-in {
+  animation: fadeScaleIn 0.4s ease forwards;
+}
+
+@keyframes fadeScaleIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Fade and scale out */
+.fade-slide-out {
+  animation: fadeScaleOut 0.4s ease forwards;
+}
+
+@keyframes fadeScaleOut {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+

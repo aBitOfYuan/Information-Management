@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="csrf-token" content="{{csrfToken}}">
+  <meta name="csrf-token" content="">
+  <link rel="stylesheet" href="../CSS/forms-sponsor-pet.css" />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    integrity="sha512-..."
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
+  <title>Document</title>
+</head>
+<body>
+  <div class="header">
+    <div class="tagline">
+      <h1>
+        Become a certified
+        <span class="highlight highlight-blue"
+          >P<i class="fa-solid fa-paw" aria-hidden="true"></i>wrent!</span
+        >
+      </h1>
+      <p class="subtagline">
+        Join our community of pet lovers and be part of something pawsome!
+      </p>
+    </div>
+    <img src="../Images/DOGS.png" alt="Header Image" class="header-img" />
+  </div>
+
+  <form action="/submit-all" method="post" id="main-form">
+    <!-- ========== Sponsor Registration ========== -->
+    <h2 class="form-title">Sponsor Registration Form</h2>
+    <div class="form-container">
+        <section class="registration-form">
+          <fieldset id="sponsor-information">
+            <legend>Sponsor Information</legend>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="Sponsor_FN">First Name</label>
+                <input type="text" id="Sponsor_FN" name="Sponsor_FN" required />
+              </div>
+              <div class="form-group">
+                <label for="Sponsor_LN">Last Name</label>
+                <input type="text" id="Sponsor_LN" name="Sponsor_LN" required />
+              </div>
+              <div class="form-group">
+                <label for="Sponsor_MI">Middle Initial</label>
+                <input type="text" id="Sponsor_MI" name="Sponsor_MI" />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="Spouse-Name">Spouse Full Name</label>
+                <input type="text" id="Spouse-Name" name="Spouse_Name" />
+              </div>
+              <div class="form-group">
+                <label for="Sponsor_Status">Status</label>
+                <select id="Sponsor_Status" name="Sponsor_Status" required>
+                  <option disabled selected>Select Status</option>
+                  <option value="Active Duty">Active Duty</option>
+                  <option value="Civilian">Civilian</option>
+                  <option value="Retired">Retired</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="Personal_Email">Personal Email</label>
+                <input type="email" id="Personal_Email" name="Personal_Email" required />
+              </div>
+              <div class="form-group">
+                <label for="Sponsor_Phone_No">Personal Contact No.</label>
+                <input type="tel" id="Sponsor_Phone_No" name="Sponsor_Phone_No" required />
+              </div>
+              <div class="form-group">
+                <label for="Work_Phone">Work Contact No.</label>
+                <input type="tel" id="Work_Phone" name="Work_Phone" />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="Spouse_Alt_No">Spouse / Alternate Contact No.</label>
+                <input type="text" id="Spouse_Alt_No" name="Spouse_Alt_No" />
+              </div>
+              <div class="form-group">
+                <label for="Preferred_Contact">Preferred Contact</label>
+                <select id="Preferred_Contact" name="Preferred_Contact" required>
+                  <option disabled selected>Select Preferred Contact</option>
+                  <option value="Sponsor">Sponsor</option>
+                  <option value="Spouse">Spouse</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="Mail_Box">Mail Box No.</label>
+                <input type="text" id="Mail_Box" name="Mail_Box" />
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset class="military-info" disabled>
+            <legend>Military Information</legend>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="Grade">Military Grade</label>
+                <input type="text" id="Grade" name="Grade" required />
+              </div>
+
+              <div class="form-group">
+                <label>Is Dual Military:</label>
+                <div class="radio-options">
+                  <label class="radio-wrapper">
+                    <input type="radio" id="is-dual-military-yes" name="is-dual-military" value="yes"/>
+                    <span class="custom-radio"></span> Yes
+                  </label>
+                  <label class="radio-wrapper">
+                    <input type="radio" id="is-dual-military-no" name="is-dual-military" value="no" />
+                    <span class="custom-radio"></span> No
+                  </label>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="Branch">Military Branch</label>
+                <input type="text" id="Branch" name="Branch" required />
+              </div>
+
+              <div class="form-group">
+                <label for="Unit">Military Unit</label>
+                <input type="text" id="Unit" name="Unit" required />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="Supervisor_ID">Supervisor ID</label>
+                <input type="text" id="Supervisor_ID" name="Supervisor_ID" />
+              </div>
+              <div class="form-group">
+                <label for="supervisor-name">Supervisor Name</label>
+                <input type="text" id="supervisor-name" name="Supervisor_Name" />
+              </div>
+              <div class="form-group">
+                <label for="supervisor-email">Supervisor Email</label>
+                <input type="text" id="supervisor-email" name="Supervisor_Email" />
+              </div>
+            </div>
+          </fieldset>
+        </section>
+    </div>
+
+    <!-- ========== Pet Registration ========== -->
+    <h3 class="form-title">Pet Registration Form</h3>
+    <div class="form-container">
+      <div id="pet-form-container">
+        <div id="pet-forms-wrapper">
+          <section class="registration-form" data-pet="1">
+            <legend class="form-name">Pet Information 1</legend>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="pet-name-1">Pet Name</label>
+                <input type="text" id="pet-name-1" name="pet-name-1" required />
+              </div>
+              <div class="form-group">
+                <label for="species-1">Species</label>
+                <input type="text" id="species-1" name="species-1" required />
+              </div>
+              <div class="form-group">
+                <label for="dob-1">Date of Birth</label>
+                <input type="date" id="dob-1" name="dob-1" required />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="age-1">Age</label>
+                <input type="text" id="age-1" name="age-1" required />
+              </div>
+              <div class="form-group">
+                <label for="breed-1">Breed</label>
+                <input type="text" id="breed-1" name="breed-1" required />
+              </div>
+              <div class="form-group">
+                <label for="color-pattern-1">Color Pattern</label>
+                <select id="color-pattern-1" name="color-pattern-1" required>
+                  <option value="" disabled selected>Select Color Pattern</option>
+                  <option value="solid">SOLID-COLOR</option>
+                  <option value="bi-color">BI-COLOR</option>
+                  <option value="multi-color">MULTI-COLOR</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="field-container">
+                <label class="field-label">Spayed/Neutered</label>
+                <div class="radio-options">
+                  <label class="radio-wrapper">
+                    <input type="radio" id="spayed-yes-1" name="spayed-1" value="yes" required />
+                    <span class="custom-radio small_text"></span> YES
+                  </label>
+                  <label class="radio-wrapper">
+                    <input type="radio" id="spayed-no-1" name="spayed-1" value="no" required />
+                    <span class="custom-radio small_text"></span> NO
+                  </label>
+                </div>
+              </div>
+
+              <div class="field-container">
+                <label class="field-label">Has Passport</label>
+                <div class="radio-options">
+                  <label class="radio-wrapper">
+                    <input type="radio" id="passport-yes-1" name="passport-1" value="yes" required />
+                    <span class="custom-radio"></span> YES
+                  </label>
+                  <label class="radio-wrapper">
+                    <input type="radio" id="passport-no-1" name="passport-1" value="no" required />
+                    <span class="custom-radio"></span> NO
+                  </label>
+                </div>
+              </div>
+
+              <div class="field-container">
+                <label class="field-label">Has Clinic History</label>
+                <div class="radio-options">
+                  <label class="radio-wrapper">
+                    <input type="radio" id="clinic-history-yes-1" name="clinic-history-1" value="yes" required />
+                    <span class="custom-radio"></span> YES
+                  </label>
+                  <label class="radio-wrapper">
+                    <input type="radio" id="clinic-history-no-1" name="clinic-history-1" value="no" required />
+                    <span class="custom-radio"></span> NO
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="clinic-name-1">Clinic Name</label>
+                <input type="text" id="clinic-name-1" name="clinic-name-1" required />
+              </div>
+              <div class="field-container">
+                <label class="field-label">Sex</label>
+                <div class="radio-options">
+                  <label class="radio-wrapper">
+                    <input type="radio" id="sex-male-1" name="sex-1" value="male" required />
+                    <span class="custom-radio"></span> Male
+                  </label>
+                  <label class="radio-wrapper">
+                    <input type="radio" id="sex-female-1" name="sex-1" value="female" required />
+                    <span class="custom-radio"></span> Female
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <h4 class="form-name">Vaccine History</h4>
+            <div id="vaccine-section-1">
+              <div class="vaccine-section" data-vaccine="1">
+                <p>Vaccine #1</p>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="vaccine-lot-1-1">Vaccine Lot</label>
+                    <input type="text" id="vaccine-lot-1-1" name="vaccine-lot-1-1" required />
+                  </div>
+                  <div class="form-group">
+                    <label for="vaccine-name-1-1">Vaccine Name</label>
+                    <input type="text" id="vaccine-name-1-1" name="vaccine-name-1-1" required />
+                  </div>
+                  <div class="form-group">
+                    <label for="vaccine-type-1-1">Vaccine Type</label>
+                    <select id="vaccine-type-1-1" name="vaccine-type-1-1" required>
+                      <option value="" disabled selected>Vaccine Type</option>
+                      <option value="Core">Core</option>
+                      <option value="Non-core">Non-core</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="vaccine_duration-1-1">Vaccine Duration</label>
+                    <input type="text" id="vaccine_duration-1-1" name="vaccine_duration-1-1" required />
+                  </div>
+                  <div class="form-group">
+                    <label for="vaccination_date-1-1">Date of Vaccination</label>
+                    <input type="date" id="vaccination_date-1-1" name="vaccination_date-1-1" required />
+                  </div>
+                  <div class="form-group">
+                    <label for="vaccination_end_date-1-1">End Date of Vaccination</label>
+                    <input type="date" id="vaccination_end_date-1-1" name="vaccination_end_date-1-1" required />
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="field-container">
+                    <label class="field-label">Has Vaccine Reaction</label>
+                    <div class="radio-options">
+                      <label class="radio-wrapper">
+                        <input type="radio" id="vaccine-reaction-yes-1-1" name="vaccine-reaction-1-1" value="yes" />
+                        <span class="custom-radio"></span> Yes
+                      </label>
+                      <label class="radio-wrapper">
+                        <input type="radio" id="vaccine-reaction-no-1-1" name="vaccine-reaction-1-1" value="no" />
+                        <span class="custom-radio"></span> No
+                      </label>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="vaccine-symptoms-1-1">Vaccine Symptoms</label>
+                    <input type="text" id="vaccine-symptoms-1-1" name="vaccine-symptoms-1-1" />
+                  </div>
+                </div>
+
+                <div class="form-actions">
+                  <div class="left-buttons">
+                    <button class="add-vaccine" type="button" data-pet="1">Add Vaccine</button>
+                    <button class="delete-vaccine" type="button" data-pet="1">Delete Vaccine</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <div class="right-buttons">
+        <button class="add-pet" type="button">Add Pet</button>
+        <button class="delete-pet" type="button">Delete Pet</button>
+        <button id="save-information" type="submit">Save</button>
+      </div>
+    </div>
+  </form>
+
+  <!-- Modal for Registration Success -->
+  <div id="success-modal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <span class="close-modal" id="close-modal">&times;</span>
+      <h2>Registration Successful!</h2>
+      <p id="modal-message"></p>
+      <button id="modal-ok-btn">OK</button>
+    </div>
+  </div>
+
+  <script src="../JS/forms-sponsor-pet.js"></script>
+</body>
+</html>
