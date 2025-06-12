@@ -6,19 +6,6 @@
   <title>PawFile - Sponsor Profile</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <link rel="stylesheet" href="../CSS/sponsor-profile.css" />
-  <style>
-    .readonly-text {
-      padding: 0.375rem 0.75rem;
-      border: 1px solid #e0e0e0;
-      background-color: #e9ecef;
-      border-radius: 4px;
-      font-size: 1rem;
-      height: 38px;
-      line-height: 38px;
-      color: #495057;
-      user-select: none;
-    }
-  </style>
 </head>
 <body>
   <div class="container">
@@ -55,11 +42,11 @@
         <div class="form-grid">
           <div class="form-group small">
             <label for="firstName">First Name</label>
-            <input type="text" id="firstName" name="firstName" readonly>
+            <input type="text" id="firstName" name="firstName" readonly required>
           </div>
           <div class="form-group small">
             <label for="lastName">Last Name</label>
-            <input type="text" id="lastName" name="lastName" readonly>
+            <input type="text" id="lastName" name="lastName" readonly required>
           </div>
           <div class="form-group small">
             <label for="middleInitial">Middle Initial</label>
@@ -73,16 +60,16 @@
           <!-- Sponsor Status -->
           <div class="form-group small status-field">
             <label for="status">Sponsor Status</label>
-            <input type="text" id="status" name="status" readonly>
+            <input type="text" id="status" name="status" readonly required>
           </div>
 
           <div class="form-group medium">
             <label for="personalEmail">Personal Email</label>
-            <input type="email" id="personalEmail" name="personalEmail" readonly>
+            <input type="email" id="personalEmail" name="personalEmail" readonly required>
           </div>
           <div class="form-group medium">
             <label for="personalContact">Personal Contact No.</label>
-            <input type="tel" id="personalContact" name="personalContact" readonly>
+            <input type="tel" id="personalContact" name="personalContact" readonly required>
           </div>
           <div class="form-group medium">
             <label for="workContact">Work Contact No.</label>
@@ -114,7 +101,7 @@
         <div class="form-grid">
           <div class="form-group medium">
             <label for="militaryGrade">Military Grade</label>
-            <input type="text" id="militaryGrade" name="militaryGrade" readonly>
+            <input type="text" id="militaryGrade" name="militaryGrade" readonly required>
           </div>
 
           <!-- Dual Military -->
@@ -125,19 +112,46 @@
 
           <div class="form-group medium">
             <label for="militaryBranch">Military Branch</label>
-            <input type="text" id="militaryBranch" name="militaryBranch" readonly>
+            <input type="text" id="militaryBranch" name="militaryBranch" readonly required>
           </div>
           <div class="form-group medium">
             <label for="militaryUnit">Military Unit</label>
-            <input type="text" id="militaryUnit" name="militaryUnit" readonly>
+            <input type="text" id="militaryUnit" name="militaryUnit" readonly required>
           </div>
           <div class="form-group medium">
             <label for="supervisorId">Supervisor ID</label>
-            <input type="text" id="supervisorId" name="supervisorId" readonly>
+            <input type="text" id="supervisorId" name="supervisorId" readonly required>
+          </div>
+          <div class="form-group medium">
+            <label for="supervisorName">Supervisor Name</label>
+            <input type="text" id="supervisorName" name="supervisorName" readonly required>
+          </div>
+          <div class="form-group medium">
+            <label for="supervisorEmail">Supervisor Email</label>
+            <input type="email" id="supervisorEmail" name="supervisorEmail" readonly required>
           </div>
         </div>
+        <!-- The JS will append the placeholder div here -->
       </section>
     </main>
+  </div>
+
+  <!-- Supervisor Options Modal -->
+  <div id="supervisorModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+      <h3 class="modal-title">Supervisor Already Exists</h3>
+      <p class="modal-description">Supervisor ID <strong id="modalSupervisorId"></strong> already exists with:</p>
+      <div class="modal-info-box">
+        <p><strong>Name:</strong> <span id="modalSupervisorName"></span></p>
+        <p><strong>Email:</strong> <span id="modalSupervisorEmail"></span></p>
+      </div>
+      <p class="modal-question">What would you like to do?</p>
+      <div class="modal-buttons">
+        <button id="loadExisting" class="modal-btn modal-btn-success">Load Existing Info</button>
+        <button id="editInfo" class="modal-btn modal-btn-primary">Keep My Changes</button>
+        <button id="cancelAction" class="modal-btn modal-btn-secondary">Cancel</button>
+      </div>
+    </div>
   </div>
 
   <script src="../JS/sponsor-profile.js"></script>
