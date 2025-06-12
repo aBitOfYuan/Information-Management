@@ -21,6 +21,21 @@ document.addEventListener('DOMContentLoaded', function () {
     const select = document.createElement('select');
     select.id = fieldId + '-select';
     select.className = 'dropdown-select';
+    
+    // FIXED: Add required attribute if original input has it
+    const originalInput = document.getElementById(fieldId);
+    if (originalInput && originalInput.hasAttribute('required')) {
+      select.setAttribute('required', 'required');
+    }
+    
+    // Add empty option for required dropdowns
+    if (select.hasAttribute('required')) {
+      const emptyOption = document.createElement('option');
+      emptyOption.value = '';
+      emptyOption.textContent = 'Select...';
+      select.appendChild(emptyOption);
+    }
+    
     options.forEach(optionValue => {
       const option = document.createElement('option');
       option.value = optionValue;
@@ -32,16 +47,55 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function handleMilitaryVisibility(currentStatus) {
+    console.log('handleMilitaryVisibility called with status:', currentStatus);
+    
+    if (!currentStatus) {
+      console.log('No status provided, defaulting to non-military view');
+      currentStatus = 'CIVILIAN';
+    }
+    
     const isActive = currentStatus === 'ACTIVE DUTY';
+    console.log('Is active duty:', isActive);
+    
     const militaryInputs = militarySection.querySelectorAll('input');
     militaryInputs.forEach(input => {
-      input.parentElement.style.display = isActive ? '' : 'none';
+      const parentElement = input.parentElement;
+      if (parentElement) {
+        parentElement.style.display = isActive ? '' : 'none';
+      }
+      
+      // FIXED: Toggle required attribute based on visibility
+      if (input.id === 'militaryGrade' || input.id === 'militaryBranch' || 
+          input.id === 'militaryUnit' || input.id === 'supervisorId' || 
+          input.id === 'supervisorName' || input.id === 'supervisorEmail') {
+        if (isActive) {
+          input.setAttribute('required', 'required');
+        } else {
+          input.removeAttribute('required');
+        }
+      }
     });
-    militaryPlaceholder.style.display = isActive ? 'none' : 'block';
+    
+    // Also handle dropdowns if they exist
+    const militarySelects = militarySection.querySelectorAll('select');
+    militarySelects.forEach(select => {
+      if (select.id.includes('militaryGrade') || select.id.includes('militaryBranch') || 
+          select.id.includes('militaryUnit') || select.id.includes('supervisorId') || 
+          select.id.includes('supervisorName') || select.id.includes('supervisorEmail')) {
+        if (isActive) {
+          select.setAttribute('required', 'required');
+        } else {
+          select.removeAttribute('required');
+        }
+      }
+    });
+    
+    if (militaryPlaceholder) {
+      militaryPlaceholder.style.display = isActive ? 'none' : 'block';
+    }
   }
 
   function clearMilitaryFields() {
-    // Clear military-related fields when switching to civilian/retired
     document.getElementById("militaryGrade").value = "";
     document.getElementById("dualMilitary").value = "";
     document.getElementById("militaryBranch").value = "";
@@ -50,29 +104,24 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById("supervisorName").value = "";
     document.getElementById("supervisorEmail").value = "";
     
-    // Clear dropdown values too if they exist
     const dualMilitarySelect = document.getElementById("dualMilitary-select");
     if (dualMilitarySelect) {
       dualMilitarySelect.value = "";
     }
   }
 
-  // Function to handle supervisor ID changes and offer load/edit options
   function handleSupervisorIdChange(supervisorIdField) {
     const supervisorId = supervisorIdField.value.trim();
     
     if (!supervisorId) {
-      // Clear supervisor fields if ID is empty
       document.getElementById("supervisorName").value = "";
       document.getElementById("supervisorEmail").value = "";
       return;
     }
 
-    // Check if supervisor exists
     fetch(`http://localhost:3000/api/supervisor/${supervisorId}`)
       .then(res => {
         if (res.status === 404) {
-          // Supervisor doesn't exist - clear fields and let user enter new info
           document.getElementById("supervisorName").value = "";
           document.getElementById("supervisorEmail").value = "";
           return null;
@@ -84,13 +133,8 @@ document.addEventListener('DOMContentLoaded', function () {
       })
       .then(supervisorData => {
         if (supervisorData) {
-          // Supervisor exists - show options
           const currentName = document.getElementById("supervisorName").value;
           const currentEmail = document.getElementById("supervisorEmail").value;
-          
-          const message = `Supervisor ID ${supervisorId} already exists with:\nName: ${supervisorData.Supervisor_Name}\nEmail: ${supervisorData.Supervisor_Email}\n\nWhat would you like to do?`;
-          
-          // Create custom modal for better UX
           showSupervisorOptionsModal(supervisorData, currentName, currentEmail);
         }
       })
@@ -103,36 +147,29 @@ document.addEventListener('DOMContentLoaded', function () {
   function showSupervisorOptionsModal(supervisorData, currentName, currentEmail) {
     const modal = document.getElementById('supervisorModal');
     
-    // Populate modal with data
     document.getElementById('modalSupervisorId').textContent = supervisorData.Supervisor_ID;
     document.getElementById('modalSupervisorName').textContent = supervisorData.Supervisor_Name || 'Not specified';
     document.getElementById('modalSupervisorEmail').textContent = supervisorData.Supervisor_Email || 'Not specified';
     
-    // Show modal
     modal.style.display = 'flex';
 
-    // Handle button clicks
     document.getElementById('loadExisting').onclick = () => {
-      // Load existing supervisor info
       document.getElementById("supervisorName").value = supervisorData.Supervisor_Name || "";
       document.getElementById("supervisorEmail").value = supervisorData.Supervisor_Email || "";
       modal.style.display = 'none';
     };
 
     document.getElementById('editInfo').onclick = () => {
-      // Keep current values (user wants to edit existing supervisor)
       modal.style.display = 'none';
     };
 
     document.getElementById('cancelAction').onclick = () => {
-      // Clear supervisor ID and related fields
       document.getElementById("supervisorId").value = "";
       document.getElementById("supervisorName").value = currentName;
       document.getElementById("supervisorEmail").value = currentEmail;
       modal.style.display = 'none';
     };
 
-    // Close modal when clicking overlay
     modal.onclick = (e) => {
       if (e.target === modal) {
         document.getElementById('cancelAction').click();
@@ -141,6 +178,8 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function toggleEditMode(isEditing) {
+    console.log('toggleEditMode called with:', isEditing); // Debug log
+    
     document.querySelectorAll('input').forEach(input => {
       if (!toggleFields.some(f => f.id === input.id)) {
         if (isEditing) {
@@ -158,6 +197,7 @@ document.addEventListener('DOMContentLoaded', function () {
     toggleFields.forEach(field => {
       const input = document.getElementById(field.id);
       if (!input) return;
+      
       if (isEditing) {
         const currentValue = input.value;
         const dropdown = createDropdown(field.id, field.options, currentValue);
@@ -168,8 +208,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (field.id === 'status') {
           dropdown.addEventListener('change', () => {
+            console.log('Status dropdown changed to:', dropdown.value); // Debug log
             handleMilitaryVisibility(dropdown.value);
-            // Clear military fields when switching to civilian/retired
             if (dropdown.value !== 'ACTIVE DUTY') {
               clearMilitaryFields();
             }
@@ -188,7 +228,6 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
 
-    // Add event listener for supervisor ID changes during edit mode
     if (isEditing) {
       const supervisorIdField = document.getElementById("supervisorId");
       if (supervisorIdField) {
@@ -199,16 +238,79 @@ document.addEventListener('DOMContentLoaded', function () {
 
   editBtn.addEventListener('click', function () {
     const isEditing = this.classList.toggle('editing-mode');
+    
     if (isEditing) {
+      console.log('Entering edit mode'); // Debug log
       this.innerHTML = '<i class="fa-solid fa-save"></i> Save';
       toggleEditMode(true);
     } else {
+      console.log('Attempting to save - validating fields'); // Debug log
+      
+      // FIXED: Create a temporary form element to use browser validation
+      const tempForm = document.createElement('form');
+      tempForm.style.display = 'none';
+      document.body.appendChild(tempForm);
+      
+      // Get all required fields and add them to the temp form
+      const requiredInputs = document.querySelectorAll('input[required]');
+      const requiredSelects = document.querySelectorAll('select[required]');
+      
+      console.log('Found required inputs:', requiredInputs.length); // Debug log
+      console.log('Found required selects:', requiredSelects.length); // Debug log
+      
+      let allValid = true;
+      let firstInvalidField = null;
+      
+      // Check inputs
+      requiredInputs.forEach(input => {
+        // Skip hidden inputs
+        if (input.style.display === 'none' || input.parentElement.style.display === 'none') {
+          console.log('Skipping hidden input:', input.id);
+          return;
+        }
+        
+        if (!input.checkValidity()) {
+          console.log('Invalid input found:', input.id, 'Value:', input.value); // Debug log
+          allValid = false;
+          if (!firstInvalidField) firstInvalidField = input;
+        }
+      });
+      
+      // Check selects (dropdowns)
+      requiredSelects.forEach(select => {
+        // Skip hidden selects
+        if (select.style.display === 'none' || select.parentElement.style.display === 'none') {
+          console.log('Skipping hidden select:', select.id);
+          return;
+        }
+        
+        if (!select.checkValidity()) {
+          console.log('Invalid select found:', select.id, 'Value:', select.value); // Debug log
+          allValid = false;
+          if (!firstInvalidField) firstInvalidField = select;
+        }
+      });
+      
+      // Clean up temp form
+      document.body.removeChild(tempForm);
+      
+      if (!allValid && firstInvalidField) {
+        console.log('Validation failed, focusing on:', firstInvalidField.id); // Debug log
+        firstInvalidField.focus();
+        firstInvalidField.reportValidity();
+        
+        // Toggle back to edit mode
+        this.classList.add('editing-mode');
+        this.innerHTML = '<i class="fa-solid fa-save"></i> Save';
+        return;
+      }
+      
+      console.log('All fields valid, proceeding to save'); // Debug log
       this.innerHTML = '<i class="fa-solid fa-edit"></i> Edit';
       toggleEditMode(false);
 
       const currentStatus = document.getElementById("status-select")?.value || document.getElementById("status").value;
       
-      // Prepare sponsor data - set military fields to empty strings if not active duty
       const sponsorData = {
         Sponsor_FN: document.getElementById("firstName").value,
         Sponsor_LN: document.getElementById("lastName").value,
@@ -231,14 +333,6 @@ document.addEventListener('DOMContentLoaded', function () {
       };
 
       const userId = sessionStorage.getItem('userId');
-
-      // If sponsor is not active duty, skip supervisor validation
-      if (currentStatus !== 'ACTIVE DUTY') {
-        updateSponsorProfile(userId, sponsorData);
-        return;
-      }
-
-      // Always update the sponsor profile - the backend will handle supervisor logic
       updateSponsorProfile(userId, sponsorData);
     }
   });
@@ -279,8 +373,15 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   fetch(`http://localhost:3000/api/sponsor/${userId}`)
-    .then(res => res.json())
+    .then(res => {
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+      return res.json();
+    })
     .then(data => {
+      console.log('Fetched sponsor data:', data);
+      
       document.getElementById("firstName").value = data.Sponsor_FN || "";
       document.getElementById("lastName").value = data.Sponsor_LN || "";
       document.getElementById("middleInitial").value = data.Sponsor_MI || "";
@@ -300,10 +401,14 @@ document.addEventListener('DOMContentLoaded', function () {
       document.getElementById("supervisorName").value = data.Supervisor_Name || "";
       document.getElementById("supervisorEmail").value = data.Supervisor_Email || "";
 
-      handleMilitaryVisibility(data.Sponsor_Status);
+      setTimeout(() => {
+        const sponsorStatus = data.Sponsor_Status || "";
+        console.log('Processing sponsor status:', sponsorStatus);
+        handleMilitaryVisibility(sponsorStatus);
+      }, 100);
     })
     .catch(err => {
-      alert('Error fetching sponsor profile.');
       console.error("Fetch error:", err);
+      alert('Error fetching sponsor profile: ' + err.message);
     });
 });
