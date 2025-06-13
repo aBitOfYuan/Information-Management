@@ -11,8 +11,8 @@ const db = mysql.createConnection({
   host: '127.0.0.1',
   port: 3306,
   user: 'root',
-  password: 'yosefff1133',
-  database: 'prac_schema'
+  password: '010123',
+  database: 'pawfiledb'
 });
 
 db.connect(err => {
@@ -321,17 +321,279 @@ app.get('/api/pet/:microchip', (req, res) => {
   });
 });
 
-app.post('/api/pets', (req, res) => {
-  const { Pet_ID, Pet_Name, Sponsor_ID } = req.body;
-
-  if (!Pet_ID || !Pet_Name || !Sponsor_ID) {
-    return res.status(400).json({ error: 'Missing pet data' });
+// POST /api/pets - Create new pet
+// POST /api/pets - Create new pet with vaccine validation
+app.post('/api/pets', async (req, res) => {
+  try {
+    const petData = req.body;
+    
+    // Validate required fields
+    if (!petData.Microchip_No || !petData.Pet_Name || !petData.Sponsor_ID) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+    
+    // Start transaction
+    await db.beginTransaction();
+    
+    // Insert pet
+    const [petResult] = await db.query(
+      'INSERT INTO Pets SET ?', 
+      petData
+    );
+    
+    // Process vaccines if any
+    if (petData.Vaccines && petData.Vaccines.length > 0) {
+      for (const vaccine of petData.Vaccines) {
+        // Check if vaccine lot already exists
+        const [existingVaccine] = await db.query(
+          'SELECT Vaccine_Lot FROM Vaccine WHERE Vaccine_Lot = ?',
+          [vaccine.Vaccine_Lot]
+        );
+        
+        // Only insert into Vaccine table if lot doesn't exist
+        if (existingVaccine.length === 0) {
+          await db.query(
+            'INSERT INTO Vaccine SET ?',
+            {
+              Vaccine_Lot: vaccine.Vaccine_Lot,
+              Vaccine_Name: vaccine.Vaccine_Name,
+              Vaccine_Type: vaccine.Vaccine_Type,
+              Vaccine_Duration: vaccine.Vaccine_Duration
+            }
+          );
+        }
+        
+        // Always insert into Vaccine_Reaction table
+        await db.query(
+          'INSERT INTO Vaccine_Reaction SET ?',
+          {
+            Microchip_No: petData.Microchip_No,
+            Vaccine_Lot: vaccine.Vaccine_Lot,
+            Date_Vaccination: vaccine.Date_Vaccination,
+            Vaccination_Effectiveness_Until: vaccine.Vaccination_Effectiveness_Until,
+            Has_Vaccine_Reaction: vaccine.Has_Vaccine_Reaction,
+            Vaccine_Reaction_Symptoms: vaccine.Vaccine_Reaction_Symptoms
+          }
+        );
+      }
+    }
+    
+    await db.commit();
+    res.json({ success: true, petId: petData.Microchip_No });
+    
+  } catch (error) {
+    await db.rollback();
+    console.error('Error creating pet:', error);
+    res.status(500).json({ error: 'Failed to create pet' });
   }
+});
 
-  const query = 'INSERT INTO Pets (Pet_ID, Pet_Name, Sponsor_ID) VALUES (?, ?, ?)';
-  db.query(query, [Pet_ID, Pet_Name, Sponsor_ID], (err, result) => {
-    if (err) return res.status(500).json({ error: 'Error adding pet' });
-    res.status(201).json({ message: 'Pet added successfully' });
+// PUT /api/pets/:petId - Update existing pet with vaccine validation
+app.put('/api/pets/:petId', async (req, res) => {
+  try {
+    const petId = req.params.petId;
+    const petData = req.body;
+    
+    // Start transaction
+    await db.beginTransaction();
+    
+    // Update pet
+    const [updateResult] = await db.query(
+      'UPDATE Pets SET ? WHERE Microchip_No = ?',
+      [petData, petId]
+    );
+    
+    if (updateResult.affectedRows === 0) {
+      return res.status(404).json({ error: 'Pet not found' });
+    }
+    
+    // Delete existing vaccine reactions for this pet
+    await db.query(
+      'DELETE FROM Vaccine_Reaction WHERE Microchip_No = ?',
+      [petId]
+    );
+    
+    // Process updated vaccines if any
+    if (petData.Vaccines && petData.Vaccines.length > 0) {
+      for (const vaccine of petData.Vaccines) {
+        // Check if vaccine lot already exists
+        const [existingVaccine] = await db.query(
+          'SELECT Vaccine_Lot FROM Vaccine WHERE Vaccine_Lot = ?',
+          [vaccine.Vaccine_Lot]
+        );
+        
+        // Only insert into Vaccine table if lot doesn't exist
+        if (existingVaccine.length === 0) {
+          await db.query(
+            'INSERT INTO Vaccine SET ?',
+            {
+              Vaccine_Lot: vaccine.Vaccine_Lot,
+              Vaccine_Name: vaccine.Vaccine_Name,
+              Vaccine_Type: vaccine.Vaccine_Type,
+              Vaccine_Duration: vaccine.Vaccine_Duration
+            }
+          );
+        }
+        
+        // Insert into Vaccine_Reaction table
+        await db.query(
+          'INSERT INTO Vaccine_Reaction SET ?',
+          {
+            Microchip_No: petId,
+            Vaccine_Lot: vaccine.Vaccine_Lot,
+            Date_Vaccination: vaccine.Date_Vaccination,
+            Vaccination_Effectiveness_Until: vaccine.Vaccination_Effectiveness_Until,
+            Has_Vaccine_Reaction: vaccine.Has_Vaccine_Reaction,
+            Vaccine_Reaction_Symptoms: vaccine.Vaccine_Reaction_Symptoms
+          }
+        );
+      }
+    }
+    
+    await db.commit();
+    res.json({ success: true });
+    
+  } catch (error) {
+    await db.rollback();
+    console.error('Error updating pet:', error);
+    res.status(500).json({ error: 'Failed to update pet' });
+  }
+});
+
+// PUT /api/pets/:petId - Update existing pet
+app.put('/api/pets/:petId', async (req, res) => {
+  try {
+      const petId = req.params.petId;
+      const petData = req.body;
+      
+      // Start transaction
+      await db.beginTransaction();
+      
+      // Update pet
+      const [updateResult] = await db.query(
+          'UPDATE Pets SET ? WHERE Microchip_No = ?',
+          [petData, petId]
+      );
+      
+      if (updateResult.affectedRows === 0) {
+          return res.status(404).json({ error: 'Pet not found' });
+      }
+      
+      // Delete existing vaccines
+      await db.query(
+          'DELETE FROM Vaccine_Reaction WHERE Microchip_No = ?',
+          [petId]
+      );
+      
+      // Insert updated vaccines if any
+      if (petData.Vaccines && petData.Vaccines.length > 0) {
+          for (const vaccine of petData.Vaccines) {
+              // Ensure vaccine exists
+              const [existingVaccine] = await db.query(
+                  'SELECT 1 FROM Vaccine WHERE Vaccine_Lot = ?',
+                  [vaccine.Vaccine_Lot]
+              );
+              
+              if (!existingVaccine.length) {
+                  await db.query(
+                      'INSERT INTO Vaccine SET ?',
+                      {
+                          Vaccine_Lot: vaccine.Vaccine_Lot,
+                          Vaccine_Name: vaccine.Vaccine_Name,
+                          Vaccine_Type: vaccine.Vaccine_Type,
+                          Vaccine_Duration: vaccine.Vaccine_Duration
+                      }
+                  );
+              }
+              
+              // Insert vaccine reaction
+              await db.query(
+                  'INSERT INTO Vaccine_Reaction SET ?',
+                  {
+                      Microchip_No: petId,
+                      ...vaccine
+                  }
+              );
+          }
+      }
+      
+      await db.commit();
+      res.json({ success: true });
+      
+  } catch (error) {
+      await db.rollback();
+      console.error('Error updating pet:', error);
+      res.status(500).json({ error: 'Failed to update pet' });
+  }
+});
+
+// NEW: Update pet data
+app.put('/api/pets/:petId', (req, res) => {
+  const { petId } = req.params;
+  const petData = req.body;
+
+  // Validate that pet exists first
+  const checkQuery = 'SELECT * FROM Pets WHERE Microchip_No = ?';
+  db.query(checkQuery, [petId, petId], (err, results) => {
+    if (err) {
+      console.error('Error checking pet existence:', err);
+      return res.status(500).json({ error: 'Database error checking pet' });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ error: 'Pet not found' });
+    }
+
+    // Build dynamic update query based on provided fields
+    const updateFields = [];
+    const updateValues = [];
+    
+    // List of allowed pet fields to update
+    const allowedFields = [
+      'Pet_Name', 'Pet_Type', 'Pet_Breed', 'Pet_Color', 'Pet_Sex', 
+      'Pet_Weight', 'Pet_DOB', 'Sponsor_ID', 'Pet_Status', 
+      'Sterilization_Status', 'Date_Sterilized', 'Vet_Clinic'
+    ];
+
+    // Only include fields that are provided and allowed
+    for (const field of allowedFields) {
+      if (petData.hasOwnProperty(field)) {
+        updateFields.push(`${field} = ?`);
+        updateValues.push(petData[field]);
+      }
+    }
+
+    if (updateFields.length === 0) {
+      return res.status(400).json({ error: 'No valid fields provided for update' });
+    }
+
+    // Add the pet ID to the end of values array for WHERE clause
+    updateValues.push(petId);
+
+    const updateQuery = `
+    UPDATE Pets 
+    SET ${updateFields.join(', ')} 
+    WHERE Microchip_No = ?
+  `;
+    // Add petId twice for the WHERE clause (checking both Microchip_No and Pet_ID)
+    updateValues.push(petId);
+
+    db.query(updateQuery, updateValues, (err, result) => {
+      if (err) {
+        console.error('Error updating pet:', err);
+        return res.status(500).json({ error: 'Database error updating pet' });
+      }
+
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ error: 'Pet not found or no changes made' });
+      }
+
+      res.json({ 
+        success: true, 
+        message: 'Pet updated successfully',
+        affectedRows: result.affectedRows
+      });
+    });
   });
 });
 
@@ -355,6 +617,18 @@ app.get('/api/pet/:microchip/vaccines', (req, res) => {
   db.query(sql, [microchip], (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(results);
+  });
+});
+
+// Add vaccine lookup endpoint
+app.get('/api/vaccine/:lot', (req, res) => {
+  const lot = req.params.lot;
+  const query = 'SELECT * FROM Vaccine WHERE Vaccine_Lot = ?';
+  
+  db.query(query, [lot], (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (results.length === 0) return res.status(404).json({ error: 'Vaccine not found' });
+    res.json(results[0]);
   });
 });
 

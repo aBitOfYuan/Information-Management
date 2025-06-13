@@ -349,14 +349,98 @@ body {
   margin-bottom: 20px;
   border-radius: 8px;
   background-color: #f9f9f9;
+  position: relative;
 }
 
-.vaccine-section h3 {
-  margin-top: 0;
+.vaccine-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.vaccine-header h3 {
+  margin: 0;
   font-size: 1.2rem;
   font-weight: 600;
   color: #0d2038;
-  margin-bottom: 15px;
+}
+
+.delete-vaccine {
+  background: none;
+  border: none;
+  color: #dc3545;
+  cursor: pointer;
+  padding: 5px;
+  font-size: 1.1rem;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+}
+
+.delete-vaccine:hover {
+  color: #c82333;
+  background-color: rgba(220, 53, 69, 0.1);
+  transform: scale(1.1);
+}
+
+.delete-vaccine i {
+  font-size: 1.2rem;
+}
+
+.add-vaccine {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.add-vaccine:hover {
+  background-color: #218838;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Animation classes */
+.fade-slide-in {
+  animation: fadeSlideIn 0.3s ease-out;
+}
+
+.fade-slide-out {
+  animation: fadeSlideOut 0.3s ease-out;
+}
+
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeSlideOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(20px);
+  }
 }
 
 /*--------------------------------------------------------------------

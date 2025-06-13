@@ -53,7 +53,6 @@ body {
   font-weight: 700;
 }
 
-
 /* Form Layout */
 .registration-form {
   max-width: 900px;
@@ -102,6 +101,39 @@ body {
   position: relative;
   flex: 1 1 30%;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Vaccine form field labels */
+.form-field label {
+  display: block;
+  color: #444;
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  order: -1; /* Ensures label appears before input/select */
+}
+
+/* Vaccine form field inputs and selects */
+.form-field input,
+.form-field select {
+  flex: none;
+  width: 100%;
+  height: 46px;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+.form-field input:focus,
+.form-field select:focus {
+  outline: none;
+  border-color: #0044cc;
+  box-shadow: 0 0 6px #0044ccaa;
+  background-color: #f0f4ff;
 }
 
 .dob-input {
@@ -152,7 +184,6 @@ select {
  color:#999;
 }
 
-/* Radio Button Containers */
 /* Radio Button Container */
 .field-container {
   flex: 1 1 30%;
@@ -179,6 +210,50 @@ select {
   margin-bottom: 20px;
   border-radius: 8px;
   background-color: #f9f9f9;
+  position: relative;
+}
+
+.vaccine-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.vaccine-header p {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #0d2038;
+}
+
+.delete-vaccine {
+  background: none;
+  border: none;
+  color: #dc3545;
+  cursor: pointer;
+  padding: 5px;
+  font-size: 1.1rem;
+  transition: color 0.2s;
+}
+
+.delete-vaccine:hover {
+  color: #c82333;
+}
+
+.add-vaccine {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.2s;
+}
+
+.add-vaccine:hover {
+  background-color: #218838;
 }
 
 /* Group of Radio Buttons */
@@ -283,23 +358,35 @@ button[type="submit"] {
 
 /* Common animation for fade & slide in */
 .fade-slide-in {
-  animation: fadeSlideIn 0.4s ease forwards;
+  animation: fadeSlideIn 0.3s ease-out;
+}
+
+.fade-slide-out {
+  animation: fadeSlideOut 0.3s ease-out;
 }
 
 @keyframes fadeSlideIn {
-  0% {
+  from {
     opacity: 0;
-    max-height: 0;
-    transform: translateY(-10px);
+    transform: translateY(-20px);
   }
-  100% {
+  to {
     opacity: 1;
-    max-height: 1000px; /* big enough for the content */
     transform: translateY(0);
   }
 }
 
-/* Common animation for fade & slide out */
+@keyframes fadeSlideOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+}
+
 /* Fade and scale in */
 .fade-slide-in {
   animation: fadeScaleIn 0.4s ease forwards;
@@ -331,4 +418,3 @@ button[type="submit"] {
     transform: scale(0.95);
   }
 }
-

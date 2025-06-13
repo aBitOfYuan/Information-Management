@@ -130,8 +130,65 @@
           </button>
         </div>
 
-        <!-- Dynamic vaccine sections will be inserted here -->
-        <div id="vaccine-history"></div>
+        <div id="vaccine-history">
+          <div class="vaccine-section">
+            <div class="vaccine-header">
+              <h3>Vaccine #1</h3>
+              <button class="delete-vaccine" type="button"><i class="fas fa-trash"></i></button>
+            </div>
+            <div class="info-grid">
+              <div class="form-field">
+                <label>Vaccine Lot</label>
+                <input type="text" name="vaccine-lot" placeholder="Vaccine LOT" required />
+              </div>
+              <div class="form-field">
+                <label>Vaccine Name</label>
+                <input type="text" name="vaccine-name" placeholder="Vaccine Name" readonly required />
+              </div>
+              <div class="form-field">
+                <label>Vaccine Type</label>
+                <select name="vaccine-type" disabled required>
+                  <option value="" disabled selected>Vaccine Type</option>
+                  <option value="Core">Core</option>
+                  <option value="Non-Core">Non-Core</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <label>Vaccine Duration</label>
+                <input type="number" name="vaccine_duration" placeholder="Vaccine Duration (years)" readonly required />
+              </div>
+              <div class="form-field">
+                <label>Date of Vaccination</label>
+                <input type="date" name="vaccination_date" class="dob-input" required />
+              </div>
+              <div class="form-field">
+                <label>End Date of Vaccine Effectiveness</label>
+                <input type="date" name="vaccination_end_date" class="dob-input" required />
+              </div>
+              <div class="form-field">
+                <label>Had Vaccine Reaction</label>
+                <div class="radio-options">
+                  <label class="radio-wrapper">
+                    <input type="radio" name="reaction1" value="Yes" /> <span class="custom-radio"></span> YES
+                  </label>
+                  <label class="radio-wrapper">
+                    <input type="radio" name="reaction1" value="No" /> <span class="custom-radio"></span> NO
+                  </label>
+                </div>
+              </div>
+              <div class="form-field" style="flex:2;">
+                <label>Vaccine Symptom</label>
+                <input type="text" name="vaccine_symptom" readonly />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <div class="right-buttons">
+            <button class="add-vaccine" type="button">Add Vaccine</button>
+          </div>
+        </div>
       </section>
 
       <div class="form-actions">
