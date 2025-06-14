@@ -258,19 +258,18 @@ document.getElementById("save-information").addEventListener("click", async (e) 
         for (const form of allForms) {
             // Collect basic pet info
             const petData = {
-                Microchip_No: form.querySelector('[name="microchip-no"]').value,
-                Pet_Name: form.querySelector('[name="pet-name"]').value,
-                Species: form.querySelector('[name="species"]').value,
-                Breed: form.querySelector('[name="breed"]').value,
-                Color: form.querySelector('[name="color"]').value,
-                Sex: form.querySelector('[name="sex"]:checked')?.value || '',
-                DOB: form.querySelector('[name="dob"]').value,
-                Age: form.querySelector('[name="age"]').value,
-                Is_Spayed_Neutered: form.querySelector('[name="spayNeuter"]:checked')?.value || '',
-                Has_Passport: form.querySelector('[name="hasPassport"]:checked')?.value || '',
-                Has_Recent_Clinic_History: form.querySelector('[name="clinicHistory"]:checked')?.value || '',
-                Clinic_Name: form.querySelector('[name="clinicName"]').value,
-                Sponsor_ID: sessionStorage.getItem('userId')
+                Pet_Name: form.querySelector('[name="pet-name"]')?.value || '',
+                Species: form.querySelector('[name="species"]')?.value || '',
+                DOB: form.querySelector('[name="dob"]')?.value || '',
+                Age: form.querySelector('[name="age"]')?.value || '',
+                Breed: form.querySelector('[name="breed"]')?.value || '',
+                Color: form.querySelector('[name="color-pattern"]')?.value || '',
+                Sex: form.querySelector('[name^="sex-"]:checked')?.value || '',
+                Is_Spayed_Neutered: form.querySelector('[name^="spayed-"]:checked')?.value || '',
+                Has_Passport: form.querySelector('[name^="passport-"]:checked')?.value || '',
+                Has_Recent_Clinic_History: form.querySelector('[name^="clinic-history-"]:checked')?.value || '',
+                Clinic_Name: form.querySelector('[name="clinic-name"]')?.value || '',
+                Sponsor_ID: sessionStorage.getItem('userId') || ''
             };
             
             // Collect vaccine data
@@ -278,46 +277,61 @@ document.getElementById("save-information").addEventListener("click", async (e) 
             petData.Vaccines = [];
             
             for (const section of vaccineSections) {
-                petData.Vaccines.push({
-                    Vaccine_Lot: section.querySelector('[name^="vaccine-lot"]').value,
-                    Vaccine_Name: section.querySelector('[name^="vaccine-name"]').value,
-                    Vaccine_Type: section.querySelector('[name^="vaccine-type"]').value,
-                    Vaccine_Duration: section.querySelector('[name^="vaccine_duration"]').value,
-                    Date_Vaccination: section.querySelector('[name^="vaccination_date"]').value,
-                    Vaccination_Effectiveness_Until: section.querySelector('[name^="vaccination_end_date"]').value,
+                const vaccine = {
+                    Vaccine_Lot: section.querySelector('[name="vaccine-lot"]')?.value || '',
+                    Vaccine_Name: section.querySelector('[name="vaccine-name"]')?.value || '',
+                    Vaccine_Type: section.querySelector('[name="vaccine-type"]')?.value || '',
+                    Vaccine_Duration: section.querySelector('[name="vaccine_duration"]')?.value || '',
+                    Date_Vaccination: section.querySelector('[name="vaccination_date"]')?.value || '',
+                    Vaccination_Effectiveness_Until: section.querySelector('[name="vaccination_end_date"]')?.value || '',
                     Has_Vaccine_Reaction: section.querySelector('[name^="reaction"]:checked')?.value || 'No',
-                    Vaccine_Reaction_Symptoms: section.querySelector('[name^="vaccine_symptom"]').value
-                });
+                    Vaccine_Reaction_Symptoms: section.querySelector('[name="vaccine-symptom"]')?.value || ''
+                };
+                
+                // Only add vaccine if required fields are present
+                if (vaccine.Vaccine_Lot && vaccine.Vaccine_Name && vaccine.Vaccine_Type) {
+                    petData.Vaccines.push(vaccine);
+                }
             }
             
-            // Determine if we're creating or updating
-            const endpoint = petData.Microchip_No 
-                ? `http://localhost:3000/api/pets/${petData.Microchip_No}`
-                : 'http://localhost:3000/api/pets';
-                
-            const method = petData.Microchip_No ? 'PUT' : 'POST';
+            // Validate required fields
+            if (!petData.Pet_Name || !petData.Species) {
+                throw new Error('Pet name and species are required');
+            }
+
+            // Send the data to the server
+            const response = await fetch('http://localhost:3000/api/pets', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(petData)
+            });
+
+            // Check if response is JSON
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                const text = await response.text();
+                throw new Error(`Server returned non-JSON response: ${text.substring(0, 100)}`);
+            }
+
+            const result = await response.json();
             
-            // Queue the save operation
-            savePromises.push(
-                fetch(endpoint, {
-                    method,
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(petData)
-                }).then(res => res.json())
-            );
+            if (!response.ok) {
+                throw new Error(result.error || 'Failed to save pet');
+            }
+
+            savePromises.push(result);
         }
         
-        // Wait for all saves to complete
-        const results = await Promise.all(savePromises);
-        
         // Check for errors
-        const errors = results.filter(result => !result.success);
+        const errors = savePromises.filter(result => !result.success);
         if (errors.length > 0) {
             throw new Error(`${errors.length} pet(s) failed to save`);
         }
         
         alert('All pets saved successfully!');
-        // Optional: refresh the page or redirect
         window.location.reload();
         
     } catch (error) {
@@ -327,7 +341,7 @@ document.getElementById("save-information").addEventListener("click", async (e) 
         // Re-enable save button
         const saveBtn = document.getElementById("save-information");
         saveBtn.disabled = false;
-        saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Information';
+        saveBtn.innerHTML = 'Save Information';
     }
 }); 
 // Helper function to set up vaccine lookup for a specific section

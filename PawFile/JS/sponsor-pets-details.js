@@ -91,40 +91,25 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       // Color select
       const colorSelect = document.getElementById('color');
-      if (colorSelect && data.Color) {
-        console.log('Setting color from data:', data.Color);
-        const dbColor = data.Color.trim();
-        let colorSet = false;
+      if (colorSelect) {
+        // Build color options FIRST
+        colorSelect.innerHTML = `
+          <option value="">Select Color</option>
+          <option value="Solid">Solid Color</option>
+          <option value="Bi-color">Bi-color</option>
+          <option value="Multi-color">Multi-color</option>
+        `;
 
-        // First try exact match
-        Array.from(colorSelect.options).forEach(opt => {
-          if (opt.value === dbColor) {
-            opt.selected = true;
-            colorSet = true;
-            console.log('Color set by exact match:', opt.value);
-          }
-        });
-
-        // If no exact match, try case-insensitive match
-        if (!colorSet) {
-          Array.from(colorSelect.options).forEach(opt => {
-            if (opt.value.toLowerCase() === dbColor.toLowerCase()) {
-              opt.selected = true;
-              colorSet = true;
-              console.log('Color set by case-insensitive match:', opt.value);
+        // THEN set selected value
+        if (data.Color) {
+          const dbColor = data.Color.trim();
+          for (let i = 0; i < colorSelect.options.length; i++) {
+            if (colorSelect.options[i].value === dbColor) {
+              colorSelect.selectedIndex = i;
+              break;
             }
-          });
+          }
         }
-
-        // If still no match, log the issue
-        if (!colorSet) {
-          console.warn('Could not match color from database:', {
-            dbColor,
-            availableOptions: Array.from(colorSelect.options).map(o => o.value)
-          });
-        }
-      } else if (colorSelect) {
-        colorSelect.selectedIndex = 0;
       }
 
       // Clinic Name
@@ -148,9 +133,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       sections.forEach((sec, idx) => {
         const header = sec.querySelector('.vaccine-header h3');
         if (header) header.textContent = `Vaccine #${idx + 1}`;
+        
+        // Update all field names
         sec.querySelectorAll('[name]').forEach(el => {
-          const baseName = el.getAttribute('name').replace(/\d+$/, '');
-          el.setAttribute('name', baseName + (idx + 1));
+          const name = el.getAttribute('name');
+          const newName = name.replace(/\d+$/, '') + (idx + 1);
+          el.setAttribute('name', newName);
         });
       });
     }
@@ -239,7 +227,21 @@ document.addEventListener("DOMContentLoaded", async () => {
         const vaccineSections = document.querySelectorAll('.vaccine-section');
         const vaccinePromises = [];
 
+        // Debug: Log total number of vaccine sections
+        console.log('Total vaccine sections:', vaccineSections.length);
+
         for (const section of vaccineSections) {
+          const index = Array.from(vaccineSections).indexOf(section) + 1;
+          
+          // Debug: Log section elements
+          console.log(`Vaccine #${index} section elements:`, {
+            lot: section.querySelector(`input[name^="vaccine-lot"]`),
+            name: section.querySelector(`input[name^="vaccine-name"]`),
+            type: section.querySelector(`select[name^="vaccine-type"]`),
+            date: section.querySelector(`input[name^="vaccination_date"]`),
+            endDate: section.querySelector(`input[name^="vaccination_end_date"]`)
+          });
+
           const vaccine = {
             Vaccine_Lot: section.querySelector(`input[name^="vaccine-lot"]`)?.value.trim(),
             Vaccine_Name: section.querySelector(`input[name^="vaccine-name"]`)?.value.trim(),
@@ -247,44 +249,59 @@ document.addEventListener("DOMContentLoaded", async () => {
             Vaccine_Duration: parseInt(section.querySelector(`input[name^="vaccine_duration"]`)?.value) || 0,
             Date_Vaccination: section.querySelector(`input[name^="vaccination_date"]`)?.value,
             Vaccination_Effectiveness_Until: section.querySelector(`input[name^="vaccination_end_date"]`)?.value,
-            Has_Vaccine_Reaction: getRadioValue(`reaction${Array.from(vaccineSections).indexOf(section) + 1}`),
+            Has_Vaccine_Reaction: getRadioValue(`reaction${index}`),
             Vaccine_Reaction_Symptoms: section.querySelector(`input[name^="vaccine_symptom"]`)?.value.trim()
           };
 
-          // Validate vaccine data
-          if (!vaccine.Vaccine_Lot || !vaccine.Vaccine_Name || !vaccine.Vaccine_Type || 
-              !vaccine.Date_Vaccination || !vaccine.Vaccination_Effectiveness_Until) {
-            throw new Error(`Vaccine #${Array.from(vaccineSections).indexOf(section) + 1} is missing required fields`);
+          // Debug: Log vaccine data before validation
+          console.log(`Vaccine #${index} data:`, vaccine);
+
+          // Improved validation with detailed error messages
+          const missingFields = [];
+          if (!vaccine.Vaccine_Lot || vaccine.Vaccine_Lot === '') missingFields.push('Lot');
+          if (!vaccine.Vaccine_Name || vaccine.Vaccine_Name === '') missingFields.push('Name');
+          if (!vaccine.Vaccine_Type || vaccine.Vaccine_Type === '') missingFields.push('Type');
+          if (!vaccine.Date_Vaccination || vaccine.Date_Vaccination === '') missingFields.push('Vaccination Date');
+          if (!vaccine.Vaccination_Effectiveness_Until || vaccine.Vaccination_Effectiveness_Until === '') {
+            missingFields.push('Effectiveness End Date');
           }
 
-          // Check if vaccine exists in database
-          const checkResponse = await fetch(`http://localhost:3000/api/vaccines/${vaccine.Vaccine_Lot}`);
-          if (!checkResponse.ok) {
-            // Add new vaccine to database
-            const addVaccineResponse = await fetch('http://localhost:3000/api/vaccines', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                Vaccine_Lot: vaccine.Vaccine_Lot,
-                Vaccine_Name: vaccine.Vaccine_Name,
-                Vaccine_Type: vaccine.Vaccine_Type,
-                Vaccine_Duration: vaccine.Vaccine_Duration
-              })
-            });
-
-            if (!addVaccineResponse.ok) {
-              throw new Error(`Failed to add new vaccine ${vaccine.Vaccine_Lot}`);
-            }
+          // Date format validation
+          function isValidDate(dateString) {
+            if (!dateString) return false;
+            const date = new Date(dateString);
+            return !isNaN(date.getTime());
           }
+
+          if (!isValidDate(vaccine.Date_Vaccination)) {
+            throw new Error(`Vaccine #${index}: Invalid vaccination date format`);
+          }
+
+          if (!isValidDate(vaccine.Vaccination_Effectiveness_Until)) {
+            throw new Error(`Vaccine #${index}: Invalid effectiveness end date format`);
+          }
+
+          // Date range validation
+          const vaccinationDate = new Date(vaccine.Date_Vaccination);
+          const effectivenessDate = new Date(vaccine.Vaccination_Effectiveness_Until);
+          
+          if (effectivenessDate < vaccinationDate) {
+            throw new Error(`Vaccine #${index}: Effectiveness end date cannot be before vaccination date`);
+          }
+
+          if (missingFields.length > 0) {
+            throw new Error(`Vaccine #${index} missing required fields: ${missingFields.join(', ')}`);
+          }
+
+          // Debug: Log radio button value
+          console.log(`Vaccine #${index} reaction:`, getRadioValue(`reaction${index}`));
 
           vaccinePromises.push(vaccine);
         }
 
         console.log('Attempting to save:', petData);
 
-        // Validate data
+        // Validate pet data
         if (!petData.Microchip_No) {
           throw new Error("Missing pet ID");
         }
@@ -324,6 +341,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             Microchip_No: petId,
             Vaccines: vaccinePromises.map(v => ({
               Vaccine_Lot: v.Vaccine_Lot,
+              Vaccine_Name: v.Vaccine_Name,
+              Vaccine_Type: v.Vaccine_Type,
+              Vaccine_Duration: v.Vaccine_Duration,
               Date_Vaccination: v.Date_Vaccination,
               Vaccination_Effectiveness_Until: v.Vaccination_Effectiveness_Until,
               Has_Vaccine_Reaction: v.Has_Vaccine_Reaction === 'Yes' ? 'Yes' : 'No',
@@ -333,7 +353,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
 
         if (!saveReactionsResponse.ok) {
-          throw new Error('Failed to save vaccine reactions');
+          const errorData = await saveReactionsResponse.json();
+          throw new Error(`Failed to save vaccine reactions: ${errorData.error || 'Unknown error'}`);
         }
 
         const result = await response.json();
@@ -376,60 +397,101 @@ document.addEventListener("DOMContentLoaded", async () => {
         const vaccines = [];
         const vaccineSections = document.querySelectorAll('.vaccine-section');
         
-        // Collect all vaccine data from the form
+        console.log('Total vaccine sections:', vaccineSections.length);
+        
+        // First validate all vaccines
         for (const section of vaccineSections) {
           const index = Array.from(vaccineSections).indexOf(section) + 1;
           
+          // Debug: Log section elements
+          console.log(`Validating vaccine #${index} section elements:`, {
+            lot: section.querySelector(`input[name="vaccine-lot${index}"]`),
+            name: section.querySelector(`input[name="vaccine-name${index}"]`),
+            type: section.querySelector(`select[name="vaccine-type${index}"]`),
+            date: section.querySelector(`input[name="vaccination_date${index}"]`),
+            endDate: section.querySelector(`input[name="vaccination_end_date${index}"]`)
+          });
+          
           const vaccine = {
-            Vaccine_Lot: section.querySelector(`input[name^="vaccine-lot"]`)?.value.trim(),
-            Vaccine_Name: section.querySelector(`input[name^="vaccine-name"]`)?.value.trim(),
-            Vaccine_Type: section.querySelector(`select[name^="vaccine-type"]`)?.value,
-            Vaccine_Duration: parseInt(section.querySelector(`input[name^="vaccine_duration"]`)?.value) || 0,
-            Date_Vaccination: section.querySelector(`input[name^="vaccination_date"]`)?.value,
-            Vaccination_Effectiveness_Until: section.querySelector(`input[name^="vaccination_end_date"]`)?.value,
+            Vaccine_Lot: section.querySelector(`input[name="vaccine-lot${index}"]`)?.value.trim(),
+            Vaccine_Name: section.querySelector(`input[name="vaccine-name${index}"]`)?.value.trim(),
+            Vaccine_Type: section.querySelector(`select[name="vaccine-type${index}"]`)?.value,
+            Vaccine_Duration: parseInt(section.querySelector(`input[name="vaccine_duration${index}"]`)?.value) || 0,
+            Date_Vaccination: section.querySelector(`input[name="vaccination_date${index}"]`)?.value,
+            Vaccination_Effectiveness_Until: section.querySelector(`input[name="vaccination_end_date${index}"]`)?.value,
             Has_Vaccine_Reaction: getRadioValue(`reaction${index}`),
-            Vaccine_Reaction_Symptoms: section.querySelector(`input[name^="vaccine_symptom"]`)?.value.trim()
+            Vaccine_Reaction_Symptoms: section.querySelector(`input[name="vaccine_symptom${index}"]`)?.value.trim()
           };
 
-          // Validate required fields
-          if (!vaccine.Vaccine_Lot || !vaccine.Vaccine_Name || !vaccine.Vaccine_Type || 
-              !vaccine.Date_Vaccination || !vaccine.Vaccination_Effectiveness_Until) {
-            throw new Error(`Vaccine #${index} is missing required fields`);
+          // Debug: Log vaccine data before validation
+          console.log(`Validating vaccine #${index}:`, vaccine);
+
+          // Enhanced validation with detailed error messages
+          const missingFields = [];
+          if (!vaccine.Vaccine_Lot || vaccine.Vaccine_Lot === '') missingFields.push('Lot');
+          if (!vaccine.Vaccine_Name || vaccine.Vaccine_Name === '') missingFields.push('Name');
+          if (!vaccine.Vaccine_Type || vaccine.Vaccine_Type === '') missingFields.push('Type');
+          if (!vaccine.Date_Vaccination || vaccine.Date_Vaccination === '') missingFields.push('Vaccination Date');
+          if (!vaccine.Vaccination_Effectiveness_Until || vaccine.Vaccination_Effectiveness_Until === '') {
+            missingFields.push('Effectiveness End Date');
+          }
+
+          // Date format validation
+          function isValidDate(dateString) {
+            if (!dateString) return false;
+            const date = new Date(dateString);
+            return !isNaN(date.getTime());
+          }
+
+          if (!isValidDate(vaccine.Date_Vaccination)) {
+            throw new Error(`Vaccine #${index}: Invalid vaccination date format`);
+          }
+
+          if (!isValidDate(vaccine.Vaccination_Effectiveness_Until)) {
+            throw new Error(`Vaccine #${index}: Invalid effectiveness end date format`);
+          }
+
+          // Date range validation
+          const vaccinationDate = new Date(vaccine.Date_Vaccination);
+          const effectivenessDate = new Date(vaccine.Vaccination_Effectiveness_Until);
+          
+          if (effectivenessDate < vaccinationDate) {
+            throw new Error(`Vaccine #${index}: Effectiveness end date cannot be before vaccination date`);
+          }
+
+          if (missingFields.length > 0) {
+            console.error(`Missing fields for vaccine ${index}:`, {
+              lot: vaccine.Vaccine_Lot,
+              name: vaccine.Vaccine_Name,
+              type: vaccine.Vaccine_Type,
+              date: vaccine.Date_Vaccination,
+              endDate: vaccine.Vaccination_Effectiveness_Until
+            });
+            throw new Error(`Vaccine #${index} missing required fields: ${missingFields.join(', ')}`);
           }
 
           vaccines.push(vaccine);
         }
 
-        // First, check if vaccines exist and add them if needed
-        for (const vaccine of vaccines) {
-          // Check if vaccine exists in the database
-          const checkResponse = await fetch(`http://localhost:3000/api/vaccines/${vaccine.Vaccine_Lot}`);
-          
-          if (!checkResponse.ok) {
-            // Vaccine doesn't exist, so add it to the Vaccine table
-            const vaccineData = {
-              Vaccine_Lot: vaccine.Vaccine_Lot,
-              Vaccine_Name: vaccine.Vaccine_Name,
-              Vaccine_Type: vaccine.Vaccine_Type,
-              Vaccine_Duration: vaccine.Vaccine_Duration
-            };
-
-            const addVaccineResponse = await fetch('http://localhost:3000/api/vaccines', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify(vaccineData)
-            });
-
-            if (!addVaccineResponse.ok) {
-              throw new Error(`Failed to add new vaccine ${vaccine.Vaccine_Lot}`);
-            }
-          }
+        // Get the pet ID and sponsor ID
+        const petId = document.getElementById("petId")?.textContent;
+        if (!petId) {
+          throw new Error("Missing pet ID");
         }
 
-        // Now save all vaccine reactions
-        const saveReactionsResponse = await fetch(`http://localhost:3000/api/pets/${petId}/vaccine-reactions`, {
+        if (!userId) {
+          throw new Error("Missing sponsor ID");
+        }
+
+        // Disable save button and show loading state
+        const saveButton = document.querySelector('.edit-btn[data-section="vaccine-history"]');
+        if (saveButton) {
+          saveButton.disabled = true;
+          saveButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+        }
+
+        // Save all vaccine reactions
+        const saveResponse = await fetch(`http://localhost:3000/api/pets/${petId}/vaccine-reactions`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -439,6 +501,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             Microchip_No: petId,
             Vaccines: vaccines.map(v => ({
               Vaccine_Lot: v.Vaccine_Lot,
+              Vaccine_Name: v.Vaccine_Name,
+              Vaccine_Type: v.Vaccine_Type,
+              Vaccine_Duration: v.Vaccine_Duration,
               Date_Vaccination: v.Date_Vaccination,
               Vaccination_Effectiveness_Until: v.Vaccination_Effectiveness_Until,
               Has_Vaccine_Reaction: v.Has_Vaccine_Reaction === 'Yes' ? 'Yes' : 'No',
@@ -447,15 +512,33 @@ document.addEventListener("DOMContentLoaded", async () => {
           })
         });
 
-        if (!saveReactionsResponse.ok) {
-          throw new Error('Failed to save vaccine reactions');
+        if (!saveResponse.ok) {
+          const errorData = await saveResponse.json();
+          throw new Error(errorData.error || `Server responded with status ${saveResponse.status}`);
         }
 
-        console.log('Vaccine history saved successfully');
+        const result = await saveResponse.json();
+        console.log('Vaccine history saved:', result);
+
+        // Re-enable save button and restore original state
+        if (saveButton) {
+          saveButton.disabled = false;
+          saveButton.innerHTML = '<i class="fa-solid fa-pen-to-square"></i> Edit';
+        }
+
+        alert('Vaccine history saved successfully!');
         return true;
       } catch (error) {
         console.error('Error saving vaccine history:', error);
         alert(`Failed to save vaccine history: ${error.message}`);
+        
+        // Re-enable save button and restore original state on error
+        const saveButton = document.querySelector('.edit-btn[data-section="vaccine-history"]');
+        if (saveButton) {
+          saveButton.disabled = false;
+          saveButton.innerHTML = '<i class="fa-solid fa-pen-to-square"></i> Edit';
+        }
+        
         return false;
       }
     }
@@ -467,22 +550,28 @@ document.addEventListener("DOMContentLoaded", async () => {
     let vaccines = [];
     try {
       const vaccinesRes = await fetch(`http://localhost:3000/api/pet/${data.Microchip_No || data.Pet_ID || petId}/vaccines`);
+      console.log('Vaccine response status:', vaccinesRes.status); // Debug log
+      
       if (vaccinesRes.ok) {
         vaccines = await vaccinesRes.json();
+        console.log('Fetched vaccines:', vaccines); // Debug log
+        
+        if (!Array.isArray(vaccines)) {
+          console.error('Vaccines data is not an array:', vaccines);
+          vaccines = [];
+        }
+      } else {
+        console.error('Failed to fetch vaccines:', await vaccinesRes.text());
       }
     } catch (e) {
-      console.warn("Could not fetch vaccine history", e);
+      console.error("Could not fetch vaccine history", e);
     }
     
-    if (Array.isArray(vaccines) && vaccines.length > 0 && vaccineHistoryContainer) {
+    if (vaccines.length > 0 && vaccineHistoryContainer) {
+      console.log('Rendering vaccines...'); // Debug log
       vaccines.forEach((vaccine, idx) => {
-        console.log('Vaccine reaction data for vaccine', idx, ':', {
-          raw: vaccine.Has_Vaccine_Reaction,
-          type: typeof vaccine.Has_Vaccine_Reaction,
-          value: vaccine.Has_Vaccine_Reaction
-        });
+        console.log('Processing vaccine:', vaccine); // Debug log
         
-        // Fixed vaccine section creation to match HTML structure
         const section = document.createElement("div");
         section.className = "vaccine-section";
         section.innerHTML = `
@@ -513,24 +602,24 @@ document.addEventListener("DOMContentLoaded", async () => {
             </div>
             <div class="form-field">
               <label>Date of Vaccination</label>
-              <input type="date" name="vaccination_date${idx+1}" class="dob-input" value="${vaccine.Date_Vaccination ? vaccine.Date_Vaccination.substring(0,10) : ''}" />
+              <input type="date" name="vaccination_date${idx+1}" class="dob-input" value="${vaccine.Date_Vaccination || ''}" />
             </div>
             <div class="form-field">
               <label>End Date of Vaccine Effectiveness</label>
-              <input type="date" name="vaccination_end_date${idx+1}" class="dob-input" value="${vaccine.Vaccination_Effectiveness_Until ? vaccine.Vaccination_Effectiveness_Until.substring(0,10) : ''}" />
+              <input type="date" name="vaccination_end_date${idx+1}" class="dob-input" value="${vaccine.Vaccination_Effectiveness_Until || ''}" />
             </div>
             <div class="form-field">
               <label>Had Vaccine Reaction</label>
               <div class="radio-options" style="display: flex; gap: 1rem; align-items: center;">
                 <label class="radio-wrapper" style="display: flex; align-items: center; gap: 0.5rem; margin: 0;">
                   <input type="radio" name="reaction${idx+1}" value="Yes" 
-                    ${vaccine.Has_Vaccine_Reaction === true || vaccine.Has_Vaccine_Reaction === 1 || vaccine.Has_Vaccine_Reaction === 'Yes' ? 'checked' : ''} 
+                    ${vaccine.Has_Vaccine_Reaction === 'Yes' ? 'checked' : ''} 
                     style="width: auto; margin: 0;" /> 
                   <span style="font-size: 0.9rem;">YES</span>
                 </label>
                 <label class="radio-wrapper" style="display: flex; align-items: center; gap: 0.5rem; margin: 0;">
                   <input type="radio" name="reaction${idx+1}" value="No" 
-                    ${vaccine.Has_Vaccine_Reaction === false || vaccine.Has_Vaccine_Reaction === 0 || vaccine.Has_Vaccine_Reaction === 'No' ? 'checked' : ''} 
+                    ${vaccine.Has_Vaccine_Reaction === 'No' ? 'checked' : ''} 
                     style="width: auto; margin: 0;" /> 
                   <span style="font-size: 0.9rem;">NO</span>
                 </label>
@@ -544,30 +633,34 @@ document.addEventListener("DOMContentLoaded", async () => {
         `;
         vaccineHistoryContainer.appendChild(section);
         
-        // Setup handlers immediately after creating section
+        // Setup handlers for this section
+        setupVaccineLookupForSection(section);
         setupVaccineReactionHandlersForSection(section);
         
         // Attach delete listener
         const delBtn = section.querySelector('.delete-vaccine');
         if (delBtn) {
           delBtn.addEventListener('click', () => {
-            if (!isVaccineHistoryEditing) return; // Prevent deletion when not editing
+            if (!isVaccineHistoryEditing) return;
             section.classList.add('fade-slide-out');
             section.addEventListener('animationend', () => {
               section.remove();
               renumberVaccines();
-              toggleVaccineHistoryEditMode(isVaccineHistoryEditing);
             });
           });
         }
       });
-      renumberVaccines();
-      toggleVaccineHistoryEditMode(isVaccineHistoryEditing);
+    } else {
+      console.log('No vaccines found or container missing');
     }
 
     // Helper function to set up vaccine lookup for a section
     function setupVaccineLookupForSection(vaccineSection) {
         const lotInput = vaccineSection.querySelector('input[name^="vaccine-lot"]');
+        const nameInput = vaccineSection.querySelector('input[name^="vaccine-name"]');
+        const typeSelect = vaccineSection.querySelector('select[name^="vaccine-type"]');
+        const durationInput = vaccineSection.querySelector('input[name^="vaccine_duration"]');
+
         if (!lotInput) return;
 
         let debounceTimeout;
@@ -576,7 +669,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             debounceTimeout = setTimeout(async () => {
                 const lot = this.value.trim();
                 if (!lot) {
-                    clearVaccineFields(this);
+                    clearVaccineFields(vaccineSection);
                     return;
                 }
 
@@ -589,52 +682,25 @@ document.addEventListener("DOMContentLoaded", async () => {
                     console.log('Response status:', response.status);
 
                     if (!response.ok) {
-                        if (response.status === 404) {
-                            console.warn(`Vaccine lot ${lot} not found`);
-                            alert(`Vaccine lot ${lot} not found in the database.`);
-                            clearVaccineFields(this);
-                            return;
-                        }
                         throw new Error(`Failed to fetch vaccine data: ${response.statusText}`);
                     }
 
-                    const vaccineData = await response.json();
-                    console.log('Vaccine data received:', vaccineData);
+                    const data = await response.json();
+                    console.log('Vaccine data received:', data);
 
-                    // Validate response data
-                    if (!vaccineData.Vaccine_Name || !vaccineData.Vaccine_Type || !vaccineData.Vaccine_Duration) {
-                        console.warn('Incomplete vaccine data:', vaccineData);
-                        alert('Vaccine data is incomplete. Please check the database.');
-                        clearVaccineFields(this);
-                        return;
+                    if (data.exists) {
+                        // Existing vaccine found - auto-fill and lock the fields
+                        if (nameInput) {
+                            nameInput.value = data.Vaccine_Name;
+                            nameInput.readOnly = true;
                     }
-
-                    // Validate vaccine type
-                    const allowedTypes = ['Core', 'Non-Core'];
-                    if (!allowedTypes.includes(vaccineData.Vaccine_Type)) {
-                        console.warn(`Invalid vaccine type: ${vaccineData.Vaccine_Type}`);
-                        alert(`Invalid vaccine type: ${vaccineData.Vaccine_Type}`);
-                        clearVaccineFields(this);
-                        return;
+                        if (typeSelect) {
+                            typeSelect.value = data.Vaccine_Type;
+                            typeSelect.disabled = true;
                     }
-
-                    const vaccineNameInput = vaccineSection.querySelector('input[name^="vaccine-name"]');
-                    const vaccineTypeSelect = vaccineSection.querySelector('select[name^="vaccine-type"]');
-                    const vaccineDurationInput = vaccineSection.querySelector('input[name^="vaccine_duration"]');
-
-                    console.log('Selected elements:', { vaccineNameInput, vaccineTypeSelect, vaccineDurationInput });
-
-                    if (vaccineNameInput) {
-                        vaccineNameInput.value = vaccineData.Vaccine_Name;
-                        vaccineNameInput.readOnly = true;
-                    }
-                    if (vaccineTypeSelect) {
-                        vaccineTypeSelect.value = vaccineData.Vaccine_Type;
-                        vaccineTypeSelect.disabled = true;
-                    }
-                    if (vaccineDurationInput) {
-                        vaccineDurationInput.value = vaccineData.Vaccine_Duration;
-                        vaccineDurationInput.readOnly = true;
+                        if (durationInput) {
+                            durationInput.value = data.Vaccine_Duration;
+                            durationInput.readOnly = true;
                     }
 
                     // Add success visual feedback
@@ -642,11 +708,33 @@ document.addEventListener("DOMContentLoaded", async () => {
                     setTimeout(() => {
                         this.style.backgroundColor = '#fff';
                     }, 1000);
-
+                    } else {
+                        // New vaccine - allow editing of fields
+                        if (nameInput) {
+                            nameInput.value = '';
+                            nameInput.readOnly = false;
+                            nameInput.placeholder = 'Enter vaccine name';
+                        }
+                        if (typeSelect) {
+                            typeSelect.value = '';
+                            typeSelect.disabled = false;
+                        }
+                        if (durationInput) {
+                            durationInput.value = '';
+                            durationInput.readOnly = false;
+                            durationInput.placeholder = 'Enter duration in years';
+                        }
+                        
+                        // Add visual feedback for new vaccine
+                        this.style.backgroundColor = '#fff3e0';
+                        setTimeout(() => {
+                            this.style.backgroundColor = '#fff';
+                        }, 1000);
+                    }
                 } catch (error) {
                     console.error('Error fetching vaccine data:', error);
-                    alert(`Error fetching vaccine data: ${error.message}`);
-                    clearVaccineFields(this);
+                    alert(`Error checking vaccine: ${error.message}`);
+                    clearVaccineFields(vaccineSection);
                     this.style.backgroundColor = '#ffebee'; // Error visual feedback
                     setTimeout(() => {
                         this.style.backgroundColor = '#fff';
@@ -656,6 +744,27 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
             }, 500); // Wait 500ms after typing stops
         });
+    }
+
+    function clearVaccineFields(section) {
+        const nameInput = section.querySelector('input[name^="vaccine-name"]');
+        const typeSelect = section.querySelector('select[name^="vaccine-type"]');
+        const durationInput = section.querySelector('input[name^="vaccine_duration"]');
+        
+        if (nameInput) {
+            nameInput.value = '';
+            nameInput.readOnly = false;
+            nameInput.placeholder = 'Enter vaccine name';
+        }
+        if (typeSelect) {
+            typeSelect.value = '';
+            typeSelect.disabled = false;
+        }
+        if (durationInput) {
+            durationInput.value = '';
+            durationInput.readOnly = false;
+            durationInput.placeholder = 'Enter duration in years';
+        }
     }
 
     // Helper function to set up vaccine reaction handlers for a section
@@ -719,23 +828,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     });
 
-    // FIXED: Setup edit button handlers with proper targeting and save functionality
-    
-    // Pet Info Edit Button - look for button with data-section="pet-info" OR fallback to first edit button
-    let petInfoEditBtn = document.querySelector('.edit-btn[data-section="pet-info"]');
-    if (!petInfoEditBtn) {
-      // Fallback: look for edit button in pet info section
-      const petInfoSection = document.querySelector('.pet-info-section, .info-section');
-      if (petInfoSection) {
-        petInfoEditBtn = petInfoSection.querySelector('.edit-btn');
-      }
-    }
-    
+    // Setup edit button handlers
+    function setupEditButtons() {
+      // Pet Info Edit Button
+      const petInfoEditBtn = document.querySelector('.edit-btn[data-section="pet-info"]');
     if (petInfoEditBtn) {
-      console.log('Pet info edit button found:', petInfoEditBtn);
       petInfoEditBtn.addEventListener('click', async function(e) {
         e.preventDefault();
-        console.log('Pet info edit button clicked, current state:', isPetInfoEditing);
+          console.log('Pet info edit button clicked');
         
         if (isPetInfoEditing) {
           // Currently editing, so save
@@ -752,32 +852,14 @@ document.addEventListener("DOMContentLoaded", async () => {
           this.innerHTML = '<i class="fa-solid fa-save"></i> Save';
         }
       });
-    } else {
-      console.warn('Pet info edit button not found');
     }
 
-    // Vaccine History Edit Button - look for button with data-section="vaccine-history" OR fallback
-    let vaccineEditBtn = document.querySelector('.edit-btn[data-section="vaccine-history"]');
-    if (!vaccineEditBtn) {
-      // Fallback: look for edit button in vaccine history section
-      const vaccineSection = document.querySelector('.vaccine-history-section, .vaccine-section-container');
-      if (vaccineSection) {
-        vaccineEditBtn = vaccineSection.querySelector('.edit-btn');
-      }
-      // Alternative fallback: look for the second edit button if there are multiple
-      if (!vaccineEditBtn) {
-        const allEditBtns = document.querySelectorAll('.edit-btn');
-        if (allEditBtns.length > 1) {
-          vaccineEditBtn = allEditBtns[1]; // Second edit button
-        }
-      }
-    }
-    
+      // Vaccine History Edit Button
+      const vaccineEditBtn = document.querySelector('.edit-btn[data-section="vaccine-history"]');
     if (vaccineEditBtn) {
-      console.log('Vaccine edit button found:', vaccineEditBtn);
       vaccineEditBtn.addEventListener('click', async function(e) {
         e.preventDefault();
-        console.log('Vaccine edit button clicked, current state:', isVaccineHistoryEditing);
+          console.log('Vaccine edit button clicked');
         
         if (isVaccineHistoryEditing) {
           // Currently editing, so save
@@ -794,18 +876,23 @@ document.addEventListener("DOMContentLoaded", async () => {
           this.innerHTML = '<i class="fa-solid fa-save"></i> Save';
         }
       });
-    } else {
-      console.warn('Vaccine edit button not found');
+      }
     }
 
-    // Set initial states - everything readonly/disabled
+    // Initialize everything when DOM is loaded
+    setupEditButtons();
+    
+    // Set initial states
     togglePetInfoEditMode(false);
     toggleVaccineHistoryEditMode(false);
 
     // Add Vaccine
     if (addBtn) {
       addBtn.addEventListener('click', () => {
-        if (!isVaccineHistoryEditing) return; // Prevent adding when not editing
+        if (!isVaccineHistoryEditing) {
+          alert('Please enable edit mode to add vaccines');
+          return;
+        }
         
         const sections = vaccineHistoryContainer.querySelectorAll('.vaccine-section');
         const nextIndex = sections.length + 1;
@@ -865,25 +952,30 @@ document.addEventListener("DOMContentLoaded", async () => {
           </div>
         `;
         vaccineHistoryContainer.appendChild(newSection);
-        toggleVaccineHistoryEditMode(isVaccineHistoryEditing);
-
+        
         // Set up the new section's functionality
         setupVaccineLookupForSection(newSection);
         setupVaccineReactionHandlersForSection(newSection);
         
-        // Attach delete listener
+        // Attach delete listener with confirmation
         const delBtn = newSection.querySelector('.delete-vaccine');
         if (delBtn) {
           delBtn.addEventListener('click', () => {
-            if (!isVaccineHistoryEditing) return; // Prevent deletion when not editing
-            newSection.classList.add('fade-slide-out');
-            newSection.addEventListener('animationend', () => {
-              newSection.remove();
-              renumberVaccines();
-              toggleVaccineHistoryEditMode(isVaccineHistoryEditing);
-            });
+            if (!isVaccineHistoryEditing) {
+              alert('Please enable edit mode to delete vaccines');
+              return;
+            }
+            
+            if (confirm('Are you sure you want to delete this vaccine record?')) {
+              newSection.classList.add('fade-slide-out');
+              newSection.addEventListener('animationend', () => {
+                newSection.remove();
+                renumberVaccines();
+              });
+            }
           });
         }
+        
         renumberVaccines();
       });
     }
@@ -962,27 +1054,5 @@ function setAllFieldsToNA() {
   const petIdElement = document.getElementById("petId");
   if (petIdElement) {
     petIdElement.textContent = "N/A";
-  }
-}
-
-function clearVaccineFields(lotInput) {
-  const section = lotInput.closest('.vaccine-section');
-  if (!section) return;
-  
-  const vaccineNameInput = section.querySelector('input[name^="vaccine-name"]');
-  const vaccineTypeSelect = section.querySelector('select[name^="vaccine-type"]');
-  const vaccineDurationInput = section.querySelector('input[name^="vaccine_duration"]');
-  
-  if (vaccineNameInput) {
-    vaccineNameInput.value = "";
-    vaccineNameInput.readOnly = false;
-  }
-  if (vaccineTypeSelect) {
-    vaccineTypeSelect.selectedIndex = 0;
-    vaccineTypeSelect.disabled = false;
-  }
-  if (vaccineDurationInput) {
-    vaccineDurationInput.value = "";
-    vaccineDurationInput.readOnly = false;
   }
 }
