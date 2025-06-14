@@ -17,7 +17,12 @@ document.addEventListener('DOMContentLoaded', () => {
       sponsor: [
         { id: 'A7B9K', password: '123' },
         { id: 'M9Z4Q', password: '123' },
-        { id: 'X3D7P', password: '123' },
+        { id: 'F2G3H', password: '123' },
+        { id: 'M9Z4Q', password: '123' },
+        { id: 'P5R6T', password: '123' },
+        { id: 'S1L2E', password: '123' },
+        { id: 'V9W0X', password: '123' },
+        { id: 'X3D7P', password: '123' }
       ],
       admin: [
         { id: 'admin', password: 'adminpass' }
