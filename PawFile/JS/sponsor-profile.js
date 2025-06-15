@@ -241,75 +241,29 @@ document.addEventListener('DOMContentLoaded', function () {
   function setupDeleteAccountFeature() {
     if (!deleteAccountBtn) return;
 
-    const deleteModal = document.getElementById('deleteConfirmationModal');
-    const deleteCancelBtn = document.getElementById('deleteCancelBtn');
-    const deleteConfirmBtn = document.getElementById('deleteConfirmBtn');
-    const countdownText = document.getElementById('countdownText');
-    const countdownNumber = document.getElementById('countdownNumber');
-    
-    let countdownTimer = null;
-    
-    // Function to start the confirmation countdown
-    function startCountdown() {
-      let seconds = 5;
-      countdownText.style.display = 'block';
-      deleteConfirmBtn.disabled = true;
-      deleteConfirmBtn.style.backgroundColor = '#6c757d';
-      deleteConfirmBtn.style.cursor = 'not-allowed';
-      
-      countdownTimer = setInterval(() => {
-        seconds--;
-        countdownNumber.textContent = seconds;
-        
-        if (seconds <= 0) {
-          clearInterval(countdownTimer);
-          countdownText.style.display = 'none';
-          deleteConfirmBtn.disabled = false;
-          deleteConfirmBtn.style.backgroundColor = '#dc3545';
-          deleteConfirmBtn.style.cursor = 'pointer';
-          deleteConfirmBtn.innerHTML = '<i class="fa-solid fa-exclamation-triangle"></i> DELETE MY ACCOUNT PERMANENTLY';
-        }
-      }, 1000);
-    }
-    
-    // Function to reset the modal state
-    function resetModalState() {
-      if (countdownTimer) {
-        clearInterval(countdownTimer);
-        countdownTimer = null;
-      }
-      countdownText.style.display = 'none';
-      deleteConfirmBtn.disabled = true;
-      deleteConfirmBtn.style.backgroundColor = '#6c757d';
-      deleteConfirmBtn.style.cursor = 'not-allowed';
-      deleteConfirmBtn.innerHTML = '<i class="fa-solid fa-trash"></i> Delete My Account';
-      countdownNumber.textContent = '5';
-    }
+    const deleteModal = document.getElementById('deleteAccountModal');
+    const deleteCancelBtn = document.getElementById('cancelDeleteAccount');
+    const deleteConfirmBtn = document.getElementById('confirmDeleteAccount');
     
     // Delete account button click handler
     deleteAccountBtn.addEventListener('click', function() {
       deleteModal.style.display = 'flex';
-      startCountdown();
     });
     
     // Cancel button click handler
     deleteCancelBtn.addEventListener('click', function() {
       deleteModal.style.display = 'none';
-      resetModalState();
     });
     
     // Modal backdrop click handler
     deleteModal.addEventListener('click', function(e) {
       if (e.target === deleteModal) {
         deleteModal.style.display = 'none';
-        resetModalState();
       }
     });
     
     // Confirm delete button click handler
     deleteConfirmBtn.addEventListener('click', function() {
-      if (this.disabled) return;
-      
       this.disabled = true;
       this.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Deleting Account...';
       this.style.cursor = 'not-allowed';
@@ -317,7 +271,9 @@ document.addEventListener('DOMContentLoaded', function () {
       const userId = sessionStorage.getItem('userId');
       if (!userId) {
         alert('No user ID found. Cannot delete account.');
-        resetModalState();
+        this.disabled = false;
+        this.innerHTML = '<i class="fa-solid fa-trash"></i> Yes, Delete Account';
+        this.style.cursor = 'pointer';
         deleteModal.style.display = 'none';
         return;
       }
@@ -332,7 +288,9 @@ document.addEventListener('DOMContentLoaded', function () {
         .catch(error => {
           console.error('Error deleting account:', error);
           alert('Error deleting account: ' + error.message);
-          resetModalState();
+          this.disabled = false;
+          this.innerHTML = '<i class="fa-solid fa-trash"></i> Yes, Delete Account';
+          this.style.cursor = 'pointer';
           deleteModal.style.display = 'none';
         });
     });
