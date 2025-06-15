@@ -12,10 +12,10 @@ app.use(bodyParser.json());
 
 // MySQL connection pool
 const pool = mysql.createPool({
-  host: '127.0.0.1',
+  host: 'localhost',
   user: 'root',
-  password: 'yosefff1133', // Change as needed
-  database: 'prac_schema',     // Change as needed
+  password: 'porksisig', // Change as needed
+  database: 'pawfile_db',     // Change as needed
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0
@@ -106,6 +106,12 @@ app.post('/submit-all', async (req, res) => {
         Sponsor_Phone_No, Work_Phone, Spouse_Alt_No, Preferred_Contact, Supervisor_ID
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       sponsorValues.slice(0, 17)
+    );
+
+    // insert account
+  await connection.execute(
+    `INSERT INTO Account (Sponsor_ID, Passcode) VALUES (?, ?)`,
+      [formData.sponsor.Sponsor_ID, password]
     );
 
     // 3. Insert pets and their vaccines
