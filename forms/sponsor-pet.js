@@ -191,7 +191,7 @@ document.addEventListener("click", function (event) {
     }
 });
 
-<<<<<<< HEAD
+//<<<<<<< HEAD
 document.getElementById("back-button").addEventListener("click", () => {
     alert("Back button clicked!");
 });
@@ -209,7 +209,7 @@ document.getElementById("save-information").addEventListener("click", () => {
     });
     console.log("All Pet Data:", data);
     alert("Data saved to console. Check browser console for details.");
-=======
+//=======
 // ====================
 // Save Button Logic
 // ====================
@@ -242,5 +242,6 @@ document.getElementById("save-information")?.addEventListener("click", (e) => {
 
   // Redirect after user clicks OK
   window.location.href = '../../PawFile/HTML/pawfile-login.html';
->>>>>>> cf85ec3c8a7728b53307660a12ca256c366112eb
+//>>>>>>> cf85ec3c8a7728b53307660a12ca256c366112eb
+});
 });

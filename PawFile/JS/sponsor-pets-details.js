@@ -92,15 +92,17 @@ document.addEventListener("DOMContentLoaded", async () => {
       // Color select
       const colorSelect = document.getElementById('color');
       if (colorSelect) {
-        // Build color options FIRST
-        colorSelect.innerHTML = `
-          <option value="">Select Color</option>
-          <option value="Solid">Solid Color</option>
-          <option value="Bi-color">Bi-color</option>
-          <option value="Multi-color">Multi-color</option>
-        `;
+        // Only build options if they don't exist yet
+        if (colorSelect.options.length <= 1) { // Assuming just the default option exists
+          colorSelect.innerHTML = `
+            <option value="">Select Color</option>
+            <option value="Solid">Solid Color</option>
+            <option value="Bi-color">Bi-color</option>
+            <option value="Multi-color">Multi-color</option>
+          `;
+        }
 
-        // THEN set selected value
+        // Then set the selected value
         if (data.Color) {
           const dbColor = data.Color.trim();
           for (let i = 0; i < colorSelect.options.length; i++) {
@@ -978,17 +980,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         
         renumberVaccines();
       });
-    }
-
-    // Update the color select element in the main form
-    const colorSelect = document.getElementById('color');
-    if (colorSelect) {
-      colorSelect.innerHTML = `
-        <option value="">Select Color</option>
-        <option value="Solid">Solid Color</option>
-        <option value="Bi-color">Bi-color</option>
-        <option value="Multi-color">Multi-color</option>
-      `;
     }
 
   } catch (err) {
