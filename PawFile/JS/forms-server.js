@@ -7,228 +7,467 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
-app.use(express.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
-// Create connection pool
+// MySQL connection pool
 const pool = mysql.createPool({
   host: '127.0.0.1',
-  port: 3306,
   user: 'root',
-  password: 'yosefff1133', // Using the first password as default
-  database: 'prac_schema',
+  password: 'yosefff1133', // Change as needed
+  database: 'prac_schema',     // Change as needed
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0
 });
 
-// Test database connection
-pool.getConnection()
-  .then(connection => {
-    console.log('Connected to MySQL');
-    connection.release();
-  })
-  .catch(err => {
-    console.error('Database connection failed:', err);
-    process.exit(1);
-  });
-  
-  // ADD THIS LINE TO SERVE YOUR CSS FILES
-  // This makes files in 'your-project/CSS/' accessible via '/css/...' paths
-  app.use('/css', express.static(path.join(__dirname, '..', 'CSS')));
-  
-  app.use('/images', express.static(path.join(__dirname, '..', 'Images')));
-  
-  // Optional: Serve your client-side JS files as well
-  // This makes files in 'your-project/JS/' accessible via '/js/...' paths
-  app.use('/js', express.static(path.join(__dirname)));
-  
-  
-  app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'HTML', 'pawfile-login.html'));
-  });
-  
-  app.get('/forms-sponsor-pet.html', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'HTML', 'forms-sponsor-pet.html'));
-  });
+// Helper to capitalize enum values as needed
+function mapEnum(val, type) {
+  if (!val) return null;
+  if (type === 'yesno') return val.toLowerCase() === 'yes' ? 'Yes' : val.toLowerCase() === 'no' ? 'No' : null;
+  if (type === 'color') {
+    if (val.toLowerCase() === 'solid') return 'Solid';
+    if (val.toLowerCase() === 'bi-color') return 'Bi-color';
+    if (val.toLowerCase() === 'multi-color') return 'Multi-color';
+  }
+  if (type === 'sex') return val.toLowerCase() === 'male' ? 'Male' : val.toLowerCase() === 'female' ? 'Female' : null;
+  if (type === 'vaccineType') {
+    if (val.toLowerCase() === 'core') return 'Core';
+    if (val.toLowerCase() === 'non-core' || val.toLowerCase() === 'noncore') return 'Non-Core';
+  }
+  return val;
+}
 
-  app.get('/HTML/sponsor-profile.html', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'HTML', 'sponsor-profile.html'));
-  });
+// Serve static files
+app.use(express.static(path.join(__dirname, '..')));
 
-  app.get('/HTML/sponsor-pets.html', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'HTML', 'sponsor-pets.html'));
-  });
+// HTML routes
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'HTML', 'pawfile-login.html'));
+});
+app.get('/forms-sponsor-pet.html', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'HTML', 'forms-sponsor-pet.html'));
+});
 
-  app.get('/HTML/forms-sponsor-pet.html', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'HTML', 'forms-sponsor-pet.html'));
-  });
+// ========== /submit-all FORM SUBMISSION ==========
+app.post('/submit-all', async (req, res) => {
+  const formData = req.body.formData || req.body;
+  const password = req.body.password || null;
 
-  app.get('/HTML/pawfile-login.html', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'HTML', 'pawfile-login.html'));
-  });
+  if (!formData || !formData.sponsor || !formData.pets || !Array.isArray(formData.pets)) {
+    console.error('❌ Invalid data structure:', req.body);
+    return res.status(400).json({ success: false, message: 'Invalid data structure.' });
+  }
 
-  app.get('/HTML/pet-information.html', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'HTML', 'pet-information.html'));
-  });
-
-  app.get('/HTML/sponsor-pets-details.html', (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'HTML', 'sponsor-pets-details.html'));
-  });
-
-
-// Delete sponsor account with cascading deletions
-app.delete('/api/sponsor/:id', async (req, res) => {
-  const sponsorId = req.params.id;
-  const connection = await pool.getConnection();
-  
+  let connection;
   try {
+    connection = await pool.getConnection();
     await connection.beginTransaction();
 
-    // Step 1: Get all pets belonging to this sponsor
-    const [pets] = await connection.query('SELECT Microchip_No FROM Pets WHERE Sponsor_ID = ?', [sponsorId]);
-    const petMicrochips = pets.map(pet => pet.Microchip_No);
-    console.log(`Found ${petMicrochips.length} pets for sponsor ${sponsorId}`);
-
-    // Step 2: Delete vaccine reactions for all pets (if any pets exist)
-    if (petMicrochips.length > 0) {
-      const deleteVaccineReactionsQuery = `
-        DELETE FROM Vaccine_Reaction 
-        WHERE Microchip_No IN (${petMicrochips.map(() => '?').join(',')})
-      `;
-      
-      const [vaccineReactionResult] = await connection.query(deleteVaccineReactionsQuery, petMicrochips);
-      console.log(`Deleted ${vaccineReactionResult.affectedRows} vaccine reaction records`);
-      
-      // Step 3: Delete pets
-      const [petsResult] = await connection.query('DELETE FROM Pets WHERE Sponsor_ID = ?', [sponsorId]);
-      console.log(`Deleted ${petsResult.affectedRows} pet records`);
+    // 1. Insert supervisor if provided
+    if (formData.sponsor.Supervisor_ID) {
+      await connection.execute(
+        `INSERT IGNORE INTO Supervisor (Supervisor_ID, Supervisor_Name, Supervisor_Email) VALUES (?, ?, ?)`,
+        [
+          formData.sponsor.Supervisor_ID || null,
+          formData.sponsor.Supervisor_Name || null,
+          formData.sponsor.Supervisor_Email || null
+        ]
+      );
     }
 
-    // Step 4: Delete the sponsor
-    const [sponsorResult] = await connection.query('DELETE FROM Sponsor WHERE Sponsor_ID = ?', [sponsorId]);
-    
-    if (sponsorResult.affectedRows === 0) {
-      await connection.rollback();
-      return res.status(404).json({ error: 'Sponsor not found' });
-    }
-    
-    console.log(`Deleted sponsor ${sponsorId}`);
-    
-    await connection.commit();
-    
-    // Step 5: Clean up orphaned supervisors (outside transaction)
-    try {
-      const cleanupResult = await cleanupSupervisors();
-      if (cleanupResult.removedSupervisors > 0) {
-        console.log('Post-deletion cleanup completed:', cleanupResult);
+    // 2. Insert sponsor (set military fields to NULL if not Active Duty)
+    const isActiveDuty = formData.sponsor.Sponsor_Status === 'Active Duty';
+    const sponsorValues = [
+      formData.sponsor.Sponsor_ID,
+      formData.sponsor.Sponsor_LN,
+      formData.sponsor.Sponsor_FN,
+      formData.sponsor.Sponsor_MI || null,
+      formData.sponsor.Spouse_Name || null,
+      formData.sponsor.Sponsor_Status,
+      isActiveDuty ? formData.sponsor.Grade : null,
+      isActiveDuty ? mapEnum(formData.sponsor.is_Dual_Military, 'yesno') : null,
+      isActiveDuty ? formData.sponsor.Branch : null,
+      isActiveDuty ? formData.sponsor.Unit : null,
+      formData.sponsor.Personal_Email,
+      formData.sponsor.Mail_Box || null,
+      formData.sponsor.Sponsor_Phone_No,
+      formData.sponsor.Work_Phone || null,
+      formData.sponsor.Spouse_Alt_No || null,
+      formData.sponsor.Preferred_Contact,
+      formData.sponsor.Supervisor_ID || null,
+      password // Temporary_Password
+    ];
+
+    await connection.execute(
+      `INSERT INTO Sponsor (
+        Sponsor_ID, Sponsor_LN, Sponsor_FN, Sponsor_MI, Spouse_Name, Sponsor_Status, 
+        Grade, is_Dual_Military, Branch, Unit, Personal_Email, Mail_Box, 
+        Sponsor_Phone_No, Work_Phone, Spouse_Alt_No, Preferred_Contact, Supervisor_ID
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      sponsorValues.slice(0, 17)
+    );
+
+    // 3. Insert pets and their vaccines
+    for (const pet of formData.pets) {
+      if (!pet.Microchip_No) continue;
+
+      await connection.execute(
+        `INSERT INTO Pets (
+          Microchip_No, Pet_Name, Species, DOB, Age, Breed, 
+          Color, Has_Passport, Sex, Is_Spayed_Neutered, 
+          Has_Recent_Clinic_History, Clinic_Name, Sponsor_ID
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          pet.Microchip_No,
+          pet.Pet_Name,
+          pet.Species,
+          pet.DOB,
+          pet.Age,
+          pet.Breed,
+          mapEnum(pet.Color, 'color'),
+          mapEnum(pet.Has_Passport, 'yesno'),
+          mapEnum(pet.Sex, 'sex'),
+          mapEnum(pet.Is_Spayed_Neutered, 'yesno'),
+          mapEnum(pet.Has_Recent_Clinic_History, 'yesno'),
+          pet.Clinic_Name || null,
+          formData.sponsor.Sponsor_ID
+        ]
+      );
+
+      // Insert vaccines for this pet
+      if (Array.isArray(pet.Vaccines)) {
+        for (const vaccine of pet.Vaccines) {
+          await connection.execute(
+            `INSERT IGNORE INTO Vaccine (Vaccine_Lot, Vaccine_Name, Vaccine_Type, Vaccine_Duration) VALUES (?, ?, ?, ?)`,
+            [
+              vaccine.Vaccine_Lot,
+              vaccine.Vaccine_Name,
+              mapEnum(vaccine.Vaccine_Type, 'vaccineType'),
+              vaccine.Vaccine_Duration
+            ]
+          );
+
+          await connection.execute(
+            `INSERT INTO Vaccine_Reaction (
+              Sponsor_ID, Microchip_No, Vaccine_Lot, Date_Vaccination, 
+              Vaccination_Effectiveness_Until, Has_Vaccine_Reaction, Vaccine_Reaction_Symptoms
+            ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+            [
+              formData.sponsor.Sponsor_ID,
+              pet.Microchip_No,
+              vaccine.Vaccine_Lot,
+              vaccine.Date_Vaccination,
+              vaccine.Vaccination_Effectiveness_Until,
+              mapEnum(vaccine.Has_Vaccine_Reaction, 'yesno'),
+              vaccine.Vaccine_Reaction_Symptoms || null
+            ]
+          );
+        }
       }
-    } catch (cleanupErr) {
-      console.error('Cleanup error after deletion:', cleanupErr);
     }
-    
-    res.json({ 
-      message: 'Account deleted successfully',
-      deletedPets: petMicrochips.length
+
+    await connection.commit();
+    res.status(200).json({
+      success: true,
+      sponsorId: formData.sponsor.Sponsor_ID,
+      password: password
     });
-  } catch (err) {
-    await connection.rollback();
-    console.error('Error in sponsor deletion:', err);
-    res.status(500).json({ error: 'Failed to delete sponsor account' });
+  } catch (error) {
+    if (connection) await connection.rollback();
+    console.error('❌ Query error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Database operation failed',
+      error: error.message,
+    });
   } finally {
-    connection.release();
+    if (connection) connection.release();
   }
 });
 
+// ========== API ENDPOINTS ==========
+
+// Helper: cleanup supervisors
+async function cleanupSupervisors() {
+  const connection = await pool.getConnection();
+  try {
+    // Step 1: Remove supervisor_id from sponsors who are not on active duty
+    await connection.query(`
+      UPDATE Sponsor 
+      SET Supervisor_ID = NULL 
+      WHERE Sponsor_Status != 'ACTIVE DUTY' AND Supervisor_ID IS NOT NULL
+    `);
+
+    // Step 2: Find supervisors who are no longer supervising anyone
+    const [orphanedSupervisors] = await connection.query(`
+      SELECT s.Supervisor_ID 
+      FROM Supervisor s
+      LEFT JOIN Sponsor sp ON s.Supervisor_ID = sp.Supervisor_ID
+      WHERE sp.Supervisor_ID IS NULL
+    `);
+
+    if (orphanedSupervisors.length > 0) {
+      const supervisorIds = orphanedSupervisors.map(sup => sup.Supervisor_ID);
+      await connection.query(
+        `DELETE FROM Supervisor WHERE Supervisor_ID IN (${supervisorIds.map(() => '?').join(',')})`,
+        supervisorIds
+      );
+    }
+  } finally {
+    connection.release();
+  }
+}
+
 // Get sponsor data along with supervisor info in one call
 app.get('/api/sponsor/:id', async (req, res) => {
+  const { id } = req.params;
   try {
-    const { id } = req.params;
-
-    const [sponsorResults] = await pool.query('SELECT * FROM Sponsor WHERE Sponsor_ID = ?', [id]);
-    
+    const connection = await pool.getConnection();
+    const [sponsorResults] = await connection.query('SELECT * FROM Sponsor WHERE Sponsor_ID = ?', [id]);
     if (sponsorResults.length === 0) {
+      connection.release();
       return res.status(404).json({ error: 'Sponsor not found' });
     }
-
     const sponsor = sponsorResults[0];
-
     if (!sponsor.Supervisor_ID) {
+      connection.release();
       return res.json({ ...sponsor, Supervisor_Name: null, Supervisor_Email: null });
     }
-
-    const [supervisorResults] = await pool.query(
+    const [supervisorResults] = await connection.query(
       'SELECT Supervisor_Name, Supervisor_Email FROM Supervisor WHERE Supervisor_ID = ?',
       [sponsor.Supervisor_ID]
     );
-
+    connection.release();
     const supervisor = supervisorResults[0] || { Supervisor_Name: null, Supervisor_Email: null };
     res.json({ ...sponsor, ...supervisor });
   } catch (err) {
-    console.error('Error fetching sponsor:', err);
     res.status(500).json({ error: 'Database error fetching sponsor' });
   }
 });
 
-
-
 // Check if a supervisor exists
 app.get('/api/supervisor/:id', async (req, res) => {
+  const { id } = req.params;
   try {
-    const { id } = req.params;
-    const [results] = await pool.query('SELECT * FROM Supervisor WHERE Supervisor_ID = ?', [id]);
-
+    const connection = await pool.getConnection();
+    const [results] = await connection.query('SELECT * FROM Supervisor WHERE Supervisor_ID = ?', [id]);
+    connection.release();
     if (results.length === 0) {
       return res.status(404).json({ error: 'Supervisor not found' });
     }
-
-    res.status(200).json(results[0]);
+    return res.status(200).json(results[0]);
   } catch (err) {
-    console.error('Error fetching supervisor:', err);
     res.status(500).json({ error: 'Database error fetching supervisor' });
   }
 });
 
-// Get sponsor's pets
-app.get('/api/sponsor/:id/pets', async (req, res) => {
-  try {
-    const sponsorID = req.params.id.toUpperCase();
-    const [results] = await pool.query('SELECT * FROM Pets WHERE UPPER(Sponsor_ID) = ?', [sponsorID]);
+// Update sponsor data (with enhanced supervisor handling and automatic cleanup)
+app.put('/api/sponsor/:id', async (req, res) => {
+  const { id } = req.params;
+  const {
+    Sponsor_FN,
+    Sponsor_LN,
+    Sponsor_MI,
+    Spouse_Name,
+    Sponsor_Status,
+    Grade,
+    is_Dual_Military,
+    Branch,
+    Unit,
+    Personal_Email,
+    Mail_Box,
+    Sponsor_Phone_No,
+    Work_Phone,
+    Spouse_Alt_No,
+    Preferred_Contact,
+    Supervisor_ID,
+    Supervisor_Name,
+    Supervisor_Email
+  } = req.body;
 
+  // Determine final values based on sponsor status
+  let finalSupervisorId = null;
+  let finalGrade = Grade;
+  let finalIsDualMilitary = is_Dual_Military;
+  let finalBranch = Branch;
+  let finalUnit = Unit;
+
+  if (Sponsor_Status === 'ACTIVE DUTY') {
+    finalSupervisorId = (!Supervisor_ID || Supervisor_ID.trim() === '') ? null : Supervisor_ID;
+  } else {
+    finalSupervisorId = null;
+    finalGrade = null;
+    finalIsDualMilitary = null;
+    finalBranch = null;
+    finalUnit = null;
+  }
+
+  let connection;
+  try {
+    connection = await pool.getConnection();
+
+    // Supervisor logic
+    if (!finalSupervisorId) {
+      // No supervisor ID provided or sponsor not on active duty - update sponsor with NULL supervisor
+      await updateSponsor(connection, id, {
+        Sponsor_FN, Sponsor_LN, Sponsor_MI, Spouse_Name, Sponsor_Status,
+        Grade: finalGrade, is_Dual_Military: finalIsDualMilitary, Branch: finalBranch, Unit: finalUnit,
+        Personal_Email, Mail_Box, Sponsor_Phone_No, Work_Phone, Spouse_Alt_No, Preferred_Contact,
+        Supervisor_ID: null
+      });
+    } else {
+      // Check if Supervisor_ID exists
+      const [supResults] = await connection.query('SELECT Supervisor_ID FROM Supervisor WHERE Supervisor_ID = ?', [finalSupervisorId]);
+      if (supResults.length > 0) {
+        // Supervisor exists - check if user provided name and email to update
+        if (Supervisor_Name && Supervisor_Name.trim() !== '' && Supervisor_Email && Supervisor_Email.trim() !== '') {
+          await connection.query(
+            `UPDATE Supervisor SET Supervisor_Name = ?, Supervisor_Email = ? WHERE Supervisor_ID = ?`,
+            [Supervisor_Name, Supervisor_Email, finalSupervisorId]
+          );
+        }
+        await updateSponsor(connection, id, {
+          Sponsor_FN, Sponsor_LN, Sponsor_MI, Spouse_Name, Sponsor_Status,
+          Grade: finalGrade, is_Dual_Military: finalIsDualMilitary, Branch: finalBranch, Unit: finalUnit,
+          Personal_Email, Mail_Box, Sponsor_Phone_No, Work_Phone, Spouse_Alt_No, Preferred_Contact,
+          Supervisor_ID: finalSupervisorId
+        });
+      } else {
+        // Supervisor does not exist - create new supervisor record only if name and email provided
+        if (Supervisor_Name && Supervisor_Name.trim() !== '' && Supervisor_Email && Supervisor_Email.trim() !== '') {
+          await connection.query(
+            `INSERT INTO Supervisor (Supervisor_ID, Supervisor_Name, Supervisor_Email) VALUES (?, ?, ?)`,
+            [finalSupervisorId, Supervisor_Name, Supervisor_Email]
+          );
+        } else {
+          await connection.query(
+            `INSERT INTO Supervisor (Supervisor_ID, Supervisor_Name, Supervisor_Email) VALUES (?, ?, ?)`,
+            [finalSupervisorId, '', '']
+          );
+        }
+        await updateSponsor(connection, id, {
+          Sponsor_FN, Sponsor_LN, Sponsor_MI, Spouse_Name, Sponsor_Status,
+          Grade: finalGrade, is_Dual_Military: finalIsDualMilitary, Branch: finalBranch, Unit: finalUnit,
+          Personal_Email, Mail_Box, Sponsor_Phone_No, Work_Phone, Spouse_Alt_No, Preferred_Contact,
+          Supervisor_ID: finalSupervisorId
+        });
+      }
+    }
+
+    // After updating the sponsor, run cleanup to remove orphaned supervisors
+    await cleanupSupervisors();
+
+    res.json({
+      message: 'Sponsor updated successfully',
+      supervisorAction: finalSupervisorId ? 'linked' : 'cleared'
+    });
+  } catch (err) {
+    console.error("Update error:", err);
+    res.status(500).json({ error: 'Database update failed' });
+  } finally {
+    if (connection) connection.release();
+  }
+});
+
+// Helper for sponsor update
+async function updateSponsor(connection, id, data) {
+  const query = `
+    UPDATE Sponsor SET
+      Sponsor_FN = ?,
+      Sponsor_LN = ?,
+      Sponsor_MI = ?,
+      Spouse_Name = ?,
+      Sponsor_Status = ?,
+      Grade = ?,
+      is_Dual_Military = ?,
+      Branch = ?,
+      Unit = ?,
+      Personal_Email = ?,
+      Mail_Box = ?,
+      Sponsor_Phone_No = ?,
+      Work_Phone = ?,
+      Spouse_Alt_No = ?,
+      Preferred_Contact = ?,
+      Supervisor_ID = ?
+    WHERE Sponsor_ID = ?
+  `;
+  const values = [
+    data.Sponsor_FN,
+    data.Sponsor_LN,
+    data.Sponsor_MI,
+    data.Spouse_Name,
+    data.Sponsor_Status,
+    data.Grade,
+    data.is_Dual_Military,
+    data.Branch,
+    data.Unit,
+    data.Personal_Email,
+    data.Mail_Box,
+    data.Sponsor_Phone_No,
+    data.Work_Phone,
+    data.Spouse_Alt_No,
+    data.Preferred_Contact,
+    data.Supervisor_ID,
+    id
+  ];
+  await connection.query(query, values);
+}
+
+// Get all pets for a sponsor
+app.get('/api/sponsor/:id/pets', async (req, res) => {
+  const sponsorID = req.params.id.toUpperCase();
+  try {
+    const connection = await pool.getConnection();
+    const [results] = await connection.query(`SELECT * FROM Pets WHERE UPPER(Sponsor_ID) = ?`, [sponsorID]);
+    connection.release();
     const formattedPets = results.map(pet => ({
       id: pet.Microchip_No?.toString(),
       name: pet.Pet_Name,
       sponsor_id: pet.Sponsor_ID
     }));
-
     res.json(formattedPets);
   } catch (err) {
-    console.error('Error fetching pets:', err);
     res.status(500).json({ error: 'Error fetching pets' });
   }
 });
 
 // Get pet by microchip
 app.get('/api/pet/:microchip', async (req, res) => {
+  const microchip = req.params.microchip;
   try {
-    const microchip = req.params.microchip;
-    const [results] = await pool.query('SELECT * FROM Pets WHERE Microchip_No = ?', [microchip]);
-
-    if (results.length === 0) {
-      return res.status(404).json({ error: 'Pet not found' });
-    }
-
+    const connection = await pool.getConnection();
+    const [results] = await connection.query('SELECT * FROM Pets WHERE Microchip_No = ?', [microchip]);
+    connection.release();
+    if (results.length === 0) return res.status(404).json({ error: 'Pet not found' });
     res.json(results[0]);
   } catch (err) {
-    console.error('Error fetching pet:', err);
     res.status(500).json({ error: err.message });
   }
 });
 
-// Get pet's vaccines - Updated endpoint
-app.get('/api/pet/:microchip/vaccines', async (req, res) => {
+// Add a pet (minimal)
+app.post('/api/pets', async (req, res) => {
+  const { Pet_ID, Pet_Name, Sponsor_ID } = req.body;
+  if (!Pet_ID || !Pet_Name || !Sponsor_ID) {
+    return res.status(400).json({ error: 'Missing pet data' });
+  }
   try {
-    const microchip = req.params.microchip;
-    const [results] = await pool.query(`
+    const connection = await pool.getConnection();
+    await connection.query('INSERT INTO Pets (Pet_ID, Pet_Name, Sponsor_ID) VALUES (?, ?, ?)', [Pet_ID, Pet_Name, Sponsor_ID]);
+    connection.release();
+    res.status(201).json({ message: 'Pet added successfully' });
+  } catch (err) {
+    res.status(500).json({ error: 'Error adding pet' });
+  }
+});
+
+// Get vaccines for a pet
+app.get('/api/pet/:microchip/vaccines', async (req, res) => {
+  const microchip = req.params.microchip;
+  try {
+    const connection = await pool.getConnection();
+    const [results] = await connection.query(`
       SELECT 
         vr.Vaccine_Lot,
         v.Vaccine_Name,
@@ -237,542 +476,28 @@ app.get('/api/pet/:microchip/vaccines', async (req, res) => {
         vr.Date_Vaccination,
         vr.Vaccination_Effectiveness_Until,
         vr.Has_Vaccine_Reaction,
-        vr.Vaccine_Reaction_Symptoms,
-        vr.Sponsor_ID
+        vr.Vaccine_Reaction_Symptoms
       FROM Vaccine_Reaction vr
       JOIN Vaccine v ON vr.Vaccine_Lot = v.Vaccine_Lot
       WHERE vr.Microchip_No = ?
       ORDER BY vr.Date_Vaccination DESC
     `, [microchip]);
-
-    // Format the results to ensure consistent data types
-    const formattedResults = results.map(vaccine => ({
-      ...vaccine,
-      Has_Vaccine_Reaction: vaccine.Has_Vaccine_Reaction === 'Yes' || vaccine.Has_Vaccine_Reaction === 1 ? 'Yes' : 'No',
-      Date_Vaccination: vaccine.Date_Vaccination ? new Date(vaccine.Date_Vaccination).toISOString().split('T')[0] : null,
-      Vaccination_Effectiveness_Until: vaccine.Vaccination_Effectiveness_Until ? new Date(vaccine.Vaccination_Effectiveness_Until).toISOString().split('T')[0] : null
-    }));
-
-    res.json(formattedResults);
+    connection.release();
+    res.json(results);
   } catch (err) {
-    console.error('Error fetching vaccines:', err);
     res.status(500).json({ error: err.message });
   }
 });
 
-// Get vaccine by lot
-app.get('/api/vaccine/:lot', async (req, res) => {
-  try {
-    const lot = req.params.lot;
-    const [results] = await pool.query('SELECT * FROM Vaccine WHERE Vaccine_Lot = ?', [lot]);
-
-    if (results.length === 0) {
-      // Return empty response instead of error
-      return res.status(200).json({ 
-        exists: false,
-        message: 'Vaccine not found - you can add it as a new vaccine'
-      });
-    }
-
-    res.json({
-      exists: true,
-      ...results[0]
-    });
-  } catch (err) {
-    console.error('Error fetching vaccine:', err);
-    res.status(500).json({ error: err.message });
-  }
+// Catch-all for uncaught exceptions
+process.on('uncaughtException', (err) => {
+  console.error('❌ Uncaught Exception:', err);
 });
-
-// POST create new vaccine
-app.post('/api/vaccines', async (req, res) => {
-  const { Vaccine_Lot, Vaccine_Name, Vaccine_Type, Vaccine_Duration } = req.body;
-  
-  if (!Vaccine_Lot || !Vaccine_Name || !Vaccine_Type || !Vaccine_Duration) {
-    return res.status(400).json({ error: 'Missing required fields' });
-  }
-
-  try {
-    const [result] = await pool.query(
-      'INSERT INTO Vaccine (Vaccine_Lot, Vaccine_Name, Vaccine_Type, Vaccine_Duration) VALUES (?, ?, ?, ?)',
-      [Vaccine_Lot, Vaccine_Name, Vaccine_Type, Vaccine_Duration]
-    );
-    res.status(201).json({ success: true, message: 'Vaccine added successfully' });
-  } catch (err) {
-    console.error('Error adding vaccine:', err);
-    if (err.code === 'ER_DUP_ENTRY') {
-      return res.status(409).json({ error: 'Vaccine lot already exists' });
-    }
-    res.status(500).json({ error: 'Database error' });
-  }
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('❌ Unhandled Rejection:', reason);
 });
-
-// PUT update vaccine reactions
-app.put('/api/pets/:petId/vaccine-reactions', async (req, res) => {
-  const petId = req.params.petId;
-  const { Sponsor_ID, Vaccines } = req.body;
-  
-  if (!Sponsor_ID) return res.status(400).json({ error: 'Sponsor_ID is required' });
-  if (!Array.isArray(Vaccines)) return res.status(400).json({ error: 'Vaccines must be an array' });
-  
-  const connection = await pool.getConnection();
-  try {
-    await connection.beginTransaction();
-
-    // Delete existing reactions for this pet
-    await connection.query('DELETE FROM Vaccine_Reaction WHERE Microchip_No = ?', [petId]);
-    
-    // Process each vaccine
-    for (const vaccine of Vaccines) {
-      // Validate required fields
-      if (!vaccine.Vaccine_Lot || !vaccine.Vaccine_Name || !vaccine.Vaccine_Type || 
-          !vaccine.Date_Vaccination || !vaccine.Vaccination_Effectiveness_Until) {
-        throw new Error('Missing required vaccine fields');
-      }
-
-      // Check if vaccine exists
-      const [existing] = await connection.query(
-        'SELECT 1 FROM Vaccine WHERE Vaccine_Lot = ?', 
-        [vaccine.Vaccine_Lot]
-      );
-
-      // If vaccine doesn't exist, create it
-      if (existing.length === 0) {
-        await connection.query(
-          'INSERT INTO Vaccine (Vaccine_Lot, Vaccine_Name, Vaccine_Type, Vaccine_Duration) VALUES (?, ?, ?, ?)',
-          [
-            vaccine.Vaccine_Lot,
-            vaccine.Vaccine_Name,
-            vaccine.Vaccine_Type,
-            vaccine.Vaccine_Duration || 1 // Default duration if not provided
-          ]
-        );
-      }
-
-      // Add vaccine reaction
-      await connection.query(
-        `INSERT INTO Vaccine_Reaction 
-         (Microchip_No, Sponsor_ID, Vaccine_Lot, Date_Vaccination, 
-          Vaccination_Effectiveness_Until, Has_Vaccine_Reaction, Vaccine_Reaction_Symptoms) 
-         VALUES (?, ?, ?, ?, ?, ?, ?)`,
-        [
-          petId,
-          Sponsor_ID,
-          vaccine.Vaccine_Lot,
-          vaccine.Date_Vaccination,
-          vaccine.Vaccination_Effectiveness_Until,
-          vaccine.Has_Vaccine_Reaction || 'No',
-          vaccine.Vaccine_Reaction_Symptoms || null
-        ]
-      );
-    }
-    
-    await connection.commit();
-    res.json({ success: true, message: 'Vaccine reactions updated successfully' });
-  } catch (error) {
-    await connection.rollback();
-    console.error('Error saving vaccine reactions:', error);
-    res.status(500).json({ error: error.message || 'Failed to save vaccine reactions' });
-  } finally {
-    connection.release();
-  }
-});
-
-// Update sponsor data with enhanced supervisor handling
-app.put('/api/sponsor/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const {
-      Sponsor_FN,
-      Sponsor_LN,
-      Sponsor_MI,
-      Spouse_Name,
-      Sponsor_Status,
-      Grade,
-      is_Dual_Military,
-      Branch,
-      Unit,
-      Personal_Email,
-      Mail_Box,
-      Sponsor_Phone_No,
-      Work_Phone,
-      Spouse_Alt_No,
-      Preferred_Contact,
-      Supervisor_ID,
-      Supervisor_Name,
-      Supervisor_Email
-    } = req.body;
-
-    // Determine final values based on sponsor status
-    let finalSupervisorId = null;
-    let finalGrade = Grade;
-    let finalIsDualMilitary = is_Dual_Military;
-    let finalBranch = Branch;
-    let finalUnit = Unit;
-
-    if (Sponsor_Status === 'ACTIVE DUTY') {
-      finalSupervisorId = (!Supervisor_ID || Supervisor_ID.trim() === '') ? null : Supervisor_ID;
-    } else {
-      finalSupervisorId = null;
-      finalGrade = null;
-      finalIsDualMilitary = null;
-      finalBranch = null;
-      finalUnit = null;
-    }
-
-    if (!finalSupervisorId) {
-      await updateSponsor(null);
-    } else {
-      // Check if Supervisor_ID exists
-      const [supResults] = await pool.query(
-        'SELECT Supervisor_ID FROM Supervisor WHERE Supervisor_ID = ?',
-        [finalSupervisorId]
-      );
-
-      if (supResults.length > 0) {
-        // Supervisor exists - check if user provided name and email to update
-        if (Supervisor_Name && Supervisor_Name.trim() !== '' && 
-            Supervisor_Email && Supervisor_Email.trim() !== '') {
-          await pool.query(
-            'UPDATE Supervisor SET Supervisor_Name = ?, Supervisor_Email = ? WHERE Supervisor_ID = ?',
-            [Supervisor_Name, Supervisor_Email, finalSupervisorId]
-          );
-          console.log(`Updated supervisor ${finalSupervisorId} with new info`);
-        }
-        await updateSponsor(finalSupervisorId);
-      } else {
-        // Supervisor does not exist - create new supervisor record
-        const supervisorData = {
-          Supervisor_ID: finalSupervisorId,
-          Supervisor_Name: Supervisor_Name && Supervisor_Name.trim() !== '' ? Supervisor_Name : '',
-          Supervisor_Email: Supervisor_Email && Supervisor_Email.trim() !== '' ? Supervisor_Email : ''
-        };
-
-        await pool.query('INSERT INTO Supervisor SET ?', supervisorData);
-        console.log(`Created new supervisor ${finalSupervisorId}`);
-        await updateSponsor(finalSupervisorId);
-      }
-    }
-
-    async function updateSponsor(supervisorId) {
-      const query = `
-        UPDATE Sponsor SET
-          Sponsor_FN = ?,
-          Sponsor_LN = ?,
-          Sponsor_MI = ?,
-          Spouse_Name = ?,
-          Sponsor_Status = ?,
-          Grade = ?,
-          is_Dual_Military = ?,
-          Branch = ?,
-          Unit = ?,
-          Personal_Email = ?,
-          Mail_Box = ?,
-          Sponsor_Phone_No = ?,
-          Work_Phone = ?,
-          Spouse_Alt_No = ?,
-          Preferred_Contact = ?,
-          Supervisor_ID = ?
-        WHERE Sponsor_ID = ?
-      `;
-      const values = [
-        Sponsor_FN,
-        Sponsor_LN,
-        Sponsor_MI,
-        Spouse_Name,
-        Sponsor_Status,
-        finalGrade,
-        finalIsDualMilitary,
-        finalBranch,
-        finalUnit,
-        Personal_Email,
-        Mail_Box,
-        Sponsor_Phone_No,
-        Work_Phone,
-        Spouse_Alt_No,
-        Preferred_Contact,
-        supervisorId,
-        id
-      ];
-
-      await pool.query(query, values);
-      
-      // After updating the sponsor, run cleanup to remove orphaned supervisors
-      try {
-        const cleanupResult = await cleanupSupervisors();
-        if (cleanupResult.removedSupervisors > 0) {
-          console.log('Cleanup completed:', cleanupResult);
-        }
-      } catch (cleanupErr) {
-        console.error('Cleanup error:', cleanupErr);
-      }
-      
-      res.json({ 
-        message: 'Sponsor updated successfully',
-        supervisorAction: supervisorId ? 'linked' : 'cleared'
-      });
-    }
-  } catch (err) {
-    console.error("Update error:", err);
-    res.status(500).json({ error: 'Database update failed' });
-  }
-});
-
-// PUT update pet information
-app.put('/api/pets/:microchip', async (req, res) => {
-  try {
-    const microchip = req.params.microchip;
-    const petData = req.body;
-
-    // Validate required fields
-    if (!petData.Pet_Name || !petData.Species) {
-      return res.status(400).json({ error: 'Pet name and species are required' });
-    }
-
-    // Validate Has_Passport is either 'Yes' or 'No'
-    if (petData.Has_Passport !== 'Yes' && petData.Has_Passport !== 'No') {
-      return res.status(400).json({ error: "Has_Passport must be 'Yes' or 'No'" });
-    }
-
-    // Validate Is_Spayed_Neutered is either 'Yes' or 'No'
-    if (petData.Is_Spayed_Neutered !== 'Yes' && petData.Is_Spayed_Neutered !== 'No') {
-      return res.status(400).json({ error: "Is_Spayed_Neutered must be 'Yes' or 'No'" });
-    }
-
-    // Validate Has_Recent_Clinic_History is either 'Yes' or 'No'
-    if (petData.Has_Recent_Clinic_History !== 'Yes' && petData.Has_Recent_Clinic_History !== 'No') {
-      return res.status(400).json({ error: "Has_Recent_Clinic_History must be 'Yes' or 'No'" });
-    }
-
-    // Validate Sex is either 'Male' or 'Female'
-    if (petData.Sex !== 'Male' && petData.Sex !== 'Female') {
-      return res.status(400).json({ error: "Sex must be 'Male' or 'Female'" });
-    }
-
-    const query = `
-      UPDATE Pets SET
-        Pet_Name = ?,
-        Species = ?,
-        DOB = ?,
-        Age = ?,
-        Breed = ?,
-        Color = ?,
-        Has_Passport = ?,
-        Sex = ?,
-        Is_Spayed_Neutered = ?,
-        Has_Recent_Clinic_History = ?,
-        Clinic_Name = ?
-      WHERE Microchip_No = ?
-    `;
-
-    const values = [
-      petData.Pet_Name,
-      petData.Species,
-      petData.DOB || null,
-      petData.Age || null,
-      petData.Breed || null,
-      petData.Color || null,
-      petData.Has_Passport,
-      petData.Sex,
-      petData.Is_Spayed_Neutered,
-      petData.Has_Recent_Clinic_History,
-      petData.Clinic_Name || null,
-      microchip
-    ];
-
-    const [result] = await pool.query(query, values);
-
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ error: 'Pet not found' });
-    }
-
-    res.json({ success: true, message: 'Pet information updated successfully' });
-  } catch (err) {
-    console.error('Error updating pet:', err);
-    res.status(500).json({ error: 'Database error updating pet' });
-  }
-});
-
-// POST create new pet
-app.post('/api/pets', async (req, res) => {
-  const connection = await pool.getConnection();
-  try {
-    await connection.beginTransaction();
-
-    const petData = req.body;
-    
-    // Validate required fields
-    if (!petData.Pet_Name || !petData.Species || !petData.Sponsor_ID) {
-      return res.status(400).json({ error: 'Pet name, species, and sponsor ID are required' });
-    }
-
-    // Generate a new microchip number (simple implementation - you might want something more robust)
-    const microchipNo = Math.floor(100000000000 + Math.random() * 900000000000).toString();
-
-    // Insert pet record
-    const [petResult] = await connection.query(
-      `INSERT INTO Pets (
-        Microchip_No, Pet_Name, Species, DOB, Age, Breed, Color, 
-        Has_Passport, Sex, Is_Spayed_Neutered, Has_Recent_Clinic_History, 
-        Clinic_Name, Sponsor_ID
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [
-        microchipNo,
-        petData.Pet_Name,
-        petData.Species,
-        petData.DOB || null,
-        petData.Age || null,
-        petData.Breed || null,
-        petData.Color || null,
-        petData.Has_Passport || 'No',
-        petData.Sex || 'Male',
-        petData.Is_Spayed_Neutered || 'No',
-        petData.Has_Recent_Clinic_History || 'No',
-        petData.Clinic_Name || null,
-        petData.Sponsor_ID
-      ]
-    );
-
-    // Insert vaccine records if they exist
-    if (petData.Vaccines && petData.Vaccines.length > 0) {
-      for (const vaccine of petData.Vaccines) {
-        // Check if vaccine exists
-        const [existingVaccine] = await connection.query(
-          'SELECT 1 FROM Vaccine WHERE Vaccine_Lot = ?',
-          [vaccine.Vaccine_Lot]
-        );
-
-        // Insert vaccine if it doesn't exist
-        if (existingVaccine.length === 0) {
-          await connection.query(
-            'INSERT INTO Vaccine (Vaccine_Lot, Vaccine_Name, Vaccine_Type, Vaccine_Duration) VALUES (?, ?, ?, ?)',
-            [
-              vaccine.Vaccine_Lot,
-              vaccine.Vaccine_Name,
-              vaccine.Vaccine_Type,
-              vaccine.Vaccine_Duration || 1
-            ]
-          );
-        }
-
-        // Insert vaccine reaction
-        await connection.query(
-          `INSERT INTO Vaccine_Reaction (
-            Microchip_No, Sponsor_ID, Vaccine_Lot, Date_Vaccination,
-            Vaccination_Effectiveness_Until, Has_Vaccine_Reaction, Vaccine_Reaction_Symptoms
-          ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-          [
-            microchipNo,
-            petData.Sponsor_ID,
-            vaccine.Vaccine_Lot,
-            vaccine.Date_Vaccination,
-            vaccine.Vaccination_Effectiveness_Until,
-            vaccine.Has_Vaccine_Reaction || 'No',
-            vaccine.Vaccine_Reaction_Symptoms || null
-          ]
-        );
-      }
-    }
-
-    await connection.commit();
-    res.status(201).json({ 
-      success: true,
-      microchipNo,
-      message: 'Pet created successfully'
-    });
-  } catch (error) {
-    await connection.rollback();
-    console.error('Error creating pet:', error);
-    res.status(500).json({ 
-      error: error.message || 'Failed to create pet'
-    });
-  } finally {
-    connection.release();
-  }
-});
-
-// DELETE pet by microchip number
-app.delete('/api/pets/:microchip', async (req, res) => {
-  const connection = await pool.getConnection();
-  try {
-    await connection.beginTransaction();
-    
-    const microchip = req.params.microchip;
-    
-    // First delete vaccine reactions (due to foreign key constraint)
-    await connection.query('DELETE FROM Vaccine_Reaction WHERE Microchip_No = ?', [microchip]);
-    
-    // Then delete the pet
-    const [result] = await connection.query('DELETE FROM Pets WHERE Microchip_No = ?', [microchip]);
-    
-    if (result.affectedRows === 0) {
-      await connection.rollback();
-      return res.status(404).json({ error: 'Pet not found' });
-    }
-    
-    await connection.commit();
-    res.json({ success: true, message: 'Pet deleted successfully' });
-  } catch (err) {
-    await connection.rollback();
-    console.error('Error deleting pet:', err);
-    res.status(500).json({ error: 'Database error deleting pet' });
-  } finally {
-    connection.release();
-  }
-});
-
-// Cleanup supervisors function
-async function cleanupSupervisors() {
-  try {
-    // Step 1: Remove supervisor_id from sponsors who are not on active duty
-    const [updateResult] = await pool.query(
-      `UPDATE Sponsor 
-       SET Supervisor_ID = NULL 
-       WHERE Sponsor_Status != 'ACTIVE DUTY' AND Supervisor_ID IS NOT NULL`
-    );
-    
-    console.log(`Updated ${updateResult.affectedRows} inactive sponsors to remove supervisor_id`);
-    
-    // Step 2: Find supervisors who are no longer supervising anyone
-    const [orphanedSupervisors] = await pool.query(
-      `SELECT s.Supervisor_ID 
-       FROM Supervisor s
-       LEFT JOIN Sponsor sp ON s.Supervisor_ID = sp.Supervisor_ID
-       WHERE sp.Supervisor_ID IS NULL`
-    );
-    
-    if (orphanedSupervisors.length === 0) {
-      console.log('No orphaned supervisors found');
-      return { 
-        updatedSponsors: updateResult.affectedRows, 
-        removedSupervisors: 0 
-      };
-    }
-    
-    // Step 3: Remove orphaned supervisor records
-    const supervisorIds = orphanedSupervisors.map(sup => sup.Supervisor_ID);
-    const [deleteResult] = await pool.query(
-      `DELETE FROM Supervisor 
-       WHERE Supervisor_ID IN (${supervisorIds.map(() => '?').join(',')})`,
-      supervisorIds
-    );
-    
-    console.log(`Removed ${deleteResult.affectedRows} orphaned supervisor records`);
-    console.log('Removed supervisors:', supervisorIds);
-    
-    return { 
-      updatedSponsors: updateResult.affectedRows, 
-      removedSupervisors: deleteResult.affectedRows,
-      removedSupervisorIds: supervisorIds
-    };
-  } catch (err) {
-    console.error('Error in cleanupSupervisors:', err);
-    throw err;
-  }
-}
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Server running at http://localhost:${PORT}`);
 });
-
