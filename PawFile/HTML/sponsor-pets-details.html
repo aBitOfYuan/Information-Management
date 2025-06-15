@@ -42,7 +42,7 @@
       <section class="info-section">
         <div class="section-header">
           <h2>Pet Information</h2>
-          <button class="edit-btn">
+          <button class="edit-btn" data-section="pet-info">
             <i class="fa-solid fa-pen-to-square"></i> Edit
           </button>
         </div>
@@ -78,8 +78,8 @@
             <div class="checkbox-container">
               <label class="checkbox-label">Spayed/Neutered</label>
               <div class="checkbox-yesno-container">
-                <label><input type="radio" name="spayNeuter" /> YES</label>
-                <label><input type="radio" name="spayNeuter" /> NO</label>
+                <label><input type="radio" name="spayNeuter" value="Yes" /> YES</label>
+                <label><input type="radio" name="spayNeuter" value="No" /> NO</label>
               </div>
             </div>
           </div>
@@ -88,8 +88,8 @@
             <div class="checkbox-container">
               <label class="checkbox-label">Has Passport</label>
               <div class="checkbox-yesno-container">
-                <label><input type="radio" name="hasPassport" /> YES</label>
-                <label><input type="radio" name="hasPassport" /> NO</label>
+                <label><input type="radio" name="hasPassport" value="Yes" /> YES</label>
+                <label><input type="radio" name="hasPassport" value="No" /> NO</label>
               </div>
             </div>
           </div>
@@ -98,8 +98,8 @@
             <div class="checkbox-container">
               <label class="checkbox-label">Has Recent Clinic History</label>
               <div class="checkbox-yesno-container">
-                <label><input type="radio" name="clinicHistory" /> YES</label>
-                <label><input type="radio" name="clinicHistory" /> NO</label>
+                <label><input type="radio" name="clinicHistory" value="Yes" /> YES</label>
+                <label><input type="radio" name="clinicHistory" value="No" /> NO</label>
               </div>
             </div>
           </div>
@@ -113,8 +113,8 @@
             <div class="checkbox-container">
               <label class="checkbox-label">Sex</label>
               <div class="checkbox-yesno-container">
-                <label><input type="radio" name="sex" /> MALE</label>
-                <label><input type="radio" name="sex" /> FEMALE</label>
+                <label><input type="radio" name="sex" value="Male" /> MALE</label>
+                <label><input type="radio" name="sex" value="Female" /> FEMALE</label>
               </div>
             </div>
           </div>
@@ -125,13 +125,70 @@
       <section class="info-section">
         <div class="section-header">
           <h2>Vaccine History</h2>
-          <button class="edit-btn">
+          <button class="edit-btn" data-section="vaccine-history">
             <i class="fa-solid fa-pen-to-square"></i> Edit
           </button>
         </div>
 
-        <!-- Dynamic vaccine sections will be inserted here -->
-        <div id="vaccine-history"></div>
+        <div id="vaccine-history">
+          <div class="vaccine-section">
+            <div class="vaccine-header">
+              <h3>Vaccine #1</h3>
+              <button class="delete-vaccine" type="button"><i class="fas fa-trash"></i></button>
+            </div>
+            <div class="info-grid">
+              <div class="form-field">
+                <label>Vaccine Lot</label>
+                <input type="text" name="vaccine-lot" placeholder="Vaccine LOT" required />
+              </div>
+              <div class="form-field">
+                <label>Vaccine Name</label>
+                <input type="text" name="vaccine-name" placeholder="Vaccine Name" readonly required />
+              </div>
+              <div class="form-field">
+                <label>Vaccine Type</label>
+                <select name="vaccine-type" disabled required>
+                  <option value="" disabled selected>Vaccine Type</option>
+                  <option value="Core">Core</option>
+                  <option value="Non-Core">Non-Core</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <label>Vaccine Duration</label>
+                <input type="number" name="vaccine_duration" placeholder="Vaccine Duration (years)" readonly required />
+              </div>
+              <div class="form-field">
+                <label>Date of Vaccination</label>
+                <input type="date" name="vaccination_date" class="dob-input" required />
+              </div>
+              <div class="form-field">
+                <label>End Date of Vaccine Effectiveness</label>
+                <input type="date" name="vaccination_end_date" class="dob-input" required />
+              </div>
+              <div class="form-field">
+                <label>Had Vaccine Reaction</label>
+                <div class="radio-options">
+                  <label class="radio-wrapper">
+                    <input type="radio" name="reaction1" value="Yes" /> <span class="custom-radio"></span> YES
+                  </label>
+                  <label class="radio-wrapper">
+                    <input type="radio" name="reaction1" value="No" /> <span class="custom-radio"></span> NO
+                  </label>
+                </div>
+              </div>
+              <div class="form-field" style="flex:2;">
+                <label>Vaccine Symptom</label>
+                <input type="text" name="vaccine_symptom" readonly />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <div class="right-buttons">
+            <button class="add-vaccine" type="button">Add Vaccine</button>
+          </div>
+        </div>
       </section>
 
       <div class="form-actions">
@@ -147,4 +204,3 @@
   <script src="../JS/sponsor-pets-details.js"></script>
 </body>
 </html>
-

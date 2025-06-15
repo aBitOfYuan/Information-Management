@@ -75,9 +75,7 @@ function attachEventListeners() {
 
       if (petId) {
         // Confirm removal
-        if (confirm(`Are you sure you want to remove pet with ID ${petId}?`)) {
-          removePet(petId);
-        }
+        removePet(petId);
       }
     });
   });
@@ -100,14 +98,46 @@ function attachEventListeners() {
 }
 
 /**
- * Remove pet from the list and re-render
- * @param {string} petId - The ID of the pet to remove
+ * Remove pet from the list and database
+ * @param {string} petId - The ID (microchip number) of the pet to remove
  */
 function removePet(petId) {
-  const index = pets.findIndex(p => p.id === petId);
-  if (index !== -1) {
-    pets.splice(index, 1); // Remove pet from array
-    renderPets();          // Refresh the displayed list
+  const sponsorID = sessionStorage.getItem('userId');
+  
+  if (!sponsorID) {
+    alert('No logged-in user detected. Redirecting to login page.');
+    window.location.href = '../HTML/pawfile-login.html';
+    return;
+  }
+
+  if (confirm(`Are you sure you want to permanently delete pet with ID ${petId}?`)) {
+    fetch(`http://localhost:3000/api/pets/${petId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => {
+      if (!response.ok) {
+        return response.json().then(err => {
+          throw new Error(err.error || 'Failed to delete pet');
+        });
+      }
+      return response.json();
+    })
+    .then(data => {
+      // Remove pet from local array and re-render
+      const index = pets.findIndex(p => p.id === petId);
+      if (index !== -1) {
+        pets.splice(index, 1);
+        renderPets();
+      }
+      alert('Pet deleted successfully');
+    })
+    .catch(error => {
+      console.error('Error deleting pet:', error);
+      alert(`Failed to delete pet: ${error.message}`);
+    });
   }
 }
 

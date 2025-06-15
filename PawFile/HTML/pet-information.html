@@ -11,7 +11,6 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
-    <script src="../JS/pet-information.js"></script>
     <style>
         input:-webkit-autofill {
             transition: background-color 9999s ease-in-out 0s;
@@ -113,55 +112,67 @@
             <h3>Vaccine History</h3>
             <div id="vaccine-section">
                 <div class="vaccine-section">
-                    <p>Vaccine #1</p>
-                    <div class="form-row">
-                        <input type="text" name="vaccine-lot" placeholder="Vaccine Lot" required />
-                        <input type="text" name="vaccine-name" placeholder="Vaccine Name" required />
-                        <select name="vaccine-type" required>
-                            <option value="" disabled selected>Vaccine Type</option>
-                            <option value="Core">Core</option>
-                            <option value="Non-core">Non-core</option>
-                        </select>
+                    <div class="vaccine-header">
+                        <p>Vaccine #1</p>
+                        <button class="delete-vaccine" type="button"><i class="fas fa-trash"></i></button>
                     </div>
-
                     <div class="form-row">
                         <div class="form-field">
-                            <input type="date" name="vaccine_duration" id="vaccine_duration" class="dob-input" required>
-                            <span class="dob-placeholder">Vaccine Duration</span>
+                            <label>Vaccine Lot</label>
+                            <input type="text" name="vaccine-lot" required />
                         </div>
                         <div class="form-field">
-                            <input type="date" name="vaccination_date" id="vaccination_date" class="dob-input" required>
-                            <span class="dob-placeholder">Date of Vaccination</span>
+                            <label>Vaccine Name</label>
+                            <input type="text" name="vaccine-name" readonly required />
                         </div>
                         <div class="form-field">
-                            <input type="date" name="vaccination_end_date" id="vaccination_end_date" class="dob-input" required>
-                            <span class="dob-placeholder">End Date of Vaccination</span>
+                            <label>Vaccine Type</label>
+                            <select name="vaccine-type" required>
+                                <option value="" disabled selected>Select Type</option>
+                                <option value="Core">Core</option>
+                                <option value="Non-Core">Non-Core</option>
+                            </select>
                         </div>
                     </div>
-
                     <div class="form-row">
-                        <div class="field-container">
-                            <label class="field-label">Sex</label>
+                        <div class="form-field">
+                            <label>Vaccine Duration</label>
+                            <input type="text" name="vaccine_duration" readonly required />
+                        </div>
+                        <div class="form-field">
+                            <label>Date of Vaccination</label>
+                            <input type="date" name="vaccination_date" class="dob-input" required />
+                        </div>
+                        <div class="form-field">
+                            <label>End Date of Vaccine Effectiveness</label>
+                            <input type="date" name="vaccination_end_date" class="dob-input" required />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-field">
+                            <label>Had Vaccine Reaction</label>
                             <div class="radio-options">
                                 <label class="radio-wrapper">
-                                    <input type="radio" name="vaccine-sex" value="male" /> <span class="custom-radio"></span> Male
+                                    <input type="radio" name="reaction1" value="Yes" /> <span class="custom-radio"></span> YES
                                 </label>
                                 <label class="radio-wrapper">
-                                    <input type="radio" name="vaccine-sex" value="female" /> <span class="custom-radio"></span> Female
+                                    <input type="radio" name="reaction1" value="No" /> <span class="custom-radio"></span> NO
                                 </label>
                             </div>
                         </div>
-                        <input type="text" name="vaccine-clinic-name" placeholder="Clinic Name" required />
+                        <div class="form-field" style="flex:2;">
+                            <label>Vaccine Symptom</label>
+                            <input type="text" name="vaccine-symptom" readonly />
+                        </div>
                     </div>
                 </div>
             </div>
 
-                <div class="form-actions">
-                    <div class="right-buttons">
-                        <button class="add-vaccine" type="button">Add Vaccine</button>
-                        <button class="delete-vaccine" type="button">Delete Vaccine</button>                            
-                    </div>
+            <div class="form-actions">
+                <div class="right-buttons">
+                    <button class="add-vaccine" type="button">Add Vaccine</button>
                 </div>
+            </div>
 
         </form>
     </div>
@@ -175,5 +186,6 @@
             <button id="save-information" type="submit">Save</button>
         </div>
     </div>   
+    <script src="../JS/pet-information.js"></script>
 </body>
 </html>
