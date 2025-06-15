@@ -4,20 +4,17 @@ const cors = require('cors');
 const app = express();
 const PORT = 3000;
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 
-// Database connection
 const db = mysql.createConnection({
-  host: 'localhost',
+  host: '127.0.0.1',
   port: 3306,
   user: 'root',
-  password: 'porksisig',
-  database: 'pawfile_db'
+  password: '010123',
+  database: 'pawfiledb'
 });
 
-// Connect to database
 db.connect(err => {
   if (err) {
     console.error('Database connection failed:', err);
@@ -26,112 +23,306 @@ db.connect(err => {
   console.log('Connected to MySQL');
 });
 
-// ================= AUTHENTICATION ENDPOINTS =================
-
-// Login endpoint
-app.post('/api/login', (req, res) => {
-  const { sponsorId, password, userRole } = req.body;
-
-  // Validate input
-  if (!sponsorId || !password || !userRole) {
-    return res.status(400).json({
-      success: false,
-      message: 'All fields are required'
-    });
-  }
-
-  // Determine query based on user role
-  const query = userRole === 'admin' 
-    ? 'SELECT * FROM Admin WHERE Admin_ID = ? AND Password = ?'
-    : `SELECT s.* FROM Sponsor s 
-       JOIN Account a ON s.Sponsor_ID = a.Sponsor_ID 
-       WHERE s.Sponsor_ID = ? AND a.Passcode = ?`;
-
-  db.query(query, [sponsorId, password], (err, results) => {
+// Function to clean up supervisor records
+function cleanupSupervisors(callback) {
+  // Step 1: Remove supervisor_id from sponsors who are not on active duty
+  const updateInactiveSponsorsQuery = `
+    UPDATE Sponsor 
+    SET Supervisor_ID = NULL 
+    WHERE Sponsor_Status != 'ACTIVE DUTY' AND Supervisor_ID IS NOT NULL
+  `;
+  
+  db.query(updateInactiveSponsorsQuery, (err, updateResult) => {
     if (err) {
-      console.error('Login error:', err);
-      return res.status(500).json({
-        success: false,
-        message: 'Database error'
+      console.error('Error updating inactive sponsors:', err);
+      return callback(err);
+    }
+    
+    console.log(`Updated ${updateResult.affectedRows} inactive sponsors to remove supervisor_id`);
+    
+    // Step 2: Find supervisors who are no longer supervising anyone
+    const findOrphanedSupervisorsQuery = `
+      SELECT s.Supervisor_ID 
+      FROM Supervisor s
+      LEFT JOIN Sponsor sp ON s.Supervisor_ID = sp.Supervisor_ID
+      WHERE sp.Supervisor_ID IS NULL
+    `;
+    
+    db.query(findOrphanedSupervisorsQuery, (err, orphanedSupervisors) => {
+      if (err) {
+        console.error('Error finding orphaned supervisors:', err);
+        return callback(err);
+      }
+      
+      if (orphanedSupervisors.length === 0) {
+        console.log('No orphaned supervisors found');
+        return callback(null, { 
+          updatedSponsors: updateResult.affectedRows, 
+          removedSupervisors: 0 
+        });
+      }
+      
+      // Step 3: Remove orphaned supervisor records
+      const supervisorIds = orphanedSupervisors.map(sup => sup.Supervisor_ID);
+      const deleteOrphanedSupervisorsQuery = `
+        DELETE FROM Supervisor 
+        WHERE Supervisor_ID IN (${supervisorIds.map(() => '?').join(',')})
+      `;
+      
+      db.query(deleteOrphanedSupervisorsQuery, supervisorIds, (err, deleteResult) => {
+        if (err) {
+          console.error('Error deleting orphaned supervisors:', err);
+          return callback(err);
+        }
+        
+        console.log(`Removed ${deleteResult.affectedRows} orphaned supervisor records`);
+        console.log('Removed supervisors:', supervisorIds);
+        
+        callback(null, { 
+          updatedSponsors: updateResult.affectedRows, 
+          removedSupervisors: deleteResult.affectedRows,
+          removedSupervisorIds: supervisorIds
+        });
       });
+    });
+  });
+}
+
+// Get sponsor data along with supervisor info in one call
+app.get('/api/sponsor/:id', (req, res) => {
+  const { id } = req.params;
+
+  const sponsorQuery = 'SELECT * FROM Sponsor WHERE Sponsor_ID = ?';
+  db.query(sponsorQuery, [id], (err, sponsorResults) => {
+    if (err) return res.status(500).json({ error: 'Database error fetching sponsor' });
+    if (sponsorResults.length === 0) return res.status(404).json({ error: 'Sponsor not found' });
+
+    const sponsor = sponsorResults[0];
+
+    if (!sponsor.Supervisor_ID) {
+      return res.json({ ...sponsor, Supervisor_Name: null, Supervisor_Email: null });
+    }
+
+    const supervisorQuery = 'SELECT Supervisor_Name, Supervisor_Email FROM Supervisor WHERE Supervisor_ID = ?';
+    db.query(supervisorQuery, [sponsor.Supervisor_ID], (err, supervisorResults) => {
+      if (err) return res.status(500).json({ error: 'Database error fetching supervisor' });
+
+      const supervisor = supervisorResults[0] || { Supervisor_Name: null, Supervisor_Email: null };
+      res.json({ ...sponsor, ...supervisor });
+    });
+  });
+});
+
+// Check if a supervisor exists
+app.get('/api/supervisor/:id', (req, res) => {
+  const { id } = req.params;
+
+  const query = 'SELECT * FROM Supervisor WHERE Supervisor_ID = ?';
+  db.query(query, [id], (err, results) => {
+    if (err) {
+      console.error('Error fetching supervisor:', err);
+      return res.status(500).json({ error: 'Database error fetching supervisor' });
     }
 
     if (results.length === 0) {
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid credentials'
-      });
+      return res.status(404).json({ error: 'Supervisor not found' });
     }
 
-    // Successful login
-    res.json({
-      success: true,
-      userRole: userRole,
-      userData: results[0],
-      redirect: userRole === 'admin' ? '/admin-dashboard.html' : '/sponsor-profile.html'
-    });
+    return res.status(200).json(results[0]);
   });
 });
 
-// ================= SPONSOR ENDPOINTS =================
-
-// Get sponsor with supervisor info
-app.get('/api/sponsor/:id', (req, res) => {
-  const query = `
-    SELECT s.*, sup.Supervisor_Name, sup.Supervisor_Email 
-    FROM Sponsor s
-    LEFT JOIN Supervisor sup ON s.Supervisor_ID = sup.Supervisor_ID
-    WHERE s.Sponsor_ID = ?
-  `;
-  
-  db.query(query, [req.params.id], (err, results) => {
-    if (err) return res.status(500).json({ error: 'Database error' });
-    res.json(results[0] || {});
-  });
-});
-
-// Update sponsor
+// Update sponsor data (with enhanced supervisor handling and automatic cleanup)
 app.put('/api/sponsor/:id', (req, res) => {
   const { id } = req.params;
-  const data = req.body;
-  
-  db.query(
-    'UPDATE Sponsor SET ? WHERE Sponsor_ID = ?',
-    [data, id],
-    (err) => {
-      if (err) return res.status(500).json({ error: 'Update failed' });
-      res.json({ success: true });
-    }
-  );
+  const {
+    Sponsor_FN,
+    Sponsor_LN,
+    Sponsor_MI,
+    Spouse_Name,
+    Sponsor_Status,
+    Grade,
+    is_Dual_Military,
+    Branch,
+    Unit,
+    Personal_Email,
+    Mail_Box,
+    Sponsor_Phone_No,
+    Work_Phone,
+    Spouse_Alt_No,
+    Preferred_Contact,
+    Supervisor_ID,
+    Supervisor_Name,
+    Supervisor_Email
+  } = req.body;
+
+  // Determine final values based on sponsor status
+  let finalSupervisorId = null;
+  let finalGrade = Grade;
+  let finalIsDualMilitary = is_Dual_Military;
+  let finalBranch = Branch;
+  let finalUnit = Unit;
+
+  if (Sponsor_Status === 'ACTIVE DUTY') {
+    // For active duty, use provided supervisor ID (if any)
+    finalSupervisorId = (!Supervisor_ID || Supervisor_ID.trim() === '') ? null : Supervisor_ID;
+  } else {
+    // For civilian/retired, set all military fields to null
+    finalSupervisorId = null;
+    finalGrade = null;
+    finalIsDualMilitary = null;
+    finalBranch = null;
+    finalUnit = null;
+  }
+
+  if (!finalSupervisorId) {
+    // No supervisor ID provided or sponsor not on active duty - update sponsor with NULL supervisor
+    updateSponsor(null);
+  } else {
+    // Check if Supervisor_ID exists
+    db.query('SELECT Supervisor_ID FROM Supervisor WHERE Supervisor_ID = ?', [finalSupervisorId], (err, supResults) => {
+      if (err) return res.status(500).json({ error: 'Database error checking supervisor' });
+
+      if (supResults.length > 0) {
+        // Supervisor exists - check if user provided name and email to update
+        if (Supervisor_Name && Supervisor_Name.trim() !== '' && 
+            Supervisor_Email && Supervisor_Email.trim() !== '') {
+          // User provided supervisor info - update supervisor record
+          const updateSupervisorQuery = `
+            UPDATE Supervisor SET Supervisor_Name = ?, Supervisor_Email = ? WHERE Supervisor_ID = ?
+          `;
+          db.query(updateSupervisorQuery, [Supervisor_Name, Supervisor_Email, finalSupervisorId], (err) => {
+            if (err) return res.status(500).json({ error: 'Database error updating supervisor' });
+            console.log(`Updated supervisor ${finalSupervisorId} with new info`);
+            updateSponsor(finalSupervisorId);
+          });
+        } else {
+          // User didn't provide supervisor info - just link to existing supervisor
+          console.log(`Linking sponsor to existing supervisor ${finalSupervisorId}`);
+          updateSponsor(finalSupervisorId);
+        }
+      } else {
+        // Supervisor does not exist - create new supervisor record only if name and email provided
+        if (Supervisor_Name && Supervisor_Name.trim() !== '' && 
+            Supervisor_Email && Supervisor_Email.trim() !== '') {
+          const insertSupervisorQuery = `
+            INSERT INTO Supervisor (Supervisor_ID, Supervisor_Name, Supervisor_Email) VALUES (?, ?, ?)
+          `;
+          db.query(insertSupervisorQuery, [finalSupervisorId, Supervisor_Name, Supervisor_Email], (err) => {
+            if (err) return res.status(500).json({ error: 'Database error inserting supervisor' });
+            console.log(`Created new supervisor ${finalSupervisorId}`);
+            updateSponsor(finalSupervisorId);
+          });
+        } else {
+          // Supervisor ID provided but no name/email - create with minimal info
+          const insertSupervisorQuery = `
+            INSERT INTO Supervisor (Supervisor_ID, Supervisor_Name, Supervisor_Email) VALUES (?, ?, ?)
+          `;
+          db.query(insertSupervisorQuery, [finalSupervisorId, '', ''], (err) => {
+            if (err) return res.status(500).json({ error: 'Database error inserting supervisor' });
+            console.log(`Created new supervisor ${finalSupervisorId} with minimal info`);
+            updateSponsor(finalSupervisorId);
+          });
+        }
+      }
+    });
+  }
+
+  function updateSponsor(supervisorId) {
+    const query = `
+      UPDATE Sponsor SET
+        Sponsor_FN = ?,
+        Sponsor_LN = ?,
+        Sponsor_MI = ?,
+        Spouse_Name = ?,
+        Sponsor_Status = ?,
+        Grade = ?,
+        is_Dual_Military = ?,
+        Branch = ?,
+        Unit = ?,
+        Personal_Email = ?,
+        Mail_Box = ?,
+        Sponsor_Phone_No = ?,
+        Work_Phone = ?,
+        Spouse_Alt_No = ?,
+        Preferred_Contact = ?,
+        Supervisor_ID = ?
+      WHERE Sponsor_ID = ?
+    `;
+    const values = [
+      Sponsor_FN,
+      Sponsor_LN,
+      Sponsor_MI,
+      Spouse_Name,
+      Sponsor_Status,
+      finalGrade,
+      finalIsDualMilitary,
+      finalBranch,
+      finalUnit,
+      Personal_Email,
+      Mail_Box,
+      Sponsor_Phone_No,
+      Work_Phone,
+      Spouse_Alt_No,
+      Preferred_Contact,
+      supervisorId,
+      id
+    ];
+    db.query(query, values, (err) => {
+      if (err) {
+        console.error("Update error:", err);
+        return res.status(500).json({ error: 'Database update failed' });
+      }
+      
+      // After updating the sponsor, run cleanup to remove orphaned supervisors
+      cleanupSupervisors((cleanupErr, cleanupResult) => {
+        if (cleanupErr) {
+          console.error('Cleanup error:', cleanupErr);
+          // Still return success for the main update, but log the cleanup error
+        } else if (cleanupResult && cleanupResult.removedSupervisors > 0) {
+          console.log('Cleanup completed:', cleanupResult);
+        }
+        
+        res.json({ 
+          message: 'Sponsor updated successfully',
+          supervisorAction: supervisorId ? 'linked' : 'cleared'
+        });
+      });
+    });
+  }
 });
 
-// ================= PET ENDPOINTS =================
-
-// Get pets for sponsor
 app.get('/api/sponsor/:id/pets', (req, res) => {
-  db.query(
-    'SELECT * FROM Pets WHERE Sponsor_ID = ?',
-    [req.params.id],
-    (err, results) => {
-      if (err) return res.status(500).json({ error: 'Database error' });
-      res.json(results);
-    }
-  );
+  const sponsorID = req.params.id.toUpperCase();
+  const sql = `SELECT * FROM Pets WHERE UPPER(Sponsor_ID) = ?`;
+
+  db.query(sql, [sponsorID], (err, results) => {
+    if (err) return res.status(500).json({ error: 'Error fetching pets' });
+
+    const formattedPets = results.map(pet => ({
+      id: pet.Microchip_No?.toString(),
+      name: pet.Pet_Name,
+      sponsor_id: pet.Sponsor_ID
+    }));
+
+    res.json(formattedPets);
+  });
 });
 
-// Get pet by microchip
 app.get('/api/pet/:microchip', (req, res) => {
-  db.query(
-    'SELECT * FROM Pets WHERE Microchip_No = ?',
-    [req.params.microchip],
-    (err, results) => {
-      if (err) return res.status(500).json({ error: err.message });
-      res.json(results[0] || {});
-    }
-  );
+  const microchip = req.params.microchip;
+  const query = 'SELECT * FROM Pets WHERE Microchip_No = ?';
+
+  db.query(query, [microchip], (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (results.length === 0) return res.status(404).json({ error: 'Pet not found' });
+
+    res.json(results[0]);
+  });
 });
 
-// Create/update pet
+// POST /api/pets - Create new pet
+// POST /api/pets - Create new pet with vaccine validation
 app.post('/api/pets', async (req, res) => {
   try {
     const petData = req.body;
@@ -142,119 +333,305 @@ app.post('/api/pets', async (req, res) => {
     }
     
     // Start transaction
-    await db.promise().beginTransaction();
+    await db.beginTransaction();
     
-    // Insert/update pet
-    await db.promise().query(
-      'INSERT INTO Pets SET ? ON DUPLICATE KEY UPDATE ?',
-      [petData, petData]
+    // Insert pet
+    const [petResult] = await db.query(
+      'INSERT INTO Pets SET ?', 
+      petData
     );
     
     // Process vaccines if any
     if (petData.Vaccines && petData.Vaccines.length > 0) {
       for (const vaccine of petData.Vaccines) {
-        // Insert/update vaccine
-        await db.promise().query(
-          'INSERT INTO Vaccine SET ? ON DUPLICATE KEY UPDATE ?',
-          [vaccine, vaccine]
+        // Check if vaccine lot already exists
+        const [existingVaccine] = await db.query(
+          'SELECT Vaccine_Lot FROM Vaccine WHERE Vaccine_Lot = ?',
+          [vaccine.Vaccine_Lot]
         );
         
-        // Insert vaccine reaction
-        await db.promise().query(
-          'INSERT INTO Vaccine_Reaction SET ? ON DUPLICATE KEY UPDATE ?',
-          [{
+        // Only insert into Vaccine table if lot doesn't exist
+        if (existingVaccine.length === 0) {
+          await db.query(
+            'INSERT INTO Vaccine SET ?',
+            {
+              Vaccine_Lot: vaccine.Vaccine_Lot,
+              Vaccine_Name: vaccine.Vaccine_Name,
+              Vaccine_Type: vaccine.Vaccine_Type,
+              Vaccine_Duration: vaccine.Vaccine_Duration
+            }
+          );
+        }
+        
+        // Always insert into Vaccine_Reaction table
+        await db.query(
+          'INSERT INTO Vaccine_Reaction SET ?',
+          {
             Microchip_No: petData.Microchip_No,
-            ...vaccine
-          }, {
+            Vaccine_Lot: vaccine.Vaccine_Lot,
             Date_Vaccination: vaccine.Date_Vaccination,
             Vaccination_Effectiveness_Until: vaccine.Vaccination_Effectiveness_Until,
             Has_Vaccine_Reaction: vaccine.Has_Vaccine_Reaction,
             Vaccine_Reaction_Symptoms: vaccine.Vaccine_Reaction_Symptoms
-          }]
+          }
         );
       }
     }
     
-    await db.promise().commit();
-    res.json({ success: true });
+    await db.commit();
+    res.json({ success: true, petId: petData.Microchip_No });
     
   } catch (error) {
-    await db.promise().rollback();
-    console.error('Error saving pet:', error);
-    res.status(500).json({ error: 'Failed to save pet data' });
+    await db.rollback();
+    console.error('Error creating pet:', error);
+    res.status(500).json({ error: 'Failed to create pet' });
   }
 });
 
-// ================= VACCINE ENDPOINTS =================
+// PUT /api/pets/:petId - Update existing pet with vaccine validation
+app.put('/api/pets/:petId', async (req, res) => {
+  try {
+    const petId = req.params.petId;
+    const petData = req.body;
+    
+    // Start transaction
+    await db.beginTransaction();
+    
+    // Update pet
+    const [updateResult] = await db.query(
+      'UPDATE Pets SET ? WHERE Microchip_No = ?',
+      [petData, petId]
+    );
+    
+    if (updateResult.affectedRows === 0) {
+      return res.status(404).json({ error: 'Pet not found' });
+    }
+    
+    // Delete existing vaccine reactions for this pet
+    await db.query(
+      'DELETE FROM Vaccine_Reaction WHERE Microchip_No = ?',
+      [petId]
+    );
+    
+    // Process updated vaccines if any
+    if (petData.Vaccines && petData.Vaccines.length > 0) {
+      for (const vaccine of petData.Vaccines) {
+        // Check if vaccine lot already exists
+        const [existingVaccine] = await db.query(
+          'SELECT Vaccine_Lot FROM Vaccine WHERE Vaccine_Lot = ?',
+          [vaccine.Vaccine_Lot]
+        );
+        
+        // Only insert into Vaccine table if lot doesn't exist
+        if (existingVaccine.length === 0) {
+          await db.query(
+            'INSERT INTO Vaccine SET ?',
+            {
+              Vaccine_Lot: vaccine.Vaccine_Lot,
+              Vaccine_Name: vaccine.Vaccine_Name,
+              Vaccine_Type: vaccine.Vaccine_Type,
+              Vaccine_Duration: vaccine.Vaccine_Duration
+            }
+          );
+        }
+        
+        // Insert into Vaccine_Reaction table
+        await db.query(
+          'INSERT INTO Vaccine_Reaction SET ?',
+          {
+            Microchip_No: petId,
+            Vaccine_Lot: vaccine.Vaccine_Lot,
+            Date_Vaccination: vaccine.Date_Vaccination,
+            Vaccination_Effectiveness_Until: vaccine.Vaccination_Effectiveness_Until,
+            Has_Vaccine_Reaction: vaccine.Has_Vaccine_Reaction,
+            Vaccine_Reaction_Symptoms: vaccine.Vaccine_Reaction_Symptoms
+          }
+        );
+      }
+    }
+    
+    await db.commit();
+    res.json({ success: true });
+    
+  } catch (error) {
+    await db.rollback();
+    console.error('Error updating pet:', error);
+    res.status(500).json({ error: 'Failed to update pet' });
+  }
+});
 
-// Get vaccines for pet
+// PUT /api/pets/:petId - Update existing pet
+app.put('/api/pets/:petId', async (req, res) => {
+  try {
+      const petId = req.params.petId;
+      const petData = req.body;
+      
+      // Start transaction
+      await db.beginTransaction();
+      
+      // Update pet
+      const [updateResult] = await db.query(
+          'UPDATE Pets SET ? WHERE Microchip_No = ?',
+          [petData, petId]
+      );
+      
+      if (updateResult.affectedRows === 0) {
+          return res.status(404).json({ error: 'Pet not found' });
+      }
+      
+      // Delete existing vaccines
+      await db.query(
+          'DELETE FROM Vaccine_Reaction WHERE Microchip_No = ?',
+          [petId]
+      );
+      
+      // Insert updated vaccines if any
+      if (petData.Vaccines && petData.Vaccines.length > 0) {
+          for (const vaccine of petData.Vaccines) {
+              // Ensure vaccine exists
+              const [existingVaccine] = await db.query(
+                  'SELECT 1 FROM Vaccine WHERE Vaccine_Lot = ?',
+                  [vaccine.Vaccine_Lot]
+              );
+              
+              if (!existingVaccine.length) {
+                  await db.query(
+                      'INSERT INTO Vaccine SET ?',
+                      {
+                          Vaccine_Lot: vaccine.Vaccine_Lot,
+                          Vaccine_Name: vaccine.Vaccine_Name,
+                          Vaccine_Type: vaccine.Vaccine_Type,
+                          Vaccine_Duration: vaccine.Vaccine_Duration
+                      }
+                  );
+              }
+              
+              // Insert vaccine reaction
+              await db.query(
+                  'INSERT INTO Vaccine_Reaction SET ?',
+                  {
+                      Microchip_No: petId,
+                      ...vaccine
+                  }
+              );
+          }
+      }
+      
+      await db.commit();
+      res.json({ success: true });
+      
+  } catch (error) {
+      await db.rollback();
+      console.error('Error updating pet:', error);
+      res.status(500).json({ error: 'Failed to update pet' });
+  }
+});
+
+// NEW: Update pet data
+app.put('/api/pets/:petId', (req, res) => {
+  const { petId } = req.params;
+  const petData = req.body;
+
+  // Validate that pet exists first
+  const checkQuery = 'SELECT * FROM Pets WHERE Microchip_No = ?';
+  db.query(checkQuery, [petId, petId], (err, results) => {
+    if (err) {
+      console.error('Error checking pet existence:', err);
+      return res.status(500).json({ error: 'Database error checking pet' });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ error: 'Pet not found' });
+    }
+
+    // Build dynamic update query based on provided fields
+    const updateFields = [];
+    const updateValues = [];
+    
+    // List of allowed pet fields to update
+    const allowedFields = [
+      'Pet_Name', 'Pet_Type', 'Pet_Breed', 'Pet_Color', 'Pet_Sex', 
+      'Pet_Weight', 'Pet_DOB', 'Sponsor_ID', 'Pet_Status', 
+      'Sterilization_Status', 'Date_Sterilized', 'Vet_Clinic'
+    ];
+
+    // Only include fields that are provided and allowed
+    for (const field of allowedFields) {
+      if (petData.hasOwnProperty(field)) {
+        updateFields.push(`${field} = ?`);
+        updateValues.push(petData[field]);
+      }
+    }
+
+    if (updateFields.length === 0) {
+      return res.status(400).json({ error: 'No valid fields provided for update' });
+    }
+
+    // Add the pet ID to the end of values array for WHERE clause
+    updateValues.push(petId);
+
+    const updateQuery = `
+    UPDATE Pets 
+    SET ${updateFields.join(', ')} 
+    WHERE Microchip_No = ?
+  `;
+    // Add petId twice for the WHERE clause (checking both Microchip_No and Pet_ID)
+    updateValues.push(petId);
+
+    db.query(updateQuery, updateValues, (err, result) => {
+      if (err) {
+        console.error('Error updating pet:', err);
+        return res.status(500).json({ error: 'Database error updating pet' });
+      }
+
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ error: 'Pet not found or no changes made' });
+      }
+
+      res.json({ 
+        success: true, 
+        message: 'Pet updated successfully',
+        affectedRows: result.affectedRows
+      });
+    });
+  });
+});
+
 app.get('/api/pet/:microchip/vaccines', (req, res) => {
-  const query = `
-    SELECT vr.*, v.Vaccine_Name, v.Vaccine_Type, v.Vaccine_Duration
+  const microchip = req.params.microchip;
+  const sql = `
+    SELECT 
+      vr.Vaccine_Lot,
+      v.Vaccine_Name,
+      v.Vaccine_Type,
+      v.Vaccine_Duration,
+      vr.Date_Vaccination,
+      vr.Vaccination_Effectiveness_Until,
+      vr.Has_Vaccine_Reaction,
+      vr.Vaccine_Reaction_Symptoms
     FROM Vaccine_Reaction vr
     JOIN Vaccine v ON vr.Vaccine_Lot = v.Vaccine_Lot
     WHERE vr.Microchip_No = ?
     ORDER BY vr.Date_Vaccination DESC
   `;
-  
-  db.query(query, [req.params.microchip], (err, results) => {
+  db.query(sql, [microchip], (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(results);
   });
 });
 
-// Get vaccine details
+// Add vaccine lookup endpoint
 app.get('/api/vaccine/:lot', (req, res) => {
-  db.query(
-    'SELECT * FROM Vaccine WHERE Vaccine_Lot = ?',
-    [req.params.lot],
-    (err, results) => {
-      if (err) return res.status(500).json({ error: err.message });
-      res.json(results[0] || {});
-    }
-  );
+  const lot = req.params.lot;
+  const query = 'SELECT * FROM Vaccine WHERE Vaccine_Lot = ?';
+  
+  db.query(query, [lot], (err, results) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (results.length === 0) return res.status(404).json({ error: 'Vaccine not found' });
+    res.json(results[0]);
+  });
 });
 
-// ================= SUPERVISOR ENDPOINTS =================
-
-// Get supervisor
-app.get('/api/supervisor/:id', (req, res) => {
-  db.query(
-    'SELECT * FROM Supervisor WHERE Supervisor_ID = ?',
-    [req.params.id],
-    (err, results) => {
-      if (err) return res.status(500).json({ error: 'Database error' });
-      res.json(results[0] || {});
-    }
-  );
-});
-
-// Cleanup orphaned supervisors
-function cleanupSupervisors(callback) {
-  // Step 1: Clear supervisor IDs from inactive sponsors
-  db.query(
-    `UPDATE Sponsor SET Supervisor_ID = NULL 
-     WHERE Sponsor_Status != 'ACTIVE DUTY' AND Supervisor_ID IS NOT NULL`,
-    (err) => {
-      if (err) return callback(err);
-      
-      // Step 2: Delete orphaned supervisors
-      db.query(
-        `DELETE FROM Supervisor 
-         WHERE Supervisor_ID IN (
-           SELECT s.Supervisor_ID FROM Supervisor s
-           LEFT JOIN Sponsor sp ON s.Supervisor_ID = sp.Supervisor_ID
-           WHERE sp.Sponsor_ID IS NULL
-         )`,
-        (err, result) => {
-          callback(err, result);
-        }
-      );
-    }
-  );
-}
-
-// Start server
 app.listen(PORT, () => {
-  console.log(`Sponsor API running on http://localhost:${PORT}`);
+  console.log(`Server running on http://localhost:${PORT}`);
 });
