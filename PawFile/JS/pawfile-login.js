@@ -1,90 +1,50 @@
 document.addEventListener('DOMContentLoaded', () => {
   const loginForm = document.getElementById('loginForm');
-  const loadingIndicator = document.getElementById('loadingIndicator');
-  const errorMessage = document.getElementById('errorMessage');
 
-  loginForm.addEventListener('submit', async (event) => {
+  loginForm.addEventListener('submit', (event) => {
     event.preventDefault();
 
-    // Get form values
     const userRole = document.getElementById('userRole').value;
-    const sponsorId = document.getElementById('sponsorId').value.trim().toUpperCase();
+    const sponsorId = document.getElementById('sponsorId').value.trim();
     const password = document.getElementById('password').value;
 
-    // Validate inputs
     if (!sponsorId || !password) {
-      showError('Please fill in all required fields.');
+      alert('Please fill in all required fields.');
       return;
     }
 
-    // Show loading state
-    setLoading(true);
+    const users = {
+      sponsor: [
+        { id: 'A7B9K', password: '123' },
+        { id: 'M9Z4Q', password: '123' },
+        { id: 'X3D7P', password: '123' },
+      ],
+      admin: [
+        { id: 'admin', password: 'adminpass' }
+      ]
+    };
 
-    try {
-      // Send login request to server
-      const response = await fetch('http://localhost:3000/api/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ 
-          sponsorId,
-          password,
-          userRole 
-        })
-      });
+    // Find user with matching id and password
+    const userFound = users[userRole]?.some(user => user.id === sponsorId && user.password === password);
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Login failed');
-      }
-
-      // Store session data
+    if (userFound) {
+      // Save login status and role in sessionStorage
       sessionStorage.setItem('isLoggedIn', 'true');
       sessionStorage.setItem('userRole', userRole);
-      sessionStorage.setItem('sponsorId', sponsorId);
-      sessionStorage.setItem('sponsorData', JSON.stringify(data.sponsorData || {}));
+      sessionStorage.setItem('userId', sponsorId);
 
-      // Show success and redirect
-      showSuccess('Login successful! Redirecting...');
+      alert(`${capitalize(userRole)} login successful! Redirecting to profile page...`);
+
+      // Redirect after 1 second to sponsor-profile.html
       setTimeout(() => {
-        window.location.href = data.redirect || '../../HTML/sponsor-profile.html';
-      }, 1500);
-
-    } catch (error) {
-      console.error('Login error:', error);
-      showError(error.message || 'Login failed. Please try again.');
-    } finally {
-      setLoading(false);
+        window.location.href = '../HTML/sponsor-profile.html';
+      }, 1000);
+    } else {
+      alert('Invalid ID or password.');
     }
   });
 
-  // Helper functions
-  function setLoading(isLoading) {
-    if (loadingIndicator) {
-      loadingIndicator.style.display = isLoading ? 'block' : 'none';
-    }
-    const submitBtn = loginForm.querySelector('button[type="submit"]');
-    if (submitBtn) {
-      submitBtn.disabled = isLoading;
-    }
-  }
-
-  function showError(message) {
-    if (errorMessage) {
-      errorMessage.textContent = message;
-      errorMessage.style.display = 'block';
-      setTimeout(() => {
-        errorMessage.style.display = 'none';
-      }, 5000);
-    } else {
-      alert(message);
-    }
-  }
-
-  function showSuccess(message) {
-    // You can implement a success message display similar to showError()
-    alert(message); // Temporary using alert for success
+  function capitalize(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
   }
 });
