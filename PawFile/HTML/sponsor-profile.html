@@ -24,6 +24,9 @@
           </a>
         </li>
       </ul>
+      <button class="delete-account-btn">
+        <i class="fa-solid fa-trash"></i> Delete Account
+      </button>
       <button class="sign-out-btn">Sign Out</button>
     </aside>
 
@@ -150,6 +153,40 @@
         <button id="loadExisting" class="modal-btn modal-btn-success">Load Existing Info</button>
         <button id="editInfo" class="modal-btn modal-btn-primary">Keep My Changes</button>
         <button id="cancelAction" class="modal-btn modal-btn-secondary">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Account Confirmation Modal -->
+  <div id="deleteAccountModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+      <h3 class="modal-title delete-modal-title">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        Delete Account
+      </h3>
+      <p class="modal-description">
+        <strong>Warning:</strong> This action cannot be undone. Deleting your account will permanently remove:
+      </p>
+      <div class="delete-warning-list">
+        <ul>
+          <li><i class="fa-solid fa-user"></i> Your sponsor profile and personal information</li>
+          <li><i class="fa-solid fa-paw"></i> All registered pets and their information</li>
+          <li><i class="fa-solid fa-syringe"></i> All vaccination records and history</li>
+          <li><i class="fa-solid fa-exclamation-triangle"></i> All vaccine reaction records</li>
+          <li><i class="fa-solid fa-file-medical"></i> All associated medical records</li>
+        </ul>
+      </div>
+      <p class="modal-question delete-confirmation-text">
+        Are you absolutely sure you want to delete your account? Type <strong>"DELETE"</strong> to confirm:
+      </p>
+      <div class="delete-confirmation-input">
+        <input type="text" id="deleteConfirmationInput" placeholder="Type DELETE to confirm" maxlength="6">
+      </div>
+      <div class="modal-buttons">
+        <button id="confirmDeleteAccount" class="modal-btn modal-btn-danger" disabled>
+          <i class="fa-solid fa-trash"></i> Delete My Account
+        </button>
+        <button id="cancelDeleteAccount" class="modal-btn modal-btn-secondary">Cancel</button>
       </div>
     </div>
   </div>

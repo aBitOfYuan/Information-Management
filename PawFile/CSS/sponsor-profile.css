@@ -99,6 +99,32 @@ body {
     background-color: rgba(255, 255, 255, 0.3);
 }
 
+/* Delete Account Button Styles */
+.delete-account-btn {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: background-color 0.3s;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.delete-account-btn:hover {
+    background-color: #c82333;
+}
+
+.delete-account-btn i {
+    font-size: 0.9rem;
+}
+
 .sign-out-btn {
     background-color: #0F5AA6;
     color: white;
@@ -109,7 +135,6 @@ body {
     cursor: pointer;
     font-size: 0.95rem;
     transition: background-color 0.3s;
-    margin-top: auto;
     margin-bottom: 15px;
 }
 
@@ -309,6 +334,73 @@ body {
     margin-bottom: 15px;
 }
 
+/* Delete Account Modal Specific Styles */
+.delete-modal-title {
+    color: #dc3545;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.delete-modal-title i {
+    color: #ffc107;
+    font-size: 1.4rem;
+}
+
+.delete-warning-list {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: 5px;
+    padding: 15px;
+    margin: 15px 0;
+}
+
+.delete-warning-list ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.delete-warning-list li {
+    color: #856404;
+    margin: 8px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.delete-warning-list li i {
+    color: #dc3545;
+    width: 16px;
+    font-size: 0.9rem;
+}
+
+.delete-confirmation-text {
+    color: #dc3545;
+    font-weight: 600;
+    margin: 15px 0 10px 0;
+}
+
+.delete-confirmation-input {
+    margin: 15px 0;
+}
+
+.delete-confirmation-input input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 2px solid #dc3545;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-family: 'Jellee', sans-serif;
+    text-transform: uppercase;
+}
+
+.delete-confirmation-input input:focus {
+    outline: none;
+    border-color: #c82333;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
 .modal-description {
     color: #666;
     margin-bottom: 10px;
@@ -346,6 +438,9 @@ body {
     font-family: 'Jellee', sans-serif;
     font-size: 0.9rem;
     transition: background-color 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .modal-btn-success {
@@ -373,6 +468,21 @@ body {
 
 .modal-btn-secondary:hover {
     background: #545b62;
+}
+
+.modal-btn-danger {
+    background: #dc3545;
+    color: white;
+}
+
+.modal-btn-danger:hover:not(:disabled) {
+    background: #c82333;
+}
+
+.modal-btn-danger:disabled {
+    background: #e9ecef;
+    color: #6c757d;
+    cursor: not-allowed;
 }
 
 /* Responsive design */
@@ -416,10 +526,12 @@ body {
         margin: 0;
     }
     
+    .delete-account-btn,
     .sign-out-btn {
         margin-top: 0;
         margin-bottom: 0;
         padding: 8px 16px;
+        font-size: 0.85rem;
     }
     
     .main-content {
@@ -448,6 +560,10 @@ body {
         flex-direction: column;
         gap: 8px;
     }
+
+    .delete-warning-list li {
+        font-size: 0.9rem;
+    }
 }
 
 @media (max-width: 600px) {
@@ -461,5 +577,11 @@ body {
         order: 3;
         flex-basis: 100%;
         justify-content: center;
+    }
+
+    .delete-account-btn,
+    .sign-out-btn {
+        order: 4;
+        margin: 5px;
     }
 }

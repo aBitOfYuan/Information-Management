@@ -88,6 +88,120 @@ function cleanupSupervisors(callback) {
   });
 }
 
+// Delete sponsor account with cascading deletions
+app.delete('/api/sponsor/:id', (req, res) => {
+  const sponsorId = req.params.id;
+  
+  // Start transaction to ensure all operations complete or none do
+  db.beginTransaction((err) => {
+    if (err) {
+      console.error('Transaction start error:', err);
+      return res.status(500).json({ error: 'Failed to start transaction' });
+    }
+
+    // Step 1: Get all pets belonging to this sponsor
+    const getPetsQuery = 'SELECT Microchip_No FROM Pets WHERE Sponsor_ID = ?';
+    
+    db.query(getPetsQuery, [sponsorId], (err, pets) => {
+      if (err) {
+        console.error('Error fetching pets:', err);
+        return db.rollback(() => {
+          res.status(500).json({ error: 'Error fetching pets data' });
+        });
+      }
+
+      const petMicrochips = pets.map(pet => pet.Microchip_No);
+      console.log(`Found ${petMicrochips.length} pets for sponsor ${sponsorId}`);
+
+      // Step 2: Delete vaccine reactions for all pets (if any pets exist)
+      if (petMicrochips.length > 0) {
+        const deleteVaccineReactionsQuery = `
+          DELETE FROM Vaccine_Reaction 
+          WHERE Microchip_No IN (${petMicrochips.map(() => '?').join(',')})
+        `;
+        
+        db.query(deleteVaccineReactionsQuery, petMicrochips, (err, vaccineReactionResult) => {
+          if (err) {
+            console.error('Error deleting vaccine reactions:', err);
+            return db.rollback(() => {
+              res.status(500).json({ error: 'Error deleting vaccine reactions' });
+            });
+          }
+          
+          console.log(`Deleted ${vaccineReactionResult.affectedRows} vaccine reaction records`);
+          
+          // Step 3: Delete pets
+          const deletePetsQuery = 'DELETE FROM Pets WHERE Sponsor_ID = ?';
+          
+          db.query(deletePetsQuery, [sponsorId], (err, petsResult) => {
+            if (err) {
+              console.error('Error deleting pets:', err);
+              return db.rollback(() => {
+                res.status(500).json({ error: 'Error deleting pets' });
+              });
+            }
+            
+            console.log(`Deleted ${petsResult.affectedRows} pet records`);
+            
+            // Step 4: Delete the sponsor
+            deleteSponsorAndCleanup();
+          });
+        });
+      } else {
+        // No pets, proceed directly to delete sponsor
+        deleteSponsorAndCleanup();
+      }
+
+      function deleteSponsorAndCleanup() {
+        const deleteSponsorQuery = 'DELETE FROM Sponsor WHERE Sponsor_ID = ?';
+        
+        db.query(deleteSponsorQuery, [sponsorId], (err, sponsorResult) => {
+          if (err) {
+            console.error('Error deleting sponsor:', err);
+            return db.rollback(() => {
+              res.status(500).json({ error: 'Error deleting sponsor account' });
+            });
+          }
+          
+          if (sponsorResult.affectedRows === 0) {
+            return db.rollback(() => {
+              res.status(404).json({ error: 'Sponsor not found' });
+            });
+          }
+          
+          console.log(`Deleted sponsor ${sponsorId}`);
+          
+          // Commit the transaction
+          db.commit((err) => {
+            if (err) {
+              console.error('Transaction commit error:', err);
+              return db.rollback(() => {
+                res.status(500).json({ error: 'Failed to commit transaction' });
+              });
+            }
+            
+            // Step 5: Clean up orphaned supervisors (outside transaction)
+            cleanupSupervisors((cleanupErr, cleanupResult) => {
+              if (cleanupErr) {
+                console.error('Cleanup error after deletion:', cleanupErr);
+                // Still return success since main deletion completed
+              } else if (cleanupResult && cleanupResult.removedSupervisors > 0) {
+                console.log('Post-deletion cleanup completed:', cleanupResult);
+              }
+              
+              res.json({ 
+                message: 'Account deleted successfully',
+                deletedPets: petMicrochips.length,
+                cleanupResult: cleanupResult || null
+              });
+            });
+          });
+        });
+      }
+    });
+  });
+});
+
 // Get sponsor data along with supervisor info in one call
 app.get('/api/sponsor/:id', (req, res) => {
   const { id } = req.params;
