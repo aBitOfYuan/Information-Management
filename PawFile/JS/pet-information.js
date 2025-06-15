@@ -157,16 +157,36 @@ document.addEventListener("click", function (event) {
                     const vaccineNameInput = section.querySelector('input[name="vaccine-name"]');
                     const vaccineTypeSelect = section.querySelector('select[name="vaccine-type"]');
                     const vaccineDurationInput = section.querySelector('input[name="vaccine_duration"]');
-                    if (vaccineNameInput) vaccineNameInput.value = vaccineData.Vaccine_Name;
-                    if (vaccineTypeSelect) {
-                        vaccineTypeSelect.value = vaccineData.Vaccine_Type;
-                        vaccineTypeSelect.disabled = true;
+                    if (vaccineData.exists) {
+                        if (vaccineNameInput) {
+                            vaccineNameInput.value = vaccineData.Vaccine_Name || '';
+                            console.log("Updated vaccine name:", vaccineNameInput.value);
+                        }
+
+                        if (vaccineTypeSelect) {
+                            vaccineTypeSelect.value = vaccineData.Vaccine_Type || '';
+                            console.log("Updated vaccine type:", vaccineTypeSelect.value);
+                        }
+
+                        if (vaccineDurationInput) {
+                            vaccineDurationInput.value = vaccineData.Vaccine_Duration || '';
+                            console.log("Updated vaccine duration:", vaccineDurationInput.value);
+                        }
+                    } else {
+                        // If vaccine does not exist, ensure fields are editable and clear values
+                        if (vaccineNameInput) {
+                            vaccineNameInput.value = '';
+                            vaccineNameInput.readOnly = false;
+                        }
+                        if (vaccineTypeSelect) {
+                            vaccineTypeSelect.value = ''; // Or set to default 'Select Type'
+                            vaccineTypeSelect.disabled = false;
+                        }
+                        if (vaccineDurationInput) {
+                            vaccineDurationInput.value = '';
+                            vaccineDurationInput.readOnly = false;
+                        }
                     }
-                    if (vaccineDurationInput) {
-                        vaccineDurationInput.value = vaccineData.Vaccine_Duration;
-                        vaccineDurationInput.readOnly = true;
-                    }
-                    if (vaccineNameInput) vaccineNameInput.readOnly = true;
                 } catch (error) {
                     console.error('Error:', error);
                     clearVaccineFields(this);
@@ -383,22 +403,35 @@ function setupVaccineLookupForSection(vaccineSection) {
             const vaccineTypeSelect = vaccineSection.querySelector('select[name="vaccine-type"]');
             const vaccineDurationInput = vaccineSection.querySelector('input[name="vaccine_duration"]');
 
-            if (vaccineNameInput) {
-                vaccineNameInput.value = vaccineData.Vaccine_Name || '';
-                vaccineNameInput.readOnly = true;
-                console.log("Updated vaccine name:", vaccineNameInput.value);
-            }
+            if (vaccineData.exists) {
+                if (vaccineNameInput) {
+                    vaccineNameInput.value = vaccineData.Vaccine_Name || '';
+                    console.log("Updated vaccine name:", vaccineNameInput.value);
+                }
 
-            if (vaccineTypeSelect) {
-                vaccineTypeSelect.value = vaccineData.Vaccine_Type || '';
-                vaccineTypeSelect.disabled = true;
-                console.log("Updated vaccine type:", vaccineTypeSelect.value);
-            }
+                if (vaccineTypeSelect) {
+                    vaccineTypeSelect.value = vaccineData.Vaccine_Type || '';
+                    console.log("Updated vaccine type:", vaccineTypeSelect.value);
+                }
 
-            if (vaccineDurationInput) {
-                vaccineDurationInput.value = vaccineData.Vaccine_Duration || '';
-                vaccineDurationInput.readOnly = true;
-                console.log("Updated vaccine duration:", vaccineDurationInput.value);
+                if (vaccineDurationInput) {
+                    vaccineDurationInput.value = vaccineData.Vaccine_Duration || '';
+                    console.log("Updated vaccine duration:", vaccineDurationInput.value);
+                }
+            } else {
+                // If vaccine does not exist, ensure fields are editable and clear values
+                if (vaccineNameInput) {
+                    vaccineNameInput.value = '';
+                    vaccineNameInput.readOnly = false;
+                }
+                if (vaccineTypeSelect) {
+                    vaccineTypeSelect.value = ''; // Or set to default 'Select Type'
+                    vaccineTypeSelect.disabled = false;
+                }
+                if (vaccineDurationInput) {
+                    vaccineDurationInput.value = '';
+                    vaccineDurationInput.readOnly = false;
+                }
             }
 
         } catch (error) {

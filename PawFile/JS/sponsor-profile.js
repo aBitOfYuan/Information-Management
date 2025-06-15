@@ -48,51 +48,36 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function handleMilitaryVisibility(currentStatus) {
-    console.log('handleMilitaryVisibility called with status:', currentStatus);
+    // Normalize the status value
+    const normalizedStatus = currentStatus ? currentStatus.toUpperCase().replace(/\s+/g, ' ') : '';
+    const isActive = normalizedStatus === 'ACTIVE DUTY';
     
-    if (!currentStatus) {
-      console.log('No status provided, defaulting to non-military view');
-      currentStatus = 'CIVILIAN';
-    }
+    const militaryFields = document.querySelectorAll('.military-field');
+    const militaryPlaceholder = document.querySelector('.military-placeholder');
     
-    const isActive = currentStatus === 'ACTIVE DUTY';
-    console.log('Is active duty:', isActive);
-    
-    const militaryInputs = militarySection.querySelectorAll('input');
-    militaryInputs.forEach(input => {
-      const parentElement = input.parentElement;
-      if (parentElement) {
-        parentElement.style.display = isActive ? '' : 'none';
-      }
-      
-      // FIXED: Toggle required attribute based on visibility
-      if (input.id === 'militaryGrade' || input.id === 'militaryBranch' || 
-          input.id === 'militaryUnit' || input.id === 'supervisorId' || 
-          input.id === 'supervisorName' || input.id === 'supervisorEmail') {
-        if (isActive) {
+    if (isActive) {
+      militaryFields.forEach(field => {
+        field.style.display = 'block';
+        const input = field.querySelector('input, select');
+        if (input) {
           input.setAttribute('required', 'required');
-        } else {
+        }
+      });
+      if (militaryPlaceholder) {
+        militaryPlaceholder.style.display = 'none';
+      }
+    } else {
+      militaryFields.forEach(field => {
+        field.style.display = 'none';
+        const input = field.querySelector('input, select');
+        if (input) {
           input.removeAttribute('required');
+          input.value = '';
         }
+      });
+      if (militaryPlaceholder) {
+        militaryPlaceholder.style.display = 'block';
       }
-    });
-    
-    // Also handle dropdowns if they exist
-    const militarySelects = militarySection.querySelectorAll('select');
-    militarySelects.forEach(select => {
-      if (select.id.includes('militaryGrade') || select.id.includes('militaryBranch') || 
-          select.id.includes('militaryUnit') || select.id.includes('supervisorId') || 
-          select.id.includes('supervisorName') || select.id.includes('supervisorEmail')) {
-        if (isActive) {
-          select.setAttribute('required', 'required');
-        } else {
-          select.removeAttribute('required');
-        }
-      }
-    });
-    
-    if (militaryPlaceholder) {
-      militaryPlaceholder.style.display = isActive ? 'none' : 'block';
     }
   }
 
@@ -420,21 +405,39 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 
   function updateSponsorProfile(userId, sponsorData) {
+    // Normalize status before sending to server
+    const currentStatus = document.getElementById("status-select")?.value || document.getElementById("status").value;
+    const normalizedStatus = currentStatus === 'ACTIVE DUTY' ? 'Active Duty' : 
+                            currentStatus.charAt(0).toUpperCase() + currentStatus.slice(1).toLowerCase();
+    
+    const data = {
+      ...sponsorData,
+      Sponsor_Status: normalizedStatus
+    };
+
     fetch(`http://localhost:3000/api/sponsor/${userId}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(sponsorData)
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data)
     })
-    .then(updateRes => {
-      if (!updateRes.ok) throw new Error("Failed to update sponsor profile.");
-      return updateRes.json();
+    .then(response => {
+      if (!response.ok) {
+        return response.json().then(err => {
+          throw new Error(err.error || 'Failed to update profile');
+        });
+      }
+      return response.json();
     })
-    .then(result => {
-      alert("Changes saved successfully!");
+    .then(data => {
+      console.log('Success:', data);
+      alert('Profile updated successfully!');
+      location.reload();
     })
-    .catch(err => {
-      alert("Error: " + err.message);
-      console.error(err);
+    .catch(error => {
+      console.error('Error:', error);
+      alert(error.message || 'Failed to update profile');
     });
   }
 

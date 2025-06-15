@@ -22,7 +22,8 @@ document.addEventListener('DOMContentLoaded', () => {
         { id: 'P5R6T', password: '123' },
         { id: 'S1L2E', password: '123' },
         { id: 'V9W0X', password: '123' },
-        { id: 'X3D7P', password: '123' }
+        { id: 'X3D7P', password: '123' },
+        { id: 'AVX48', password: '123' }
       ],
       admin: [
         { id: 'admin', password: 'adminpass' }
