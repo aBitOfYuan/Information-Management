@@ -298,7 +298,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Function to delete account with cascading deletions
   function deleteAccount(userId) {
-    return fetch(`http://localhost:3000/api/sponsor/${userId}/delete-account`, {
+    return fetch(`http://localhost:3000/api/sponsor/${userId}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json'
