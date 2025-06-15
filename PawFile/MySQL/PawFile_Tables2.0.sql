@@ -30,6 +30,13 @@ CREATE TABLE Sponsor (
     FOREIGN KEY (Supervisor_ID) REFERENCES Supervisor(Supervisor_ID)
 );
 
+-- Account table
+CREATE TABLE Account (
+    Sponsor_ID VARCHAR(5) NOT NULL,
+    passcode VARCHAR(20) NOT NULL,
+    FOREIGN KEY (Sponsor_ID) REFERENCES Sponsor(Sponsor_ID)
+);
+
 -- Pet Table
 CREATE TABLE Pets (
     Microchip_No BIGINT PRIMARY KEY,
