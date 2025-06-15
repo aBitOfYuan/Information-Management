@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
   const editBtn = document.querySelector('.edit-btn');
   const signOutBtn = document.querySelector('.sign-out-btn');
+  const deleteAccountBtn = document.querySelector('.delete-account-btn');
 
   const militarySection = document.querySelector(".profile-section:nth-of-type(2)");
   const statusField = document.getElementById("status");
@@ -236,6 +237,87 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
+  // DELETE ACCOUNT FUNCTIONALITY
+  function setupDeleteAccountFeature() {
+    if (!deleteAccountBtn) return;
+
+    const deleteModal = document.getElementById('deleteAccountModal');
+    const deleteCancelBtn = document.getElementById('cancelDeleteAccount');
+    const deleteConfirmBtn = document.getElementById('confirmDeleteAccount');
+    
+    // Delete account button click handler
+    deleteAccountBtn.addEventListener('click', function() {
+      deleteModal.style.display = 'flex';
+    });
+    
+    // Cancel button click handler
+    deleteCancelBtn.addEventListener('click', function() {
+      deleteModal.style.display = 'none';
+    });
+    
+    // Modal backdrop click handler
+    deleteModal.addEventListener('click', function(e) {
+      if (e.target === deleteModal) {
+        deleteModal.style.display = 'none';
+      }
+    });
+    
+    // Confirm delete button click handler
+    deleteConfirmBtn.addEventListener('click', function() {
+      this.disabled = true;
+      this.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Deleting Account...';
+      this.style.cursor = 'not-allowed';
+      
+      const userId = sessionStorage.getItem('userId');
+      if (!userId) {
+        alert('No user ID found. Cannot delete account.');
+        this.disabled = false;
+        this.innerHTML = '<i class="fa-solid fa-trash"></i> Yes, Delete Account';
+        this.style.cursor = 'pointer';
+        deleteModal.style.display = 'none';
+        return;
+      }
+      
+      // Call the delete account API
+      deleteAccount(userId)
+        .then(() => {
+          alert('Account deleted successfully. You will be redirected to the login page.');
+          sessionStorage.clear();
+          window.location.href = '../HTML/pawfile-login.html';
+        })
+        .catch(error => {
+          console.error('Error deleting account:', error);
+          alert('Error deleting account: ' + error.message);
+          this.disabled = false;
+          this.innerHTML = '<i class="fa-solid fa-trash"></i> Yes, Delete Account';
+          this.style.cursor = 'pointer';
+          deleteModal.style.display = 'none';
+        });
+    });
+  }
+
+  // Function to delete account with cascading deletions
+  function deleteAccount(userId) {
+    return fetch(`http://localhost:3000/api/sponsor/${userId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => {
+      if (!response.ok) {
+        return response.json().then(errorData => {
+          throw new Error(errorData.message || 'Failed to delete account');
+        });
+      }
+      return response.json();
+    })
+    .then(result => {
+      console.log('Account deletion result:', result);
+      return result;
+    });
+  }
+
   editBtn.addEventListener('click', function () {
     const isEditing = this.classList.toggle('editing-mode');
     
@@ -411,4 +493,7 @@ document.addEventListener('DOMContentLoaded', function () {
       console.error("Fetch error:", err);
       alert('Error fetching sponsor profile: ' + err.message);
     });
+
+  // Initialize delete account feature
+  setupDeleteAccountFeature();
 });
